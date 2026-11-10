@@ -590,17 +590,67 @@ document.addEventListener("DOMContentLoaded", () => {
     element.textContent = new Date().getFullYear();
   });
 
-  // Contact Form Handler
+    // Contact Form Handler: submit enquiries to Supabase
   const contactForm = document.querySelector("#contact-form");
+  const formMessage = document.querySelector("#form-message");
+
   if (contactForm) {
-    contactForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const message = document.querySelector("#form-message");
-      if (message) {
-        message.textContent =
-          "Thank you! Your enquiry has been recorded. For immediate assistance, please call 08077280802 or email primefocusschools@gmail.com.";
+    const contactSupabase = window.supabase.createClient(
+      "https://hztinvahixhvkfhpccrq.supabase.co",
+      "sb_publishable_Jx9KPHzuBIbJtG9rBr3MZA_iax1izan",
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false
+        }
       }
-      contactForm.reset();
+    );
+
+    contactForm.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const submitButton = contactForm.querySelector(
+        'button[type="submit"]'
+      );
+
+      const formData = new FormData(contactForm);
+      const enquiry = {
+        name: String(formData.get("name") || "").trim(),
+        email: String(formData.get("email") || "").trim(),
+        phone: String(formData.get("tel") || "").trim(),
+        message: String(formData.get("message") || "").trim(),
+        status: "new"
+      };
+
+      if (formMessage) {
+        formMessage.textContent = "Sending your enquiry…";
+      }
+      if (submitButton) submitButton.disabled = true;
+
+      try {
+        const { error } = await contactSupabase
+          .from("contact_messages")
+          .insert(enquiry);
+
+        if (error) throw error;
+
+        contactForm.reset();
+
+        if (formMessage) {
+          formMessage.textContent =
+            "Thank you. Your enquiry has been sent to Prime Focus Schools.";
+        }
+      } catch (error) {
+        console.error("Contact enquiry submission failed:", error);
+
+        if (formMessage) {
+          formMessage.textContent =
+            "We couldn’t send your enquiry right now. Please call 08077280802 or email primefocusschools@gmail.com.";
+        }
+      } finally {
+        if (submitButton) submitButton.disabled = false;
+      }
     });
   }
 });

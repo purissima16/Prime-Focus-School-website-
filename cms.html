@@ -3,99 +3,471 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PFS Blog Content Management System | Prime Focus Schools</title>
+  <title>PFS Content Management System | Prime Focus Schools</title>
   <link rel="icon" type="image/webp" href="images/pfs undone logo.webp">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/blog.css">
   <link rel="stylesheet" href="css/cms.css">
-<script src="js/blog-data.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/blog-store.js"></script>
-<script src="js/cms.js" defer></script>
-</head>
-<body class="cms-body">
 
-  <!-- ==========================================================================
-       1. Authentication Lockscreen (Gatekeeper)
-       ========================================================================== -->
+  <script src="js/blog-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/blog-store.js"></script>
+  <script src="js/cms.js" defer></script>
+
+  <style>
+    .cms-enquiries {
+      margin-top: 26px;
+      overflow: hidden;
+      border: 1px solid #e6ebf2;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 12px 32px rgba(24, 39, 75, .06);
+    }
+
+    .enquiries-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 24px 26px;
+      border-bottom: 1px solid #edf0f5;
+      background: linear-gradient(135deg, #fff 0%, #f6f9ff 100%);
+    }
+
+    .enquiries-title-group {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .enquiries-title-icon {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      flex: 0 0 46px;
+      place-items: center;
+      border-radius: 14px;
+      color: #155eef;
+      background: #eaf1ff;
+      font-size: 22px;
+    }
+
+    .enquiries-heading h2 {
+      margin: 0;
+      color: #182230;
+      font-size: 20px;
+    }
+
+    .enquiries-heading p {
+      margin: 6px 0 0;
+      color: #667085;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .enquiries-count {
+      display: inline-flex;
+      min-width: 34px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 9px;
+      border-radius: 999px;
+      color: #155eef;
+      background: #eaf1ff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .enquiries-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 18px 26px 0;
+    }
+
+    .enquiry-summary-item {
+      padding: 14px 16px;
+      border: 1px solid #edf0f5;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .enquiry-summary-item span {
+      display: block;
+      color: #667085;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .enquiry-summary-item strong {
+      display: block;
+      margin-top: 5px;
+      color: #182230;
+      font-size: 22px;
+    }
+
+    .enquiry-summary-item.is-new strong {
+      color: #b54708;
+    }
+
+    .enquiries-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 26px;
+    }
+
+    .enquiries-search {
+      position: relative;
+      flex: 1;
+    }
+
+    .enquiries-search input,
+    .enquiries-toolbar select {
+      width: 100%;
+      min-height: 42px;
+      box-sizing: border-box;
+      border: 1px solid #d0d5dd;
+      border-radius: 9px;
+      background: #fff;
+      color: #344054;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .enquiries-search input {
+      padding: 0 14px 0 38px;
+    }
+
+    .enquiries-search span {
+      position: absolute;
+      top: 50%;
+      left: 13px;
+      color: #667085;
+      transform: translateY(-50%);
+    }
+
+    .enquiries-toolbar select {
+      width: 175px;
+      padding: 0 12px;
+    }
+
+    .enquiries-refresh {
+      min-height: 42px;
+      padding: 0 15px;
+      border: 1px solid #d0d5dd;
+      border-radius: 9px;
+      color: #344054;
+      background: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .enquiries-refresh:hover {
+      background: #f8fafc;
+    }
+
+    .enquiries-table-wrap {
+      overflow-x: auto;
+      border-top: 1px solid #edf0f5;
+    }
+
+    .enquiries-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 850px;
+    }
+
+    .enquiries-table th {
+      padding: 12px 16px;
+      color: #667085;
+      background: #f8fafc;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    .enquiries-table td {
+      padding: 15px 16px;
+      border-top: 1px solid #edf0f5;
+      color: #344054;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .enquiries-table tr:hover td {
+      background: #fbfcff;
+    }
+
+    .enquiry-sender strong {
+      display: block;
+      color: #182230;
+      font-size: 13px;
+    }
+
+    .enquiry-sender small,
+    .enquiry-contact small {
+      display: block;
+      margin-top: 4px;
+      color: #667085;
+      font-size: 11px;
+    }
+
+    .enquiry-contact a {
+      color: #155eef;
+      text-decoration: none;
+    }
+
+    .enquiry-message-preview {
+      max-width: 300px;
+      color: #475467;
+      line-height: 1.45;
+    }
+
+    .enquiry-view-btn {
+      padding: 6px 10px;
+      border: 1px solid #d0d5dd;
+      border-radius: 7px;
+      color: #344054;
+      background: #fff;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .enquiry-view-btn:hover {
+      border-color: #84adff;
+      color: #155eef;
+      background: #f6f9ff;
+    }
+
+    .enquiry-status-select {
+      min-height: 34px;
+      padding: 0 8px;
+      border: 1px solid #d0d5dd;
+      border-radius: 7px;
+      background: #fff;
+      color: #344054;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .enquiries-empty {
+      padding: 42px 20px;
+      color: #667085;
+      text-align: center;
+    }
+
+    .enquiries-empty strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #344054;
+      font-size: 14px;
+    }
+
+    .enquiry-dialog {
+      width: min(620px, calc(100% - 32px));
+      max-height: min(80vh, 760px);
+      padding: 0;
+      overflow: auto;
+      border: 0;
+      border-radius: 16px;
+      box-shadow: 0 24px 70px rgba(16, 24, 40, .25);
+    }
+
+    .enquiry-dialog::backdrop {
+      background: rgba(16, 24, 40, .55);
+      backdrop-filter: blur(3px);
+    }
+
+    .enquiry-dialog-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 22px 24px;
+      border-bottom: 1px solid #edf0f5;
+      background: #f8faff;
+    }
+
+    .enquiry-dialog-header h2 {
+      margin: 0;
+      color: #182230;
+      font-size: 19px;
+    }
+
+    .enquiry-dialog-header p {
+      margin: 6px 0 0;
+      color: #667085;
+      font-size: 12px;
+    }
+
+    .enquiry-dialog-close {
+      width: 34px;
+      height: 34px;
+      border: 1px solid #d0d5dd;
+      border-radius: 9px;
+      color: #475467;
+      background: #fff;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .enquiry-dialog-body {
+      padding: 22px 24px;
+    }
+
+    .enquiry-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .enquiry-detail {
+      padding: 13px 14px;
+      border: 1px solid #edf0f5;
+      border-radius: 10px;
+    }
+
+    .enquiry-detail span {
+      display: block;
+      margin-bottom: 5px;
+      color: #667085;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .enquiry-detail strong,
+    .enquiry-detail a {
+      color: #182230;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .enquiry-full-message {
+      margin-top: 14px;
+      padding: 16px;
+      border: 1px solid #edf0f5;
+      border-radius: 10px;
+      color: #344054;
+      background: #fcfcfd;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 700px) {
+      .enquiries-heading {
+        padding: 20px;
+      }
+
+      .enquiries-summary {
+        grid-template-columns: 1fr;
+        padding: 14px 20px 0;
+      }
+
+      .enquiries-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 16px 20px;
+      }
+
+      .enquiries-toolbar select {
+        width: 100%;
+      }
+
+      .enquiry-detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body class="cms-body">
   <div id="cms-auth-overlay" class="cms-auth-overlay">
     <div class="cms-auth-box">
-      <div class="cm
-      s-auth-logo">
+      <div class="cms-auth-logo">
         <img src="images/pfs undone logo.webp" alt="Prime Focus Schools">
       </div>
       <h2>PFS Blog CMS Portal</h2>
-      <p class="auth-sub">Enter the administrative passcode to manage school articles and updates.</p>
+      <p class="auth-sub">
+        Enter the administrative passcode to manage school articles and enquiries.
+      </p>
 
       <form id="cms-auth-form">
         <div class="cms-form-group">
           <label for="cms-auth-pass">Passcode</label>
-          <input 
-            type="password" 
-            id="cms-auth-pass" 
-            class="cms-input" 
-            placeholder="Enter admin passcode" 
+          <input
+            type="password"
+            id="cms-auth-pass"
+            class="cms-input"
+            placeholder="Enter admin passcode"
             autocomplete="current-password"
             required
           >
         </div>
 
-        <div class="cms-form-group" style="display: flex; justify-content: space-between; align-items: center;">
-          <label class="cms-checkbox-label" style="text-transform: none; font-size: 13px; font-weight: 500;">
+        <div class="cms-form-group"
+          style="display:flex;justify-content:space-between;align-items:center">
+          <label class="cms-checkbox-label"
+            style="text-transform:none;font-size:13px;font-weight:500">
             <input type="checkbox" id="cms-auth-remember">
             Remember this session
           </label>
         </div>
 
-        <div id="cms-auth-error" style="color: var(--cms-danger); font-size: 12.5px; font-weight: 600; margin-bottom: 14px; display: none;">
+        <div id="cms-auth-error"
+          style="display:none;color:var(--cms-danger);font-size:12.5px;font-weight:600;margin-bottom:14px">
           Invalid passcode. Please try again.
         </div>
 
-        <button type="submit" class="cms-btn cms-btn-primary cms-btn-block">
+        <button type="submit"
+          class="cms-btn cms-btn-primary cms-btn-block">
           Unlock Admin Portal →
         </button>
-<!-- 
-        <div class="auth-hint">
-          <strong>Default Passcode:</strong> <code>pfsadmin2026</code><br>
-          <small>You can change this anytime from the CMS toolbox.</small>
-        </div> -->
 
-        <div style="margin-top: 20px;">
-          <a href="blog.html" style="font-size: 12.5px; color: var(--cms-blue); font-weight: 600;">← Return to Public Blog</a>
+        <div style="margin-top:20px">
+          <a href="blog.html"
+            style="font-size:12.5px;color:var(--cms-blue);font-weight:600">
+            ← Return to Public Blog
+          </a>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- ==========================================================================
-       2. CMS Top Navigation Bar
-       ========================================================================== -->
   <header class="cms-header">
     <div class="cms-brand-group">
       <img src="images/pfs undone logo.webp" alt="Prime Focus Schools Logo">
       <div class="cms-brand-title">
         PRIME FOCUS SCHOOLS
-        <small>BLOG CONTENT MANAGEMENT SYSTEM</small>
+        <small>CONTENT MANAGEMENT SYSTEM</small>
       </div>
     </div>
 
     <div class="cms-header-actions">
-      <a href="blog.html" class="cms-btn cms-btn-outline" style="font-size: 12px; height: 38px;">
+      <a href="blog.html" class="cms-btn cms-btn-outline"
+        style="font-size:12px;height:38px">
         View Live Blog ↗
       </a>
       <span class="badge-user">👤 Admin Staff</span>
-      <button type="button" id="cms-logout-btn" class="cms-btn cms-btn-secondary" style="font-size: 12px; height: 38px;">
+      <button type="button" id="cms-logout-btn"
+        class="cms-btn cms-btn-secondary"
+        style="font-size:12px;height:38px">
         Sign Out
       </button>
     </div>
   </header>
 
-  <!-- ==========================================================================
-       3. Main Dashboard View
-       ========================================================================== -->
   <main class="cms-main">
-
-    <!-- Metrics Bar -->
     <div class="cms-stats-grid">
       <div class="cms-stat-card">
         <div class="cms-stat-info">
@@ -108,52 +480,56 @@
       <div class="cms-stat-card">
         <div class="cms-stat-info">
           <p>Published Live</p>
-          <h3 id="stat-published-posts" style="color: var(--cms-success);">0</h3>
+          <h3 id="stat-published-posts" style="color:var(--cms-success)">0</h3>
         </div>
-        <div class="cms-stat-icon" style="color: var(--cms-success); background: #ECFDF5;">✓</div>
+        <div class="cms-stat-icon"
+          style="color:var(--cms-success);background:#ECFDF5">✓</div>
       </div>
 
       <div class="cms-stat-card">
         <div class="cms-stat-info">
           <p>Draft Articles</p>
-          <h3 id="stat-draft-posts" style="color: var(--cms-warning);">0</h3>
+          <h3 id="stat-draft-posts" style="color:var(--cms-warning)">0</h3>
         </div>
-        <div class="cms-stat-icon" style="color: var(--cms-warning); background: #FFFBEB;">📝</div>
+        <div class="cms-stat-icon"
+          style="color:var(--cms-warning);background:#FFFBEB">📝</div>
       </div>
 
       <div class="cms-stat-card">
         <div class="cms-stat-info">
           <p>Categories</p>
-          <h3 id="stat-categories" style="color: var(--cms-blue);">0</h3>
+          <h3 id="stat-categories" style="color:var(--cms-blue)">0</h3>
         </div>
         <div class="cms-stat-icon">🏷</div>
       </div>
     </div>
 
-    <!-- Posts Management Table Card -->
-    <div class="cms-content-card">
+    <section class="cms-content-card" aria-labelledby="articles-heading">
       <div class="cms-card-header">
         <div>
-          <h2>Articles &amp; Announcements</h2>
-          <p style="font-size: 13px; color: var(--cms-muted); margin-top: 4px;">
-            Publish, edit, unpublish, and organize stories for the Prime Focus Schools blog.
+          <h2 id="articles-heading">Articles &amp; Announcements</h2>
+          <p style="font-size:13px;color:var(--cms-muted);margin-top:4px">
+            Publish, edit, unpublish, and organize stories for the PFS blog.
           </p>
         </div>
         <div class="cms-card-actions">
-          <button type="button" id="cms-new-post-btn" class="cms-btn cms-btn-primary">
+          <button type="button" id="cms-new-post-btn"
+            class="cms-btn cms-btn-primary">
             + Create New Article
           </button>
         </div>
       </div>
 
-      <!-- Filters Toolbar -->
       <div class="cms-filter-bar">
         <div class="cms-search-box">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" id="cms-search-input" placeholder="Filter articles by title, author, keyword...">
+          <input type="text" id="cms-search-input"
+            placeholder="Filter articles by title, author, keyword...">
         </div>
 
         <div class="cms-filter-selects">
@@ -161,7 +537,7 @@
             <option value="all">All Categories</option>
           </select>
 
-          <select id="cms-status-filter" aria-label="Filter by status">
+          <select id="cms-status-filter" aria-label="Filter by article status">
             <option value="all">All Statuses</option>
             <option value="published">Published</option>
             <option value="draft">Drafts</option>
@@ -169,96 +545,218 @@
         </div>
       </div>
 
-      <!-- Table Wrapper -->
       <div class="cms-table-wrapper">
         <table class="cms-table">
           <thead>
             <tr>
-              <th style="width: 70px;">Cover</th>
+              <th style="width:70px">Cover</th>
               <th>Title &amp; Summary</th>
               <th>Category</th>
               <th>Status</th>
-              <th style="text-align: center;">Featured</th>
+              <th style="text-align:center">Featured</th>
               <th>Published</th>
-              <th style="width: 150px;">Actions</th>
+              <th style="width:150px">Actions</th>
             </tr>
           </thead>
-          <tbody id="cms-posts-tbody">
-            <!-- Populated dynamically by cms.js -->
+          <tbody id="cms-posts-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Enquiries inbox -->
+    <section class="cms-enquiries" aria-labelledby="enquiries-heading">
+      <div class="enquiries-heading">
+        <div class="enquiries-title-group">
+          <div class="enquiries-title-icon" aria-hidden="true">✉</div>
+          <div>
+            <h2 id="enquiries-heading">
+              Enquiries inbox
+              <span id="cms-enquiry-count" class="enquiries-count">0</span>
+            </h2>
+            <p>
+              Messages submitted through the public contact form. Only CMS admins
+              can access these enquiries.
+            </p>
+          </div>
+        </div>
+
+        <button type="button" id="cms-enquiries-refresh"
+          class="enquiries-refresh">
+          ↻ Refresh inbox
+        </button>
+      </div>
+
+      <div class="enquiries-summary">
+        <div class="enquiry-summary-item is-new">
+          <span>New enquiries</span>
+          <strong id="cms-enquiry-new-count">0</strong>
+        </div>
+        <div class="enquiry-summary-item">
+          <span>Total messages</span>
+          <strong id="cms-enquiry-total-count">0</strong>
+        </div>
+        <div class="enquiry-summary-item">
+          <span>Latest message</span>
+          <strong id="cms-enquiry-latest" style="font-size:14px">—</strong>
+        </div>
+      </div>
+
+      <div class="enquiries-toolbar">
+        <label class="enquiries-search">
+          <span aria-hidden="true">⌕</span>
+          <input id="cms-enquiry-search"
+            type="search"
+            placeholder="Search name, email, phone, or message"
+            aria-label="Search enquiries">
+        </label>
+
+        <select id="cms-enquiry-status-filter" aria-label="Filter enquiries by status">
+          <option value="all">All enquiries</option>
+          <option value="new">New</option>
+          <option value="read">Read</option>
+          <option value="replied">Replied</option>
+          <option value="archived">Archived</option>
+        </select>
+      </div>
+
+      <div class="enquiries-table-wrap">
+        <table class="enquiries-table">
+          <thead>
+            <tr>
+              <th>Received</th>
+              <th>From</th>
+              <th>Contact</th>
+              <th>Message</th>
+              <th>Status</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody id="cms-enquiries-tbody">
+            <tr>
+              <td colspan="6" class="enquiries-empty">
+                <strong>Loading enquiries…</strong>
+                Please wait while messages are retrieved.
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
 
-    <!-- Data Management & Portability Toolbox -->
-    <div class="cms-toolbox-card">
+    <section class="cms-toolbox-card">
       <h3>CMS Backup &amp; Deployment Tools</h3>
       <p>
-        Keep your blog updated and backup school records anytime. You can export JSON backups, 
-        import articles, or download the updated <code>blog-data.js</code> file to deploy updates permanently.
+        Export JSON backups, import articles, or download the updated
+        <code>blog-data.js</code> file for a static backup.
       </p>
 
       <div class="cms-toolbox-btns">
-        <button type="button" id="btn-download-js" class="cms-btn cms-btn-secondary" title="Export updated js/blog-data.js for static sites">
+        <button type="button" id="btn-download-js"
+          class="cms-btn cms-btn-secondary">
           ⬇ Download updated <code>blog-data.js</code>
         </button>
 
-        <button type="button" id="btn-export-json" class="cms-btn cms-btn-secondary">
+        <button type="button" id="btn-export-json"
+          class="cms-btn cms-btn-secondary">
           💾 Export JSON Backup
         </button>
 
-        <button type="button" id="btn-import-json" class="cms-btn cms-btn-secondary">
+        <button type="button" id="btn-import-json"
+          class="cms-btn cms-btn-secondary">
           📂 Import Articles JSON
         </button>
-        <input type="file" id="file-import-input" accept=".json" style="display: none;">
+        <input type="file" id="file-import-input"
+          accept=".json" style="display:none">
 
-        <button type="button" id="btn-change-password" class="cms-btn cms-btn-secondary">
+        <button type="button" id="btn-change-password"
+          class="cms-btn cms-btn-secondary">
           🔑 Change Passcode
         </button>
 
-        <button type="button" id="btn-reset-defaults" class="cms-btn cms-btn-danger" style="margin-left: auto;">
+        <button type="button" id="btn-reset-defaults"
+          class="cms-btn cms-btn-danger" style="margin-left:auto">
           ↺ Reset to Sample Articles
         </button>
       </div>
-    </div>
+    </section>
   </main>
 
-  <!-- ==========================================================================
-       4. Post Editor Slide-Over Modal
-       ========================================================================== -->
-  <div id="cms-editor-modal" class="cms-editor-modal" role="dialog" aria-modal="true" aria-labelledby="editor-title-text">
+  <!-- Enquiry detail dialog -->
+  <dialog id="cms-enquiry-dialog" class="enquiry-dialog">
+    <div class="enquiry-dialog-header">
+      <div>
+        <h2 id="cms-enquiry-dialog-title">Enquiry details</h2>
+        <p id="cms-enquiry-dialog-date"></p>
+      </div>
+      <button type="button" id="cms-enquiry-dialog-close"
+        class="enquiry-dialog-close" aria-label="Close enquiry">×</button>
+    </div>
+
+    <div class="enquiry-dialog-body">
+      <div class="enquiry-detail-grid">
+        <div class="enquiry-detail">
+          <span>Name</span>
+          <strong id="cms-enquiry-dialog-name">—</strong>
+        </div>
+        <div class="enquiry-detail">
+          <span>Email</span>
+          <a id="cms-enquiry-dialog-email" href="#">—</a>
+        </div>
+        <div class="enquiry-detail">
+          <span>Phone</span>
+          <a id="cms-enquiry-dialog-phone" href="#">—</a>
+        </div>
+        <div class="enquiry-detail">
+          <span>Status</span>
+          <select id="cms-enquiry-dialog-status" class="enquiry-status-select">
+            <option value="new">New</option>
+            <option value="read">Read</option>
+            <option value="replied">Replied</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="cms-enquiry-dialog-message" class="enquiry-full-message"></div>
+    </div>
+  </dialog>
+
+  <!-- Post editor -->
+  <div id="cms-editor-modal" class="cms-editor-modal"
+    role="dialog" aria-modal="true" aria-labelledby="editor-title-text">
     <div class="cms-editor-pane">
       <div class="cms-editor-header">
         <h3 id="editor-title-text">Create New Article</h3>
-        <button type="button" id="cms-editor-close" class="cms-editor-close" aria-label="Close editor">✕</button>
+        <button type="button" id="cms-editor-close"
+          class="cms-editor-close" aria-label="Close editor">✕</button>
       </div>
 
       <div class="cms-editor-body">
         <form id="cms-editor-form">
           <input type="hidden" id="field-post-id">
 
-          <!-- Title & Slug -->
           <div class="editor-grid-2">
             <div class="cms-form-group">
               <label for="field-title">Article Title *</label>
-              <input type="text" id="field-title" class="cms-input" placeholder="e.g. Highlights from Our Inter-House Sports Festival" required>
+              <input type="text" id="field-title" class="cms-input"
+                placeholder="e.g. Highlights from Our Inter-House Sports Festival"
+                required>
             </div>
             <div class="cms-form-group">
               <label for="field-slug">URL Slug</label>
-              <input type="text" id="field-slug" class="cms-input" placeholder="e.g. highlights-inter-house-sports-festival">
+              <input type="text" id="field-slug" class="cms-input"
+                placeholder="e.g. highlights-inter-house-sports-festival">
             </div>
           </div>
 
-          <!-- Category, Status, Featured -->
           <div class="editor-grid-3">
             <div class="cms-form-group">
               <label for="field-category">Category</label>
-              <select id="field-category" class="cms-input">
-                <!-- Populated dynamically -->
-              </select>
-              <input type="text" id="field-category-custom" class="cms-input" placeholder="Type new category name..." style="display: none; margin-top: 6px;">
+              <select id="field-category" class="cms-input"></select>
+              <input type="text" id="field-category-custom" class="cms-input"
+                placeholder="Type new category name..."
+                style="display:none;margin-top:6px">
             </div>
-
             <div class="cms-form-group">
               <label for="field-status">Status</label>
               <select id="field-status" class="cms-input">
@@ -266,44 +764,45 @@
                 <option value="draft">Draft (Private, not visible on blog)</option>
               </select>
             </div>
-
-            <div class="cms-form-group" style="display: flex; flex-direction: column; justify-content: center;">
-              <label class="cms-checkbox-label" style="margin-top: 18px;">
+            <div class="cms-form-group"
+              style="display:flex;flex-direction:column;justify-content:center">
+              <label class="cms-checkbox-label" style="margin-top:18px">
                 <input type="checkbox" id="field-featured">
                 <span>⭐ Feature this article at top</span>
               </label>
             </div>
           </div>
 
-          <!-- Author, Role, Date -->
           <div class="editor-grid-3">
             <div class="cms-form-group">
               <label for="field-author">Author Name</label>
-              <input type="text" id="field-author" class="cms-input" placeholder="e.g. Dr. Mrs. A. Adeyemi">
+              <input type="text" id="field-author" class="cms-input"
+                placeholder="e.g. Dr. Mrs. A. Adeyemi">
             </div>
-
             <div class="cms-form-group">
               <label for="field-author-role">Author Role / Designation</label>
-              <input type="text" id="field-author-role" class="cms-input" placeholder="e.g. Principal, Prime Focus Schools">
+              <input type="text" id="field-author-role" class="cms-input"
+                placeholder="e.g. Principal, Prime Focus Schools">
             </div>
-
             <div class="cms-form-group">
               <label for="field-date">Publication Date</label>
-              <input type="text" id="field-date" class="cms-input" placeholder="e.g. October 26, 2026">
+              <input type="text" id="field-date" class="cms-input"
+                placeholder="e.g. October 26, 2026">
             </div>
           </div>
 
-          <!-- Cover Image Selector -->
           <div class="cms-form-group">
-            <label>Article Cover Image</label>
+            <label for="field-cover">Article Cover Image</label>
             <div class="image-selector-wrap">
-              <input type="text" id="field-cover" class="cms-input" placeholder="Image URL or local path (e.g. images/school-1.webp)">
+              <input type="text" id="field-cover" class="cms-input"
+                placeholder="Image URL or local path">
 
-              <!-- Quick image picker chips -->
               <div class="quick-image-pills">
-                <span style="font-size: 11px; font-weight: 700; color: var(--cms-muted);">Quick Pick School Photos:</span>
+                <span style="font-size:11px;font-weight:700;color:var(--cms-muted)">
+                  Quick Pick School Photos:
+                </span>
                 <button type="button" class="quick-img-chip" data-src="images/school-2.webp">Academic Campus HD</button>
-                <button type="button" class="quick-img-chip" data-src="images/school-1.webp">Courtyard & Court HD</button>
+                <button type="button" class="quick-img-chip" data-src="images/school-1.webp">Courtyard &amp; Court HD</button>
                 <button type="button" class="quick-img-chip" data-src="images/school-hero.webp">School Hero Panorama</button>
                 <button type="button" class="quick-img-chip" data-src="images/ict-lab.webp">ICT Lab</button>
                 <button type="button" class="quick-img-chip" data-src="images/physics-lab.webp">Physics Lab</button>
@@ -315,75 +814,89 @@
                 <button type="button" class="quick-img-chip" data-src="images/events/ball.webp">Sports Day</button>
               </div>
 
-              <div style="display: flex; gap: 10px; align-items: center; margin-top: 4px;">
-                <label for="field-cover-file" class="cms-btn cms-btn-secondary" style="font-size: 12px; height: 36px; cursor: pointer;">
+              <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
+                <label for="field-cover-file" class="cms-btn cms-btn-secondary"
+                  style="font-size:12px;height:36px;cursor:pointer">
                   📁 Upload Photo from Computer...
                 </label>
-                <input type="file" id="field-cover-file" accept="image/*" style="display: none;">
-                <span style="font-size: 11.5px; color: var(--cms-muted);">Image automatically optimizes for web preview</span>
+                <input type="file" id="field-cover-file"
+                  accept="image/*" style="display:none">
+                <span style="font-size:11.5px;color:var(--cms-muted)">
+                  Image automatically optimizes for web preview
+                </span>
               </div>
 
-              <!-- Live Preview of Cover -->
               <div class="image-preview-box">
-                <img id="editor-cover-preview" src="images/school-1.webp" alt="Cover Preview">
+                <img id="editor-cover-preview"
+                  src="images/school-1.webp" alt="Cover Preview">
               </div>
 
-              <input type="text" id="field-cover-caption" class="cms-input" placeholder="Optional image caption (e.g. PFS students presenting at the science fair)">
+              <input type="text" id="field-cover-caption" class="cms-input"
+                placeholder="Optional image caption">
             </div>
           </div>
 
-          <!-- Excerpt -->
           <div class="cms-form-group">
-            <label for="field-excerpt">Short Summary / Excerpt (shown on article card)</label>
-            <textarea id="field-excerpt" class="cms-textarea" style="min-height: 70px;" placeholder="Write a 1-2 sentence teaser to engage readers..."></textarea>
+            <label for="field-excerpt">Short Summary / Excerpt</label>
+            <textarea id="field-excerpt" class="cms-textarea"
+              style="min-height:70px"
+              placeholder="Write a 1-2 sentence teaser..."></textarea>
           </div>
 
-          <!-- Rich Content Editor with Toolbar & Preview -->
           <div class="cms-form-group">
-            <label>Article Body Content *</label>
+            <label for="field-content">Article Body Content *</label>
 
             <div class="editor-toolbar">
-              <button type="button" class="toolbar-btn" data-action="bold" title="Bold"><strong>B</strong></button>
-              <button type="button" class="toolbar-btn" data-action="italic" title="Italic"><em>I</em></button>
+              <button type="button" class="toolbar-btn" data-action="bold"><strong>B</strong></button>
+              <button type="button" class="toolbar-btn" data-action="italic"><em>I</em></button>
               <div class="toolbar-divider"></div>
-              <button type="button" class="toolbar-btn" data-action="h2" title="Section Heading">H2</button>
-              <button type="button" class="toolbar-btn" data-action="h3" title="Subheading">H3</button>
+              <button type="button" class="toolbar-btn" data-action="h2">H2</button>
+              <button type="button" class="toolbar-btn" data-action="h3">H3</button>
               <div class="toolbar-divider"></div>
-              <button type="button" class="toolbar-btn" data-action="ul" title="Bullet List">• List</button>
-              <button type="button" class="toolbar-btn" data-action="ol" title="Numbered List">1. List</button>
-              <button type="button" class="toolbar-btn" data-action="quote" title="Quote">“ Quote</button>
-              <button type="button" class="toolbar-btn" data-action="callout" title="Important Callout Box">💡 Notice Box</button>
-              <button type="button" class="toolbar-btn" data-action="link" title="Insert Link">🔗 Link</button>
-              <button type="button" class="toolbar-btn" data-action="hr" title="Divider">— Line</button>
+              <button type="button" class="toolbar-btn" data-action="ul">• List</button>
+              <button type="button" class="toolbar-btn" data-action="ol">1. List</button>
+              <button type="button" class="toolbar-btn" data-action="quote">“ Quote</button>
+              <button type="button" class="toolbar-btn" data-action="callout">💡 Notice Box</button>
+              <button type="button" class="toolbar-btn" data-action="link">🔗 Link</button>
+              <button type="button" class="toolbar-btn" data-action="hr">— Line</button>
 
               <div class="editor-mode-tabs">
-                <button type="button" id="tab-mode-write" class="editor-mode-tab active">Write</button>
-                <button type="button" id="tab-mode-preview" class="editor-mode-tab">Preview</button>
+                <button type="button" id="tab-mode-write"
+                  class="editor-mode-tab active">Write</button>
+                <button type="button" id="tab-mode-preview"
+                  class="editor-mode-tab">Preview</button>
               </div>
             </div>
 
-            <textarea id="field-content" class="cms-textarea content-textarea" placeholder="Write or paste your article HTML/text here..."></textarea>
-            <div id="editor-preview-pane" class="content-preview-pane post-body"></div>
+            <textarea id="field-content" class="cms-textarea content-textarea"
+              placeholder="Write or paste your article HTML/text here..."></textarea>
+            <div id="editor-preview-pane"
+              class="content-preview-pane post-body"></div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-              <small style="color: var(--cms-muted);">Supports rich HTML formatting &amp; paragraphs</small>
-              <span id="editor-word-count" style="font-size: 11.5px; font-weight: 700; color: var(--cms-blue);">0 words · ~1 min read</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+              <small style="color:var(--cms-muted)">
+                Supports rich HTML formatting &amp; paragraphs
+              </small>
+              <span id="editor-word-count"
+                style="font-size:11.5px;font-weight:700;color:var(--cms-blue)">
+                0 words · ~1 min read
+              </span>
             </div>
           </div>
 
-          <!-- Tags -->
           <div class="cms-form-group">
             <label for="field-tags">Tags (comma-separated)</label>
-            <input type="text" id="field-tags" class="cms-input" placeholder="e.g. Announcements, Resumption, Sports, Parents">
+            <input type="text" id="field-tags" class="cms-input"
+              placeholder="e.g. Announcements, Resumption, Sports, Parents">
           </div>
         </form>
       </div>
 
       <div class="cms-editor-footer">
-        <button type="button" id="cms-editor-cancel" class="cms-btn cms-btn-secondary">
-          Cancel
-        </button>
-        <button type="submit" form="cms-editor-form" class="cms-btn cms-btn-primary" style="min-width: 160px;">
+        <button type="button" id="cms-editor-cancel"
+          class="cms-btn cms-btn-secondary">Cancel</button>
+        <button type="submit" form="cms-editor-form"
+          class="cms-btn cms-btn-primary" style="min-width:160px">
           ✓ Save Article
         </button>
       </div>
@@ -391,5 +904,321 @@
   </div>
 
   <div id="cms-toast" class="pfs-toast"></div>
+
+  <!-- Enquiries inbox behavior: uses the existing BlogStore Supabase client. -->
+  <script>
+    (() => {
+      "use strict";
+
+      const client =
+        window.BlogStore && typeof window.BlogStore.getClient === "function"
+          ? window.BlogStore.getClient()
+          : null;
+
+      const body = document.getElementById("cms-enquiries-tbody");
+      const searchInput = document.getElementById("cms-enquiry-search");
+      const statusFilter = document.getElementById("cms-enquiry-status-filter");
+      const refreshButton = document.getElementById("cms-enquiries-refresh");
+      const countBadge = document.getElementById("cms-enquiry-count");
+      const newCount = document.getElementById("cms-enquiry-new-count");
+      const totalCount = document.getElementById("cms-enquiry-total-count");
+      const latestLabel = document.getElementById("cms-enquiry-latest");
+      const dialog = document.getElementById("cms-enquiry-dialog");
+
+      let enquiries = [];
+
+      function escape(value) {
+        const element = document.createElement("div");
+        element.textContent = value == null ? "" : String(value);
+        return element.innerHTML;
+      }
+
+      function showInboxError(message) {
+        if (!body) return;
+        body.innerHTML = `
+          <tr>
+            <td colspan="6" class="enquiries-empty">
+              <strong>Could not load enquiries</strong>
+              ${escape(message)}
+            </td>
+          </tr>`;
+      }
+
+      function showInboxEmpty(message) {
+        if (!body) return;
+        body.innerHTML = `
+          <tr>
+            <td colspan="6" class="enquiries-empty">
+              <strong>${escape(message)}</strong>
+              New contact-form messages will appear here.
+            </td>
+          </tr>`;
+      }
+
+      function formatDate(value) {
+        if (!value) return "—";
+        const date = new Date(value);
+        return Number.isNaN(date.getTime())
+          ? "—"
+          : date.toLocaleString(undefined, {
+              dateStyle: "medium",
+              timeStyle: "short"
+            });
+      }
+
+      function updateSummary() {
+        const unread = enquiries.filter(item => item.status === "new").length;
+
+        if (countBadge) countBadge.textContent = unread;
+        if (newCount) newCount.textContent = unread;
+        if (totalCount) totalCount.textContent = enquiries.length;
+        if (latestLabel) {
+          latestLabel.textContent = enquiries.length
+            ? formatDate(enquiries[0].created_at)
+            : "—";
+        }
+      }
+
+      function renderEnquiries() {
+        if (!body) return;
+
+        const query = (searchInput ? searchInput.value : "")
+          .trim()
+          .toLowerCase();
+        const selectedStatus = statusFilter ? statusFilter.value : "all";
+
+        const filtered = enquiries.filter(item => {
+          const matchesStatus =
+            selectedStatus === "all" || item.status === selectedStatus;
+          const searchable = [
+            item.name,
+            item.email,
+            item.phone,
+            item.message
+          ].join(" ").toLowerCase();
+
+          return matchesStatus && searchable.includes(query);
+        });
+
+        if (!filtered.length) {
+          showInboxEmpty(
+            enquiries.length
+              ? "No enquiries match these filters"
+              : "Your inbox is clear"
+          );
+          return;
+        }
+
+        body.innerHTML = filtered.map(item => {
+          const message = String(item.message || "");
+          const preview =
+            message.length > 120 ? `${message.slice(0, 120)}…` : message;
+          const safeStatus = [
+            "new",
+            "read",
+            "replied",
+            "archived"
+          ].includes(item.status) ? item.status : "new";
+
+          return `
+            <tr>
+              <td>${escape(formatDate(item.created_at))}</td>
+              <td class="enquiry-sender">
+                <strong>${escape(item.name)}</strong>
+                <small>${escape(item.email)}</small>
+              </td>
+              <td class="enquiry-contact">
+                <a href="mailto:${encodeURIComponent(item.email || "")}">
+                  ${escape(item.email)}
+                </a>
+                <small>${escape(item.phone || "No phone supplied")}</small>
+              </td>
+              <td class="enquiry-message-preview">${escape(preview)}</td>
+              <td>
+                <select class="enquiry-status-select"
+                  data-enquiry-status="${escape(item.id)}"
+                  aria-label="Change status for ${escape(item.name)}">
+                  <option value="new" ${safeStatus === "new" ? "selected" : ""}>New</option>
+                  <option value="read" ${safeStatus === "read" ? "selected" : ""}>Read</option>
+                  <option value="replied" ${safeStatus === "replied" ? "selected" : ""}>Replied</option>
+                  <option value="archived" ${safeStatus === "archived" ? "selected" : ""}>Archived</option>
+                </select>
+              </td>
+              <td>
+                <button type="button" class="enquiry-view-btn"
+                  data-enquiry-view="${escape(item.id)}">
+                  View
+                </button>
+              </td>
+            </tr>`;
+        }).join("");
+      }
+
+      async function loadEnquiries() {
+        if (!client || !body) return;
+
+        if (refreshButton) {
+          refreshButton.disabled = true;
+          refreshButton.textContent = "Loading…";
+        }
+
+        try {
+          const { data, error } = await client
+            .from("contact_messages")
+            .select("id, name, email, phone, message, status, created_at")
+            .order("created_at", { ascending: false });
+
+          if (error) throw error;
+
+          enquiries = data || [];
+          updateSummary();
+          renderEnquiries();
+        } catch (error) {
+          console.error("Could not load enquiries:", error);
+          showInboxError(
+            "Check that the contact_messages admin read policy is enabled."
+          );
+        } finally {
+          if (refreshButton) {
+            refreshButton.disabled = false;
+            refreshButton.textContent = "↻ Refresh inbox";
+          }
+        }
+      }
+
+      async function updateEnquiryStatus(id, status) {
+        const validStatuses = ["new", "read", "replied", "archived"];
+        if (!validStatuses.includes(status)) return;
+
+        try {
+          const { error } = await client
+            .from("contact_messages")
+            .update({ status })
+            .eq("id", id);
+
+          if (error) throw error;
+
+          const enquiry = enquiries.find(item => item.id === id);
+          if (enquiry) enquiry.status = status;
+
+          updateSummary();
+          renderEnquiries();
+        } catch (error) {
+          console.error("Could not update enquiry status:", error);
+          alert("The enquiry status could not be updated. Please try again.");
+          await loadEnquiries();
+        }
+      }
+
+      function openEnquiry(id) {
+        const item = enquiries.find(enquiry => enquiry.id === id);
+        if (!item || !dialog) return;
+
+        document.getElementById("cms-enquiry-dialog-title").textContent =
+          item.name || "Enquiry details";
+        document.getElementById("cms-enquiry-dialog-date").textContent =
+          formatDate(item.created_at);
+        document.getElementById("cms-enquiry-dialog-name").textContent =
+          item.name || "—";
+
+        const email = document.getElementById("cms-enquiry-dialog-email");
+        email.textContent = item.email || "—";
+        email.href = item.email
+          ? `mailto:${encodeURIComponent(item.email)}`
+          : "#";
+
+        const phone = document.getElementById("cms-enquiry-dialog-phone");
+        phone.textContent = item.phone || "—";
+        phone.href = item.phone
+          ? `tel:${String(item.phone).replace(/[^\d+]/g, "")}`
+          : "#";
+
+        document.getElementById("cms-enquiry-dialog-message").textContent =
+          item.message || "";
+
+        const status = document.getElementById("cms-enquiry-dialog-status");
+        status.value = item.status || "new";
+        status.dataset.enquiryId = item.id;
+
+        dialog.showModal();
+      }
+
+      if (body) {
+        body.addEventListener("click", event => {
+          const button = event.target.closest("[data-enquiry-view]");
+          if (button) openEnquiry(button.dataset.enquiryView);
+        });
+
+        body.addEventListener("change", event => {
+          const select = event.target.closest("[data-enquiry-status]");
+          if (select) {
+            updateEnquiryStatus(
+              select.dataset.enquiryStatus,
+              select.value
+            );
+          }
+        });
+      }
+
+      if (searchInput) {
+        searchInput.addEventListener("input", renderEnquiries);
+      }
+
+      if (statusFilter) {
+        statusFilter.addEventListener("change", renderEnquiries);
+      }
+
+      if (refreshButton) {
+        refreshButton.addEventListener("click", loadEnquiries);
+      }
+
+      const closeButton =
+        document.getElementById("cms-enquiry-dialog-close");
+
+      if (closeButton && dialog) {
+        closeButton.addEventListener("click", () => dialog.close());
+      }
+
+      if (dialog) {
+        dialog.addEventListener("click", event => {
+          if (event.target === dialog) dialog.close();
+        });
+      }
+
+      const dialogStatus =
+        document.getElementById("cms-enquiry-dialog-status");
+
+      if (dialogStatus) {
+        dialogStatus.addEventListener("change", async () => {
+          await updateEnquiryStatus(
+            dialogStatus.dataset.enquiryId,
+            dialogStatus.value
+          );
+
+          if (dialog.open) dialog.close();
+        });
+      }
+
+      if (client) {
+        client.auth.onAuthStateChange((event, session) => {
+          if (session && ["SIGNED_IN", "TOKEN_REFRESHED"].includes(event)) {
+            setTimeout(loadEnquiries, 0);
+          }
+
+          if (event === "SIGNED_OUT") {
+            enquiries = [];
+            updateSummary();
+            showInboxEmpty("Sign in to view enquiries");
+          }
+        });
+
+        client.auth.getSession().then(({ data, error }) => {
+          if (!error && data.session) loadEnquiries();
+        });
+      } else {
+        showInboxError("The shared Supabase client is not available.");
+      }
+    })();
+  </script>
 </body>
 </html>
