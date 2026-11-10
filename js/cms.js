@@ -20,6 +20,8 @@
 
   const CMS_ADMIN_EMAIL = "chimamandafavour99@gmail.com";
 
+  const $ = id => document.getElementById(id);
+
   function escapeHtml(value) {
     if (!value) return "";
     const element = document.createElement("div");
@@ -28,7 +30,7 @@
   }
 
   function showToast(message, type = "success") {
-    let toast = document.getElementById("cms-toast");
+    let toast = $("cms-toast");
 
     if (!toast) {
       toast = document.createElement("div");
@@ -37,11 +39,10 @@
       document.body.appendChild(toast);
     }
 
-    const icon = type === "error" ? "⚠" : "✓";
     toast.innerHTML =
-      `<span>${icon}</span> <span>${escapeHtml(message)}</span>`;
+      `<span>${type === "error" ? "⚠" : "✓"}</span> ` +
+      `<span>${escapeHtml(message)}</span>`;
     toast.classList.add("show");
-
     setTimeout(() => toast.classList.remove("show"), 3500);
   }
 
@@ -73,58 +74,58 @@
     return Boolean(data);
   }
 
-  const authOverlay = document.getElementById("cms-auth-overlay");
-  const authForm = document.getElementById("cms-auth-form");
-  const authPassInput = document.getElementById("cms-auth-pass");
-  const authErrorMsg = document.getElementById("cms-auth-error");
-  const logoutBtn = document.getElementById("cms-logout-btn");
+  const authOverlay = $("cms-auth-overlay");
+  const authForm = $("cms-auth-form");
+  const authPassInput = $("cms-auth-pass");
+  const authErrorMsg = $("cms-auth-error");
+  const logoutBtn = $("cms-logout-btn");
 
-  const statTotalPosts = document.getElementById("stat-total-posts");
-  const statPublishedPosts = document.getElementById("stat-published-posts");
-  const statDraftPosts = document.getElementById("stat-draft-posts");
-  const statCategories = document.getElementById("stat-categories");
+  const statTotalPosts = $("stat-total-posts");
+  const statPublishedPosts = $("stat-published-posts");
+  const statDraftPosts = $("stat-draft-posts");
+  const statCategories = $("stat-categories");
 
-  const postsTableBody = document.getElementById("cms-posts-tbody");
-  const cmsSearchInput = document.getElementById("cms-search-input");
-  const cmsCategoryFilter = document.getElementById("cms-category-filter");
-  const cmsStatusFilter = document.getElementById("cms-status-filter");
-  const newPostBtn = document.getElementById("cms-new-post-btn");
+  const postsTableBody = $("cms-posts-tbody");
+  const cmsSearchInput = $("cms-search-input");
+  const cmsCategoryFilter = $("cms-category-filter");
+  const cmsStatusFilter = $("cms-status-filter");
+  const newPostBtn = $("cms-new-post-btn");
 
-  const editorModal = document.getElementById("cms-editor-modal");
-  const editorCloseBtn = document.getElementById("cms-editor-close");
-  const editorCancelBtn = document.getElementById("cms-editor-cancel");
-  const editorForm = document.getElementById("cms-editor-form");
-  const editorTitle = document.getElementById("editor-title-text");
+  const editorModal = $("cms-editor-modal");
+  const editorCloseBtn = $("cms-editor-close");
+  const editorCancelBtn = $("cms-editor-cancel");
+  const editorForm = $("cms-editor-form");
+  const editorTitle = $("editor-title-text");
 
-  const fieldId = document.getElementById("field-post-id");
-  const fieldTitle = document.getElementById("field-title");
-  const fieldSlug = document.getElementById("field-slug");
-  const fieldCategory = document.getElementById("field-category");
-  const fieldCategoryCustom = document.getElementById("field-category-custom");
-  const fieldStatus = document.getElementById("field-status");
-  const fieldFeatured = document.getElementById("field-featured");
-  const fieldAuthor = document.getElementById("field-author");
-  const fieldAuthorRole = document.getElementById("field-author-role");
-  const fieldDate = document.getElementById("field-date");
-  const fieldCover = document.getElementById("field-cover");
-  const fieldCoverCaption = document.getElementById("field-cover-caption");
-  const fieldCoverFile = document.getElementById("field-cover-file");
-  const coverPreviewImg = document.getElementById("editor-cover-preview");
-  const fieldExcerpt = document.getElementById("field-excerpt");
-  const fieldContent = document.getElementById("field-content");
-  const fieldTags = document.getElementById("field-tags");
-  const wordCountDisplay = document.getElementById("editor-word-count");
+  const fieldId = $("field-post-id");
+  const fieldTitle = $("field-title");
+  const fieldSlug = $("field-slug");
+  const fieldCategory = $("field-category");
+  const fieldCategoryCustom = $("field-category-custom");
+  const fieldStatus = $("field-status");
+  const fieldFeatured = $("field-featured");
+  const fieldAuthor = $("field-author");
+  const fieldAuthorRole = $("field-author-role");
+  const fieldDate = $("field-date");
+  const fieldCover = $("field-cover");
+  const fieldCoverCaption = $("field-cover-caption");
+  const fieldCoverFile = $("field-cover-file");
+  const coverPreviewImg = $("editor-cover-preview");
+  const fieldExcerpt = $("field-excerpt");
+  const fieldContent = $("field-content");
+  const fieldTags = $("field-tags");
+  const wordCountDisplay = $("editor-word-count");
 
-  const tabWrite = document.getElementById("tab-mode-write");
-  const tabPreview = document.getElementById("tab-mode-preview");
-  const previewPane = document.getElementById("editor-preview-pane");
+  const tabWrite = $("tab-mode-write");
+  const tabPreview = $("tab-mode-preview");
+  const previewPane = $("editor-preview-pane");
 
-  const btnExportJson = document.getElementById("btn-export-json");
-  const btnImportJson = document.getElementById("btn-import-json");
-  const fileImportInput = document.getElementById("file-import-input");
-  const btnDownloadJs = document.getElementById("btn-download-js");
-  const btnResetDefaults = document.getElementById("btn-reset-defaults");
-  const btnChangePassword = document.getElementById("btn-change-password");
+  const btnExportJson = $("btn-export-json");
+  const btnImportJson = $("btn-import-json");
+  const fileImportInput = $("file-import-input");
+  const btnDownloadJs = $("btn-download-js");
+  const btnResetDefaults = $("btn-reset-defaults");
+  const btnChangePassword = $("btn-change-password");
 
   function displayAuthError(message) {
     if (!authErrorMsg) return;
@@ -180,9 +181,7 @@
         return;
       }
 
-      const submitButton =
-        authForm.querySelector('button[type="submit"]');
-
+      const submitButton = authForm.querySelector('button[type="submit"]');
       if (submitButton) submitButton.disabled = true;
 
       try {
@@ -286,7 +285,6 @@
         "beforeend",
         '<option value="__new__">+ Enter New Category...</option>'
       );
-
       fieldCategory.value = previous;
     }
   }
@@ -353,10 +351,8 @@
             </span>
           </td>
           <td style="text-align:center">
-            <button type="button"
-              class="table-action-btn"
-              data-action="feature"
-              data-id="${escapeHtml(post.id)}"
+            <button type="button" class="table-action-btn"
+              data-action="feature" data-id="${escapeHtml(post.id)}"
               title="${featured ? "Unfeature article" : "Feature article"}">
               ${featured ? "⭐" : "☆"}
             </button>
@@ -381,8 +377,7 @@
                 title="${published ? "Switch to Draft" : "Publish Article"}">
                 ${published ? "⏸" : "▶"}
               </button>
-              <button type="button"
-                class="table-action-btn btn-delete"
+              <button type="button" class="table-action-btn btn-delete"
                 data-action="delete" data-id="${escapeHtml(post.id)}"
                 title="Delete Article">🗑</button>
             </div>
@@ -438,11 +433,9 @@
   if (cmsSearchInput) {
     cmsSearchInput.addEventListener("input", renderPostsTable);
   }
-
   if (cmsCategoryFilter) {
     cmsCategoryFilter.addEventListener("change", renderPostsTable);
   }
-
   if (cmsStatusFilter) {
     cmsStatusFilter.addEventListener("change", renderPostsTable);
   }
@@ -481,7 +474,6 @@
           fieldCategory.value = post.category;
         } else {
           fieldCategory.value = "__new__";
-
           if (fieldCategoryCustom) {
             fieldCategoryCustom.value = post.category || "";
             fieldCategoryCustom.style.display = "block";
@@ -528,17 +520,9 @@
     if (editorModal) editorModal.classList.remove("open");
   }
 
-  if (newPostBtn) {
-    newPostBtn.addEventListener("click", () => openEditor());
-  }
-
-  if (editorCloseBtn) {
-    editorCloseBtn.addEventListener("click", closeEditor);
-  }
-
-  if (editorCancelBtn) {
-    editorCancelBtn.addEventListener("click", closeEditor);
-  }
+  if (newPostBtn) newPostBtn.addEventListener("click", () => openEditor());
+  if (editorCloseBtn) editorCloseBtn.addEventListener("click", closeEditor);
+  if (editorCancelBtn) editorCancelBtn.addEventListener("click", closeEditor);
 
   if (fieldTitle) {
     fieldTitle.addEventListener("input", event => {
@@ -554,7 +538,6 @@
 
       const custom = event.target.value === "__new__";
       fieldCategoryCustom.style.display = custom ? "block" : "none";
-
       if (custom) fieldCategoryCustom.focus();
     });
   }
@@ -581,16 +564,12 @@
       if (!file) return;
 
       const reader = new FileReader();
-
       reader.onload = loadEvent => {
         const dataUrl = loadEvent.target.result;
-
         if (fieldCover) fieldCover.value = dataUrl;
         if (coverPreviewImg) coverPreviewImg.src = dataUrl;
-
         showToast("Image loaded. Save the article to keep the change.");
       };
-
       reader.readAsDataURL(file);
     });
   }
@@ -633,7 +612,6 @@
   if (tabWrite) {
     tabWrite.addEventListener("click", () => setEditorTab("write"));
   }
-
   if (tabPreview) {
     tabPreview.addEventListener("click", () => setEditorTab("preview"));
   }
@@ -652,7 +630,6 @@
       end,
       "select"
     );
-
     fieldContent.focus();
     updateWordCount();
   }
@@ -663,19 +640,15 @@
         case "bold":
           insertFormat("<strong>", "</strong>", "bold text");
           break;
-
         case "italic":
           insertFormat("<em>", "</em>", "italic text");
           break;
-
         case "h2":
           insertFormat("<h2>", "</h2>", "Section Heading");
           break;
-
         case "h3":
           insertFormat("<h3>", "</h3>", "Subheading");
           break;
-
         case "quote":
           insertFormat(
             "<blockquote>\n  ",
@@ -683,7 +656,6 @@
             "Inspiring quotation goes here..."
           );
           break;
-
         case "ul":
           insertFormat(
             "<ul>\n  <li>",
@@ -691,7 +663,6 @@
             "First item"
           );
           break;
-
         case "ol":
           insertFormat(
             "<ol>\n  <li>",
@@ -699,7 +670,6 @@
             "First step"
           );
           break;
-
         case "callout":
           insertFormat(
             '<div class="blog-callout">\n  <h4>Important Notice</h4>\n  <p>',
@@ -707,10 +677,8 @@
             "Callout text details here."
           );
           break;
-
         case "link": {
           const url = prompt("Enter URL:", "https://");
-
           if (url) {
             insertFormat(
               `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">`,
@@ -720,7 +688,6 @@
           }
           break;
         }
-
         case "hr":
           insertFormat("<hr>\n", "", "");
           break;
@@ -733,16 +700,12 @@
       event.preventDefault();
 
       const title = fieldTitle ? fieldTitle.value.trim() : "";
-
       if (!title) {
         showToast("Article title is required.", "error");
         return;
       }
 
-      let category = fieldCategory
-        ? fieldCategory.value
-        : "General";
-
+      let category = fieldCategory ? fieldCategory.value : "General";
       if (category === "__new__") {
         category =
           (fieldCategoryCustom && fieldCategoryCustom.value.trim()) ||
@@ -752,7 +715,6 @@
       const saveButton = document.querySelector(
         'button[form="cms-editor-form"][type="submit"]'
       );
-
       if (saveButton) saveButton.disabled = true;
 
       try {
@@ -786,10 +748,7 @@
         loadDashboard();
       } catch (error) {
         console.error("Could not save article:", error);
-        showToast(
-          error.message || "Could not save the article.",
-          "error"
-        );
+        showToast(error.message || "Could not save the article.", "error");
       } finally {
         if (saveButton) saveButton.disabled = false;
       }
@@ -803,7 +762,6 @@
         `pfs-blog-posts-backup-${new Date().toISOString().slice(0, 10)}.json`,
         "application/json"
       );
-
       showToast("Article backup exported.");
     });
   }
@@ -822,10 +780,7 @@
         loadDashboard();
       } catch (error) {
         console.error("Import failed:", error);
-        showToast(
-          error.message || "Could not import articles.",
-          "error"
-        );
+        showToast(error.message || "Could not import articles.", "error");
       } finally {
         fileImportInput.value = "";
       }
@@ -839,18 +794,15 @@
         "blog-data.js",
         "application/javascript"
       );
-
       showToast("Blog data file downloaded.");
     });
   }
 
   if (btnResetDefaults) {
     btnResetDefaults.addEventListener("click", async () => {
-      const confirmed = confirm(
+      if (!confirm(
         "Replace all current articles with the original sample articles?"
-      );
-
-      if (!confirmed) return;
+      )) return;
 
       try {
         await BlogStore.resetToDefaults();
@@ -858,40 +810,141 @@
         loadDashboard();
       } catch (error) {
         console.error("Could not reset articles:", error);
-        showToast(
-          error.message || "Could not restore sample articles.",
-          "error"
-        );
+        showToast(error.message || "Could not restore sample articles.", "error");
       }
     });
   }
 
-  if (btnChangePassword) {
-    btnChangePassword.addEventListener("click", async () => {
-      const newPassword = prompt(
-        "Enter a new admin password (at least 8 characters):"
-      );
+  function openPasswordChangeDialog() {
+    const dialog = document.createElement("dialog");
 
-      if (!newPassword) return;
+    dialog.style.cssText = `
+      width: min(420px, calc(100% - 32px));
+      border: 0;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+    `;
 
-      if (newPassword.trim().length < 8) {
-        showToast("Use a password with at least 8 characters.", "error");
+    dialog.innerHTML = `
+      <form id="cms-password-change-form">
+        <h2 style="margin:0 0 8px">Change Admin Password</h2>
+        <p style="margin:0 0 18px;color:#64748b">
+          Confirm your current password, then choose a new one.
+        </p>
+
+        <label for="cms-current-password">Current password</label>
+        <input id="cms-current-password" type="password"
+          autocomplete="current-password" required
+          style="display:block;width:100%;box-sizing:border-box;margin:6px 0 14px;padding:10px">
+
+        <label for="cms-new-password">New password</label>
+        <input id="cms-new-password" type="password"
+          autocomplete="new-password" minlength="8" required
+          style="display:block;width:100%;box-sizing:border-box;margin:6px 0 14px;padding:10px">
+
+        <label for="cms-confirm-password">Confirm new password</label>
+        <input id="cms-confirm-password" type="password"
+          autocomplete="new-password" minlength="8" required
+          style="display:block;width:100%;box-sizing:border-box;margin:6px 0 10px;padding:10px">
+
+        <p id="cms-password-change-error" role="alert"
+          style="display:none;color:#b91c1c;margin:0 0 12px"></p>
+
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button type="button" id="cms-password-cancel">Cancel</button>
+          <button type="submit" id="cms-password-submit">
+            Change Password
+          </button>
+        </div>
+      </form>
+    `;
+
+    document.body.appendChild(dialog);
+
+    const form = dialog.querySelector("#cms-password-change-form");
+    const currentInput = dialog.querySelector("#cms-current-password");
+    const newInput = dialog.querySelector("#cms-new-password");
+    const confirmInput = dialog.querySelector("#cms-confirm-password");
+    const errorElement = dialog.querySelector("#cms-password-change-error");
+    const submitButton = dialog.querySelector("#cms-password-submit");
+
+    function closeDialog() {
+      if (dialog.open) dialog.close();
+      dialog.remove();
+    }
+
+    dialog.querySelector("#cms-password-cancel")
+      .addEventListener("click", closeDialog);
+
+    dialog.addEventListener("click", event => {
+      if (event.target === dialog) closeDialog();
+    });
+
+    dialog.addEventListener("close", () => dialog.remove());
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      errorElement.style.display = "none";
+
+      if (newInput.value.length < 8) {
+        errorElement.textContent =
+          "The new password must be at least 8 characters.";
+        errorElement.style.display = "block";
         return;
       }
 
-      const { error } = await supabaseClient.auth.updateUser({
-        password: newPassword
-      });
+      if (newInput.value !== confirmInput.value) {
+        errorElement.textContent = "The new passwords do not match.";
+        errorElement.style.display = "block";
+        confirmInput.focus();
+        return;
+      }
 
-      if (error) {
-        showToast(
-          error.message || "Could not update the password.",
-          "error"
-        );
-      } else {
-        showToast("Admin password updated.");
+      submitButton.disabled = true;
+      submitButton.textContent = "Updating…";
+
+      try {
+        const { error: verifyError } =
+          await supabaseClient.auth.signInWithPassword({
+            email: CMS_ADMIN_EMAIL,
+            password: currentInput.value
+          });
+
+        if (verifyError) {
+          throw new Error("The current password is incorrect.");
+        }
+
+        const { error: updateError } =
+          await supabaseClient.auth.updateUser({
+            password: newInput.value
+          });
+
+        if (updateError) throw updateError;
+
+        closeDialog();
+        showToast("Admin password changed successfully.");
+      } catch (error) {
+        console.error("Password change failed:", error);
+        errorElement.textContent =
+          error.message || "Could not change the password.";
+        errorElement.style.display = "block";
+        submitButton.disabled = false;
+        submitButton.textContent = "Change Password";
+        currentInput.value = "";
+        currentInput.focus();
       }
     });
+
+    dialog.showModal();
+    currentInput.focus();
+  }
+
+  if (btnChangePassword) {
+    btnChangePassword.addEventListener(
+      "click",
+      openPasswordChangeDialog
+    );
   }
 
   document.addEventListener("DOMContentLoaded", checkAuth);
