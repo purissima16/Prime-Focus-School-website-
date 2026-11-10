@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Discover learning, school life and facilities at Prime Focus Schools, Ipaja, Lagos.">
+  <title>Prime Focus Schools | Glorify God Always</title>
+  <link rel="icon" type="image/webp" href="images/pfs undone logo.webp">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/blog.css">
+ <script src="js/blog-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/blog-store.js"></script>
+<script src="js/blog.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="images/pfs undone logo.webp" alt="PFS school logo">
+      <span>PRIME FOCUS <small>SCHOOLS</small></span>
+    </a>
+
+    <button class="menu-toggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+
+    <nav class="main-nav">
+      <a class="active" href="index.html">Home</a>
+      <div class="nav-dropdown">
+        <a href="about.html">About <svg class="dropdown-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="dropdown-menu">
+          <a href="about.html">About the School</a>
+          <a href="anthem.html">School Anthem</a>
+        </div>
+      </div>
+      <a href="gallery.html">Gallery</a>
+      <a href="events.html">Past Events</a>
+      <a href="blog.html">Blog</a
+      <a href="contact.html">Contact Us</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="eyebrow light">WELCOME TO PRIME FOCUS SCHOOLS</p>
+        <h1>Building Minds,<br><span>Raising Leaders.</span></h1>
+        <p class="hero-text">
+          A place where curiosity is encouraged, potential is nurtured
+          and every learner is given room to grow.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-light" href="about.html">Discover Our School</a>
+          <a class="button button-outline" href="gallery.html">Explore Our Facilities</a>
+        </div>
+        <div class="hero-caption">LEARN · GROW · EXCEL</div>
+      </div>
+      <a class="scroll-cue" href="#welcome">SCROLL TO EXPLORE ↓</a>
+    </section>
+
+    <section class="welcome section" id="welcome">
+      <div class="section-heading">
+        <p class="eyebrow">A MESSAGE FROM OUR PRINCIPAL</p>
+        <h2>Every child deserves<br><span>a future full of possibility.</span></h2>
+      </div>
+
+      <div class="welcome-grid">
+        <div class="principal-photo" role="button" tabindex="0" aria-label="View Principal portrait widely">
+          <img src="images/principal-pfs.webp" alt="Principal of Prime Focus Schools">
+          <span class="zoom-cue-badge">🔍 View Widely</span>
+          <div class="photo-label">PRIME FOCUS SCHOOLS</div>
+        </div>
+        <div class="welcome-copy">
+          <p class="lead">Dear Parents, Guardians and Students,</p>
+          <p>
+            Welcome to Prime Focus Schools, where learning goes beyond
+            the classroom. We believe that education should help every
+            child develop knowledge, character, confidence and a lifelong
+            love of learning.
+          </p>
+          <p>
+            Our goal is to create an environment where students are
+            encouraged to ask questions, discover their strengths and
+            prepare for the opportunities of tomorrow. We value the
+            partnership between our school, our families and our community.
+          </p>
+          <p>
+            Thank you for being part of the Prime Focus Schools journey.
+            Together, we can help every learner move forward with purpose.
+          </p>
+          <p class="signature">The Principal <span>Prime Focus Schools</span></p>
+          <a class="text-link" href="about.html">More About Our School ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="blue-band">
+      <div>
+        <p class="eyebrow light">MORE THAN A CLASSROOM</p>
+        <h2>Room to discover.<br>Space to become.</h2>
+      </div>
+      <a class="button button-light" href="gallery.html">Explore Our Facilities ↗</a>
+    </section>
+
+    <section class="section">
+      <div class="section-heading centered">
+        <p class="eyebrow">OUR LEARNING ENVIRONMENT</p>
+        <h2>Spaces that inspire <span>discovery.</span></h2>
+        <p>Explore the facilities that support practical learning and creativity.</p>
+      </div>
+      <div class="card-grid" id="home-facilities"></div>
+      <div class="center-action">
+        <a class="button button-blue" href="gallery.html">View All Facilities ↗</a>
+      </div>
+    </section>
+
+    <section class="events-preview section">
+      <div class="section-heading">
+        <p class="eyebrow">LIFE AT PFS</p>
+        <h2>Moments worth <span>remembering.</span></h2>
+        <p>Explore celebrations, school activities and memorable moments from our community.</p>
+      </div>
+      <div class="event-grid" id="home-events"></div>
+      <div class="center-action">
+        <a class="button button-blue" href="events.html">Explore Past Events ↗</a>
+      </div>
+    </section>
+
+    <section class="section" style="background: #FAFBFD;">
+      <div class="section-heading">
+        <p class="eyebrow">NEWS &amp; INSIGHTS</p>
+        <h2>Latest from <span>our blog.</span></h2>
+        <p>Explore articles, academic updates, student achievements, and guidance from Prime Focus Schools.</p>
+      </div>
+      <div class="card-grid" id="home-blog-posts"></div>
+      <div class="center-action">
+        <a class="button button-blue" href="blog.html">Visit Our Blog ↗</a>
+      </div>
+    </section>
+
+    <section class="closing-banner">
+      <p class="eyebrow light">YOUR JOURNEY STARTS HERE</p>
+      <h2>Focused on learning.<br>Ready for the future.</h2>
+      <a class="button button-light" href="contact.html">Get in Touch ↗</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-main">
+      <a class="brand footer-brand" href="index.html">
+        <img src="images/pfs undone logo.webp" alt="Prime Focus Schools logo">
+        <span>PRIME FOCUS <small>SCHOOLS</small></span>
+      </a>
+      <p>Glorify God Always.</p>
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="anthem.html">Anthem</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="events.html">Past Events</a>
+        <a href="blog.html">Blog</a>
+        <a href="contact.html">Contact</a>
+        <a href="cms.html" style="color: var(--light-blue); font-weight: 700;">CMS Portal</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span class="current-year"></span> Prime Focus Schools</span>
+      <span>LEARN · GROW · EXCEL</span>
+    </div>
+  </footer>
+</body>
+</html>

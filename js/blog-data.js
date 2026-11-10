@@ -1,0 +1,110 @@
+/**
+ * Prime Focus Schools - Blog Posts Dataset
+ * Synchronized via local CMS server on 2026-10-26 14:22:51
+ * Glorify God Always | Ipaja, Lagos
+ */
+
+const defaultBlogPosts = [
+  {
+    "id": "pfs-welcome-new-academic-session",
+    "slug": "welcome-to-new-academic-term-prime-focus-schools",
+    "title": "Welcoming Our Students to an Inspiring New Academic Term",
+    "category": "Announcements",
+    "author": "Dr. Mrs. A. Adeyemi",
+    "authorRole": "Principal, Prime Focus Schools",
+    "date": "October 20, 2026",
+    "cover": "images/school-1.webp",
+    "coverCaption": "Prime Focus Schools campus grounds welcoming our students for the term",
+    "readTime": "4 min read",
+    "excerpt": "As we commence another enriching academic term, we welcome our students, parents, and teachers with renewed zeal, upgraded learning facilities, and high spiritual and academic standards.",
+    "content": "<p class=\"lead\">A warm welcome to all new and returning learners, parents, and dedicated teachers of Prime Focus Schools as we begin another academic term filled with purpose, progress, and promise.</p><p>At Prime Focus Schools, our motto—<em>Glorify God Always</em>—remains the bedrock of everything we do. We believe that true academic accomplishment is most meaningful when grounded in moral uprightness, discipline, diligence, and godly character. This term, our theme centers on <strong>\"Pursuing Excellence Through Diligence and Character.\"</strong></p><h2>Our Key Priorities for the Term</h2><p>Education is a dynamic journey that requires constant innovation. This term, our administration has instituted several improvements to elevate the learner experience:</p><ul><li><strong>Strengthened STEM Curriculum:</strong> Integrating more hands-on practical sessions in Physics, Chemistry, Biology, and Technical Drawing laboratories.</li><li><strong>Expanded Digital Literacy & ICT:</strong> Preparing our students with computational thinking, foundational coding skills, and digital problem-solving.</li><li><strong>Character & Leadership Mentorship:</strong> Weekly chapel assemblies, prefect training, and pastoral care sessions to nurture confident, compassionate leaders.</li><li><strong>Vocational Skills Training:</strong> Continuing practical exposure in ICT, music, fashion design, and creative crafts for well-rounded development.</li></ul><blockquote>\"Train up a child in the way he should go: and when he is old, he will not depart from it.\" — Proverbs 22:6. At Prime Focus Schools, our mission is to ensure every child discovers their God-given potential and steps into the world with confidence and purpose.</blockquote><h2>Partnering with Our Parents</h2><p>The academic and moral growth of our children thrives most when there is active, open collaboration between the home and the school. We encourage all parents to:</p><ol><li>Review daily homework notebooks and digital learning materials with your children.</li><li>Ensure prompt arrival before morning devotion at 7:45 AM.</li><li>Maintain consistent communication with class teachers and school administrators.</li><li>Attend upcoming Parent-Teacher Consultations scheduled for mid-term.</li></ol><div class=\"blog-callout\"><h4>Important Term Dates to Note</h4><p>Mid-Term Assessments will take place in the 6th week of the term, followed immediately by our Open Day. The detailed term calendar has been dispatched to all parents via the school communication desk.</p></div><p>We invite you to join us in prayer and dedicated partnership as we guide our young champions toward greater heights. Here is to a fulfilling, peaceful, and triumphant academic term!</p>",
+    "tags": [
+      "Announcements",
+      "Resumption",
+      "Academic Term",
+      "School Life"
+    ],
+    "featured": true,
+    "status": "published",
+    "createdAt": "2026-10-20T08:00:00.000Z",
+    "updatedAt": "2026-10-20T08:00:00.000Z"
+  },
+  {
+    "id": "pfs-science-stem-ict-laboratories",
+    "slug": "hands-on-discovery-inside-our-science-ict-laboratories",
+    "title": "Hands-On Discovery: Inside Our Newly Equipped Science & ICT Laboratories",
+    "category": "Academic Excellence",
+    "author": "Mr. K. Babatunde",
+    "authorRole": "Head of Sciences & ICT",
+    "date": "October 12, 2026",
+    "cover": "images/ict-lab.webp",
+    "coverCaption": "Students engaged in computer and digital skills in the PFS ICT Laboratory",
+    "readTime": "5 min read",
+    "excerpt": "Practical education is the foundation of scientific inquiry. Discover how PFS learners explore physics, chemistry, biology, and digital computing daily.",
+    "content": "<p class=\"lead\">Science and technology are not merely textbook subjects—they are pathways through which young minds observe, experiment, test hypotheses, and solve real-world problems.</p><p>At Prime Focus Schools, Ipaja, we take immense pride in providing dedicated, fully equipped laboratory spaces designed to turn abstract concepts into tangible understanding. From microscopic cell observation to molecular chemical titrations and computer software design, our students learn by doing.</p><h2>Equipping the Next Generation of Innovators</h2><p>Our science complex comprises four specialized facilities tailored to national curriculum standards and international STEM benchmarks:</p><h3>1. The Physics Laboratory</h3><p>Equipped with optical benches, electrical circuit apparatus, mechanics kits, and measuring instruments, the Physics lab enables senior students to independently verify physical laws and grasp the principles that drive modern engineering.</p><h3>2. The Chemistry Laboratory</h3><p>Safety is paramount in our Chemistry lab. With modern fume hoods, precision reagent storage, gas lines, and safety shower equipment, learners carry out qualitative and volumetric analyses with utmost confidence.</p><h3>3. The Biology & Life Sciences Laboratory</h3><p>Featuring binocular microscopes, anatomical charts, preserved specimens, and botanical slides, learners explore the intricate wonders of God's living creations from cellular structures to complex ecological systems.</p><h3>4. The ICT and Digital Computing Suite</h3><p>With high-speed workstations, ergonomic seating, and interactive monitors, students learn digital literacy, word processing, spreadsheet modeling, presentation design, and introductory algorithm logic.</p><blockquote>\"When students see a reaction turn vibrant colors or assemble a functioning circuit with their own hands, the excitement of learning transforms into a lasting passion for discovery.\"</blockquote><h2>Bridging Theory and Career Pathways</h2><p>Beyond passing WAEC, NECO, and BECE examinations with distinction, our laboratory program prepares students for competitive careers in Medicine, Engineering, Computer Science, Data Analytics, and Environmental Sciences. We look forward to showcasing more student innovations during our upcoming Science & Tech Exhibition!</p>",
+    "tags": [
+      "STEM",
+      "Laboratories",
+      "ICT",
+      "Innovation",
+      "Academic Excellence"
+    ],
+    "featured": false,
+    "status": "published",
+    "createdAt": "2026-10-12T10:30:00.000Z",
+    "updatedAt": "2026-10-12T10:30:00.000Z"
+  },
+  {
+    "id": "pfs-cultural-day-celebration-highlights",
+    "slug": "celebrating-heritage-harmony-highlights-from-pfs-cultural-day",
+    "title": "Celebrating Heritage & Harmony: Highlights from PFS Cultural Day",
+    "category": "Culture & Events",
+    "author": "PFS Press Club",
+    "authorRole": "Student & Staff Editorial Team",
+    "date": "September 28, 2026",
+    "cover": "images/events/yoruba.webp",
+    "coverCaption": "Students dressed in resplendent traditional Nigerian attire during PFS Cultural Day",
+    "readTime": "3 min read",
+    "excerpt": "Colorful attires, traditional delicacies, and captivating stage performances brought Nigerian heritage to life during our annual school cultural festival.",
+    "content": "<p class=\"lead\">The school auditorium was a kaleidoscope of colors, rich textures, and rhythmic drumming as Prime Focus Schools held its Annual Cultural Day celebration.</p><p>The event, which brought together students, teachers, parents, and alumni, was staged under the inspiring theme: <strong>\"Unity in Diversity: Celebrating Our Roots, Building Our Nation.\"</strong></p><h2>A Vibrant Display of Nigerian Traditions</h2><p>Students were grouped into cultural representation houses to showcase the diverse customs and heritage of Nigeria:</p><ul><li><strong>Yoruba Heritage:</strong> Dressed in majestic Aso-Oke, Agbada, and Iro and Buba, students performed royal palace greetings, rendered proverbs, and showcased classic Bata and Apala dances.</li><li><strong>Hausa-Fulani Splendour:</strong> Presenting northern hospitality, students wore graceful Babban Riga and flowing Kaftans, demonstrating traditional folklore and greetings.</li><li><strong>Igbo Cultural Pageantry:</strong> Vibrant Isiagu outfits, coral beads, and energetic masquerade dance representations thrilled the audience.</li><li><strong>South-South & Edo Splendor:</strong> Regal velvet wraps, intricate Okuku crowns, and ceremonial bronze-inspired tableaus honored the historic Benin kingdom and Niger Delta traditions.</li></ul><blockquote>\"Culture is the identity of a people. Teaching our children to respect their heritage and appreciate the customs of others builds mutual understanding, national unity, and emotional intelligence.\"</blockquote><h2>Culinary Showcase & Community Bonding</h2><p>Parents participated enthusiastically by preparing authentic delicacies including pounded yam with egusi, jollof rice, tuwo shinkafa, edikang ikong, and fresh palm wine punch. We extend heartfelt gratitude to all parents, costume designers, and staff coordinators whose hard work made this edition unforgettable.</p>",
+    "tags": [
+      "Culture",
+      "Heritage",
+      "Celebrations",
+      "School Events"
+    ],
+    "featured": false,
+    "status": "published",
+    "createdAt": "2026-09-28T14:15:00.000Z",
+    "updatedAt": "2026-09-28T14:15:00.000Z"
+  },
+  {
+    "id": "pfs-nurturing-character-leadership",
+    "slug": "nurturing-character-integrity-and-faith-in-the-21st-century-learner",
+    "title": "Nurturing Character, Integrity, and Faith in the 21st Century Learner",
+    "category": "Parent & Student Guide",
+    "author": "School Counselling Unit",
+    "authorRole": "Guidance & Counselling",
+    "date": "September 15, 2026",
+    "cover": "images/events/anjola-award.webp",
+    "coverCaption": "Award winners honored for exceptional leadership, academic integrity, and character",
+    "readTime": "4 min read",
+    "excerpt": "True education cultivates both intellectual capability and moral excellence. Here is our holistic approach to mentoring confident and God-fearing future leaders.",
+    "content": "<p class=\"lead\">In an era characterized by rapid technological advancement and social shifts, academic achievement alone is not sufficient to guarantee long-term success. The foundation of enduring greatness is character.</p><p>At Prime Focus Schools, our educational philosophy is anchored on the holistic development of the child: <em>Heart, Head, and Hands</em>. We nurture learners who not only excel in examinations but also possess strong moral fortitude, empathy, and leadership integrity.</p><h2>The Pillars of Character Development at PFS</h2><p>Our approach integrates four essential pillars into daily school life:</p><h3>1. Spiritual Foundation & Moral Uprightness</h3><p>Rooted in our motto \"Glorify God Always,\" students are taught the value of honesty, prayer, fairness, and reverence in all situations. Integrity means doing the right thing even when no one is watching.</p><h3>2. Emotional Resilience & Self-Discipline</h3><p>Through our dedicated Guidance & Counselling desk, students learn constructive ways to handle academic stress, resolve conflicts peacefully, and build self-confidence without arrogance.</p><h3>3. Peer Collaboration & Community Responsibility</h3><p>Group projects, prefectship duties, and school clubs encourage students to serve one another and understand that true leadership is demonstrated through service.</p><h3>4. Practical Vocational Competence</h3><p>By learning practical vocational skills such as music, fashion, and technology, our students cultivate humility, patience, and pride in honest labor.</p><div class=\"blog-callout\"><h4>Practical Tips for Parents at Home</h4><p>1. Model the values you want to see: honesty, punctuality, and respect.<br>2. Set clear digital boundaries and monitor screen time balance.<br>3. Praise effort and honesty as much as good exam scores.</p></div><p>Together, school and family can raise a generation of exceptional leaders who shine brightly wherever they go.</p>",
+    "tags": [
+      "Character",
+      "Leadership",
+      "Guidance",
+      "Faith",
+      "Parenting"
+    ],
+    "featured": false,
+    "status": "published",
+    "createdAt": "2026-09-15T09:00:00.000Z",
+    "updatedAt": "2026-09-15T09:00:00.000Z"
+  }
+];
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { defaultBlogPosts };
+}

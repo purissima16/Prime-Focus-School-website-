@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View event photo album and memorable moments from Prime Focus Schools.">
+  <title>Event Photos | Prime Focus Schools</title>
+  <link rel="icon" type="image/webp" href="images/pfs undone logo.webp">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="images/pfs undone logo.webp" alt="Prime Focus Schools logo">
+      <span>PRIME FOCUS <small>SCHOOLS</small></span>
+    </a>
+    <button class="menu-toggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <div class="nav-dropdown">
+        <a href="about.html">About <svg class="dropdown-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="dropdown-menu">
+          <a href="about.html">About the School</a>
+          <a href="anthem.html">School Anthem</a>
+        </div>
+      </div>
+      <a href="gallery.html">Gallery</a>
+      <a class="active" href="events.html">Past Events</a>
+      <a href="blog.html">Blog</a>
+      <a href="contact.html">Contact Us</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero event-hero">
+      <div class="breadcrumb-nav">
+        <a class="back-link" href="events.html">← Back to Past Events</a>
+      </div>
+      <p class="eyebrow light"><span id="event-eyebrow">EVENT GALLERY</span> · <span id="event-photo-count">0</span> PHOTOS</p>
+      <h1 id="event-title">Event Photos</h1>
+      <p id="event-description">Exploring moments and memories from Prime Focus Schools.</p>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <p class="eyebrow">PHOTO ALBUM</p>
+        <h2>Moments captured <span>in detail.</span></h2>
+        <p>Click on any photograph to view it in full screen.</p>
+      </div>
+
+      <div class="single-event-grid" id="single-event-photos">
+        <!-- Rendered dynamically by main.js -->
+      </div>
+    </section>
+
+    <section class="section events-preview">
+      <div class="section-heading">
+        <p class="eyebrow">MORE MEMORIES</p>
+        <h2>Explore other <span>events.</span></h2>
+        <p>Take a look at photos from our other school celebrations and activities.</p>
+      </div>
+
+      <div class="event-grid" id="other-events">
+        <!-- Rendered dynamically by main.js -->
+      </div>
+    </section>
+
+    <section class="blue-band">
+      <div>
+        <p class="eyebrow light">JOIN OUR COMMUNITY</p>
+        <h2>Experience learning and life at PFS.</h2>
+      </div>
+      <a class="button button-light" href="contact.html">Contact Us Today ↗</a>
+    </section>
+  </main>
+
+  <!-- Interactive Lightbox Modal -->
+  <div id="lightbox" class="lightbox" hidden role="dialog" aria-modal="true" aria-label="Photo Viewer">
+    <div class="lightbox-overlay" id="lightbox-backdrop"></div>
+    <div class="lightbox-dialog">
+      <button class="lightbox-close" id="lightbox-close" aria-label="Close photo viewer">✕</button>
+      <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous photo">❮</button>
+      <div class="lightbox-body">
+        <img id="lightbox-img" src="" alt="Enlarged event photograph">
+        <div class="lightbox-caption">
+          <p id="lightbox-title"></p>
+          <span id="lightbox-counter"></span>
+        </div>
+      </div>
+      <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next photo">❯</button>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-main">
+      <a class="brand footer-brand" href="index.html">
+        <img src="images/pfs undone logo.webp" alt="Prime Focus Schools logo">
+        <span>PRIME FOCUS <small>SCHOOLS</small></span>
+      </a>
+      <p>Glorify God Always.</p>
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="anthem.html">Anthem</a>
+        <a href="gallery.html">Gallery</a>
+        <a class="active" href="events.html">Past Events</a>
+        <a href="blog.html">Blog</a>
+        <a href="contact.html">Contact</a>
+        <a href="cms.html" style="color: var(--light-blue); font-weight: 700;">CMS Portal</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span class="current-year"></span> Prime Focus Schools</span>
+      <span>LEARN · GROW · EXCEL</span>
+    </div>
+  </footer>
+</body>
+</html>

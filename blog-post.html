@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Read full school articles, stories, announcements and updates from Prime Focus Schools, Ipaja, Lagos.">
+  <title>Article | Prime Focus Schools Blog</title>
+  <link rel="icon" type="image/webp" href="images/pfs undone logo.webp">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/blog.css">
+<script src="js/blog-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/blog-store.js"></script>
+<script src="js/blog.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="images/pfs undone logo.webp" alt="PFS school logo">
+      <span>PRIME FOCUS <small>SCHOOLS</small></span>
+    </a>
+
+    <button class="menu-toggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <div class="nav-dropdown">
+        <a href="about.html">About <svg class="dropdown-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="dropdown-menu">
+          <a href="about.html">About the School</a>
+          <a href="anthem.html">School Anthem</a>
+        </div>
+      </div>
+      <a href="gallery.html">Gallery</a>
+      <a href="events.html">Past Events</a>
+      <a class="active" href="blog.html">Blog</a>
+      <a href="contact.html">Contact Us</a>
+    </nav>
+  </header>
+
+  <main>
+    <article class="single-post-wrapper" id="single-post-content">
+      <!-- Breadcrumbs -->
+      <nav class="post-breadcrumbs" aria-label="Breadcrumbs">
+        <a href="index.html">Home</a>
+        <span>›</span>
+        <a href="blog.html">Blog</a>
+        <span>›</span>
+        <a href="blog.html" id="post-breadcrumb-category">Category</a>
+        <span>›</span>
+        <span id="post-breadcrumb-title" style="color: var(--navy); font-weight: 600;">Article</span>
+      </nav>
+
+      <!-- Post Header -->
+      <header class="post-header">
+        <div class="post-header-meta">
+          <span class="article-category-badge" id="post-category-badge">Category</span>
+          <span class="meta-dot"></span>
+          <span id="post-date-display" style="font-size: 13px; color: var(--muted); font-weight: 600;">Date</span>
+          <span class="meta-dot"></span>
+          <span id="post-readtime-display" style="font-size: 13px; color: var(--blue); font-weight: 700;">3 min read</span>
+        </div>
+
+        <h1 id="post-title-display">Article Title</h1>
+
+        <div class="author-header-box">
+          <div class="author-avatar-circle" id="post-author-avatar">PFS</div>
+          <div class="author-header-info">
+            <span class="name" id="post-author-name">Author Name</span>
+            <span class="role" id="post-author-role">Author Role</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Featured Image -->
+      <div class="post-hero-image-wrap zoomable-img-trigger" role="button" tabindex="0" aria-label="View article cover photo widely">
+        <img id="post-cover-image" src="images/school-hero.webp" alt="Article Cover" loading="lazy">
+        <span class="zoom-cue-badge">🔍 View Widely</span>
+        <div class="post-image-caption" id="post-cover-caption" style="display: none;"></div>
+      </div>
+
+      <!-- Main Body Content -->
+      <div class="post-body" id="post-body-content">
+        <!-- Rich article text injected dynamically -->
+      </div>
+
+      <!-- Article Tags -->
+      <div class="post-tags-container">
+        <span class="post-tags-label">Tags:</span>
+        <div id="post-tags-list" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+      </div>
+
+      <!-- Social Sharing Bar -->
+      <section class="post-share-bar" aria-label="Share article">
+        <span class="post-share-label">Share this story:</span>
+        <div class="share-buttons-group">
+          <button type="button" class="share-btn btn-copy" id="share-btn-copy" title="Copy article link to clipboard">
+            🔗 Copy Link
+          </button>
+          <a class="share-btn btn-whatsapp" id="share-btn-whatsapp" target="_blank" rel="noopener noreferrer" title="Share via WhatsApp">
+            💬 WhatsApp
+          </a>
+          <a class="share-btn btn-x" id="share-btn-x" target="_blank" rel="noopener noreferrer" title="Share on X / Twitter">
+            𝕏 Post
+          </a>
+          <a class="share-btn btn-facebook" id="share-btn-facebook" target="_blank" rel="noopener noreferrer" title="Share on Facebook">
+            Facebook
+          </a>
+        </div>
+      </section>
+
+      <!-- Author Bio Box -->
+      <section class="author-bio-card">
+        <div class="bio-avatar" id="bio-author-avatar">PFS</div>
+        <div class="author-bio-copy">
+          <h4 id="bio-author-name">Prime Focus Schools</h4>
+          <p class="role-tag" id="bio-author-role">Editorial Board</p>
+          <p>
+            Prime Focus Schools is a premier educational institution in Ipaja, Lagos, dedicated to academic excellence, 
+            moral values, practical skills, and holistic character formation. Our guiding motto is <em>Glorify God Always</em>.
+          </p>
+        </div>
+      </section>
+
+      <!-- Prev / Next Navigation -->
+      <nav class="post-navigation-bar" aria-label="Adjacent articles">
+        <a href="blog.html" class="nav-post-card prev" id="nav-prev-post">
+          <span class="nav-direction-label">← Previous Article</span>
+          <span class="nav-post-title">Previous Article Title</span>
+        </a>
+        <a href="blog.html" class="nav-post-card next" id="nav-next-post">
+          <span class="nav-direction-label">Next Article →</span>
+          <span class="nav-post-title">Next Article Title</span>
+        </a>
+      </nav>
+
+      <div style="text-align: center; margin-top: 20px;">
+        <a href="blog.html" class="button button-outline" style="border-color: var(--blue); color: var(--blue); background: transparent;">
+          ← Back to All Articles
+        </a>
+      </div>
+    </article>
+
+    <!-- Related Articles -->
+    <section class="related-posts-section" id="related-posts-section">
+      <div class="related-posts-wrapper">
+        <div class="related-heading">
+          <h2>Related <span>Stories &amp; Updates</span></h2>
+        </div>
+        <div class="blog-posts-grid" id="related-posts-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-main">
+      <a class="brand footer-brand" href="index.html">
+        <img src="images/pfs undone logo.webp" alt="Prime Focus Schools logo">
+        <span>PRIME FOCUS <small>SCHOOLS</small></span>
+      </a>
+      <p>Glorify God Always.</p>
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="anthem.html">Anthem</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="events.html">Past Events</a>
+        <a class="active" href="blog.html">Blog</a>
+        <a href="contact.html">Contact</a>
+        <a href="cms.html" style="color: var(--light-blue); font-weight: 700;">CMS Portal</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span class="current-year"></span> Prime Focus Schools</span>
+      <span>LEARN · GROW · EXCEL</span>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PFS Blog Content Management System | Prime Focus Schools</title>
+  <link rel="icon" type="image/webp" href="images/pfs undone logo.webp">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/blog.css">
+  <link rel="stylesheet" href="css/cms.css">
+<script src="js/blog-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/blog-store.js"></script>
+<script src="js/cms.js" defer></script>
+</head>
+<body class="cms-body">
+
+  <!-- ==========================================================================
+       1. Authentication Lockscreen (Gatekeeper)
+       ========================================================================== -->
+  <div id="cms-auth-overlay" class="cms-auth-overlay">
+    <div class="cms-auth-box">
+      <div class="cm
+      s-auth-logo">
+        <img src="images/pfs undone logo.webp" alt="Prime Focus Schools">
+      </div>
+      <h2>PFS Blog CMS Portal</h2>
+      <p class="auth-sub">Enter the administrative passcode to manage school articles and updates.</p>
+
+      <form id="cms-auth-form">
+        <div class="cms-form-group">
+          <label for="cms-auth-pass">Passcode</label>
+          <input 
+            type="password" 
+            id="cms-auth-pass" 
+            class="cms-input" 
+            placeholder="Enter admin passcode" 
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <div class="cms-form-group" style="display: flex; justify-content: space-between; align-items: center;">
+          <label class="cms-checkbox-label" style="text-transform: none; font-size: 13px; font-weight: 500;">
+            <input type="checkbox" id="cms-auth-remember">
+            Remember this session
+          </label>
+        </div>
+
+        <div id="cms-auth-error" style="color: var(--cms-danger); font-size: 12.5px; font-weight: 600; margin-bottom: 14px; display: none;">
+          Invalid passcode. Please try again.
+        </div>
+
+        <button type="submit" class="cms-btn cms-btn-primary cms-btn-block">
+          Unlock Admin Portal →
+        </button>
+<!-- 
+        <div class="auth-hint">
+          <strong>Default Passcode:</strong> <code>pfsadmin2026</code><br>
+          <small>You can change this anytime from the CMS toolbox.</small>
+        </div> -->
+
+        <div style="margin-top: 20px;">
+          <a href="blog.html" style="font-size: 12.5px; color: var(--cms-blue); font-weight: 600;">← Return to Public Blog</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       2. CMS Top Navigation Bar
+       ========================================================================== -->
+  <header class="cms-header">
+    <div class="cms-brand-group">
+      <img src="images/pfs undone logo.webp" alt="Prime Focus Schools Logo">
+      <div class="cms-brand-title">
+        PRIME FOCUS SCHOOLS
+        <small>BLOG CONTENT MANAGEMENT SYSTEM</small>
+      </div>
+    </div>
+
+    <div class="cms-header-actions">
+      <a href="blog.html" class="cms-btn cms-btn-outline" style="font-size: 12px; height: 38px;">
+        View Live Blog ↗
+      </a>
+      <span class="badge-user">👤 Admin Staff</span>
+      <button type="button" id="cms-logout-btn" class="cms-btn cms-btn-secondary" style="font-size: 12px; height: 38px;">
+        Sign Out
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       3. Main Dashboard View
+       ========================================================================== -->
+  <main class="cms-main">
+
+    <!-- Metrics Bar -->
+    <div class="cms-stats-grid">
+      <div class="cms-stat-card">
+        <div class="cms-stat-info">
+          <p>Total Articles</p>
+          <h3 id="stat-total-posts">0</h3>
+        </div>
+        <div class="cms-stat-icon">📚</div>
+      </div>
+
+      <div class="cms-stat-card">
+        <div class="cms-stat-info">
+          <p>Published Live</p>
+          <h3 id="stat-published-posts" style="color: var(--cms-success);">0</h3>
+        </div>
+        <div class="cms-stat-icon" style="color: var(--cms-success); background: #ECFDF5;">✓</div>
+      </div>
+
+      <div class="cms-stat-card">
+        <div class="cms-stat-info">
+          <p>Draft Articles</p>
+          <h3 id="stat-draft-posts" style="color: var(--cms-warning);">0</h3>
+        </div>
+        <div class="cms-stat-icon" style="color: var(--cms-warning); background: #FFFBEB;">📝</div>
+      </div>
+
+      <div class="cms-stat-card">
+        <div class="cms-stat-info">
+          <p>Categories</p>
+          <h3 id="stat-categories" style="color: var(--cms-blue);">0</h3>
+        </div>
+        <div class="cms-stat-icon">🏷</div>
+      </div>
+    </div>
+
+    <!-- Posts Management Table Card -->
+    <div class="cms-content-card">
+      <div class="cms-card-header">
+        <div>
+          <h2>Articles &amp; Announcements</h2>
+          <p style="font-size: 13px; color: var(--cms-muted); margin-top: 4px;">
+            Publish, edit, unpublish, and organize stories for the Prime Focus Schools blog.
+          </p>
+        </div>
+        <div class="cms-card-actions">
+          <button type="button" id="cms-new-post-btn" class="cms-btn cms-btn-primary">
+            + Create New Article
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters Toolbar -->
+      <div class="cms-filter-bar">
+        <div class="cms-search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="cms-search-input" placeholder="Filter articles by title, author, keyword...">
+        </div>
+
+        <div class="cms-filter-selects">
+          <select id="cms-category-filter" aria-label="Filter by category">
+            <option value="all">All Categories</option>
+          </select>
+
+          <select id="cms-status-filter" aria-label="Filter by status">
+            <option value="all">All Statuses</option>
+            <option value="published">Published</option>
+            <option value="draft">Drafts</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Table Wrapper -->
+      <div class="cms-table-wrapper">
+        <table class="cms-table">
+          <thead>
+            <tr>
+              <th style="width: 70px;">Cover</th>
+              <th>Title &amp; Summary</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th style="text-align: center;">Featured</th>
+              <th>Published</th>
+              <th style="width: 150px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="cms-posts-tbody">
+            <!-- Populated dynamically by cms.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Data Management & Portability Toolbox -->
+    <div class="cms-toolbox-card">
+      <h3>CMS Backup &amp; Deployment Tools</h3>
+      <p>
+        Keep your blog updated and backup school records anytime. You can export JSON backups, 
+        import articles, or download the updated <code>blog-data.js</code> file to deploy updates permanently.
+      </p>
+
+      <div class="cms-toolbox-btns">
+        <button type="button" id="btn-download-js" class="cms-btn cms-btn-secondary" title="Export updated js/blog-data.js for static sites">
+          ⬇ Download updated <code>blog-data.js</code>
+        </button>
+
+        <button type="button" id="btn-export-json" class="cms-btn cms-btn-secondary">
+          💾 Export JSON Backup
+        </button>
+
+        <button type="button" id="btn-import-json" class="cms-btn cms-btn-secondary">
+          📂 Import Articles JSON
+        </button>
+        <input type="file" id="file-import-input" accept=".json" style="display: none;">
+
+        <button type="button" id="btn-change-password" class="cms-btn cms-btn-secondary">
+          🔑 Change Passcode
+        </button>
+
+        <button type="button" id="btn-reset-defaults" class="cms-btn cms-btn-danger" style="margin-left: auto;">
+          ↺ Reset to Sample Articles
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==========================================================================
+       4. Post Editor Slide-Over Modal
+       ========================================================================== -->
+  <div id="cms-editor-modal" class="cms-editor-modal" role="dialog" aria-modal="true" aria-labelledby="editor-title-text">
+    <div class="cms-editor-pane">
+      <div class="cms-editor-header">
+        <h3 id="editor-title-text">Create New Article</h3>
+        <button type="button" id="cms-editor-close" class="cms-editor-close" aria-label="Close editor">✕</button>
+      </div>
+
+      <div class="cms-editor-body">
+        <form id="cms-editor-form">
+          <input type="hidden" id="field-post-id">
+
+          <!-- Title & Slug -->
+          <div class="editor-grid-2">
+            <div class="cms-form-group">
+              <label for="field-title">Article Title *</label>
+              <input type="text" id="field-title" class="cms-input" placeholder="e.g. Highlights from Our Inter-House Sports Festival" required>
+            </div>
+            <div class="cms-form-group">
+              <label for="field-slug">URL Slug</label>
+              <input type="text" id="field-slug" class="cms-input" placeholder="e.g. highlights-inter-house-sports-festival">
+            </div>
+          </div>
+
+          <!-- Category, Status, Featured -->
+          <div class="editor-grid-3">
+            <div class="cms-form-group">
+              <label for="field-category">Category</label>
+              <select id="field-category" class="cms-input">
+                <!-- Populated dynamically -->
+              </select>
+              <input type="text" id="field-category-custom" class="cms-input" placeholder="Type new category name..." style="display: none; margin-top: 6px;">
+            </div>
+
+            <div class="cms-form-group">
+              <label for="field-status">Status</label>
+              <select id="field-status" class="cms-input">
+                <option value="published">Published (Live immediately)</option>
+                <option value="draft">Draft (Private, not visible on blog)</option>
+              </select>
+            </div>
+
+            <div class="cms-form-group" style="display: flex; flex-direction: column; justify-content: center;">
+              <label class="cms-checkbox-label" style="margin-top: 18px;">
+                <input type="checkbox" id="field-featured">
+                <span>⭐ Feature this article at top</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Author, Role, Date -->
+          <div class="editor-grid-3">
+            <div class="cms-form-group">
+              <label for="field-author">Author Name</label>
+              <input type="text" id="field-author" class="cms-input" placeholder="e.g. Dr. Mrs. A. Adeyemi">
+            </div>
+
+            <div class="cms-form-group">
+              <label for="field-author-role">Author Role / Designation</label>
+              <input type="text" id="field-author-role" class="cms-input" placeholder="e.g. Principal, Prime Focus Schools">
+            </div>
+
+            <div class="cms-form-group">
+              <label for="field-date">Publication Date</label>
+              <input type="text" id="field-date" class="cms-input" placeholder="e.g. October 26, 2026">
+            </div>
+          </div>
+
+          <!-- Cover Image Selector -->
+          <div class="cms-form-group">
+            <label>Article Cover Image</label>
+            <div class="image-selector-wrap">
+              <input type="text" id="field-cover" class="cms-input" placeholder="Image URL or local path (e.g. images/school-1.webp)">
+
+              <!-- Quick image picker chips -->
+              <div class="quick-image-pills">
+                <span style="font-size: 11px; font-weight: 700; color: var(--cms-muted);">Quick Pick School Photos:</span>
+                <button type="button" class="quick-img-chip" data-src="images/school-2.webp">Academic Campus HD</button>
+                <button type="button" class="quick-img-chip" data-src="images/school-1.webp">Courtyard & Court HD</button>
+                <button type="button" class="quick-img-chip" data-src="images/school-hero.webp">School Hero Panorama</button>
+                <button type="button" class="quick-img-chip" data-src="images/ict-lab.webp">ICT Lab</button>
+                <button type="button" class="quick-img-chip" data-src="images/physics-lab.webp">Physics Lab</button>
+                <button type="button" class="quick-img-chip" data-src="images/chemistry-lab.webp">Chemistry Lab</button>
+                <button type="button" class="quick-img-chip" data-src="images/biology-lab.webp">Biology Lab</button>
+                <button type="button" class="quick-img-chip" data-src="images/principal-pfs.webp">Principal Photo</button>
+                <button type="button" class="quick-img-chip" data-src="images/events/yoruba.webp">Cultural Day</button>
+                <button type="button" class="quick-img-chip" data-src="images/events/anjola-award.webp">Awards Day</button>
+                <button type="button" class="quick-img-chip" data-src="images/events/ball.webp">Sports Day</button>
+              </div>
+
+              <div style="display: flex; gap: 10px; align-items: center; margin-top: 4px;">
+                <label for="field-cover-file" class="cms-btn cms-btn-secondary" style="font-size: 12px; height: 36px; cursor: pointer;">
+                  📁 Upload Photo from Computer...
+                </label>
+                <input type="file" id="field-cover-file" accept="image/*" style="display: none;">
+                <span style="font-size: 11.5px; color: var(--cms-muted);">Image automatically optimizes for web preview</span>
+              </div>
+
+              <!-- Live Preview of Cover -->
+              <div class="image-preview-box">
+                <img id="editor-cover-preview" src="images/school-1.webp" alt="Cover Preview">
+              </div>
+
+              <input type="text" id="field-cover-caption" class="cms-input" placeholder="Optional image caption (e.g. PFS students presenting at the science fair)">
+            </div>
+          </div>
+
+          <!-- Excerpt -->
+          <div class="cms-form-group">
+            <label for="field-excerpt">Short Summary / Excerpt (shown on article card)</label>
+            <textarea id="field-excerpt" class="cms-textarea" style="min-height: 70px;" placeholder="Write a 1-2 sentence teaser to engage readers..."></textarea>
+          </div>
+
+          <!-- Rich Content Editor with Toolbar & Preview -->
+          <div class="cms-form-group">
+            <label>Article Body Content *</label>
+
+            <div class="editor-toolbar">
+              <button type="button" class="toolbar-btn" data-action="bold" title="Bold"><strong>B</strong></button>
+              <button type="button" class="toolbar-btn" data-action="italic" title="Italic"><em>I</em></button>
+              <div class="toolbar-divider"></div>
+              <button type="button" class="toolbar-btn" data-action="h2" title="Section Heading">H2</button>
+              <button type="button" class="toolbar-btn" data-action="h3" title="Subheading">H3</button>
+              <div class="toolbar-divider"></div>
+              <button type="button" class="toolbar-btn" data-action="ul" title="Bullet List">• List</button>
+              <button type="button" class="toolbar-btn" data-action="ol" title="Numbered List">1. List</button>
+              <button type="button" class="toolbar-btn" data-action="quote" title="Quote">“ Quote</button>
+              <button type="button" class="toolbar-btn" data-action="callout" title="Important Callout Box">💡 Notice Box</button>
+              <button type="button" class="toolbar-btn" data-action="link" title="Insert Link">🔗 Link</button>
+              <button type="button" class="toolbar-btn" data-action="hr" title="Divider">— Line</button>
+
+              <div class="editor-mode-tabs">
+                <button type="button" id="tab-mode-write" class="editor-mode-tab active">Write</button>
+                <button type="button" id="tab-mode-preview" class="editor-mode-tab">Preview</button>
+              </div>
+            </div>
+
+            <textarea id="field-content" class="cms-textarea content-textarea" placeholder="Write or paste your article HTML/text here..."></textarea>
+            <div id="editor-preview-pane" class="content-preview-pane post-body"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+              <small style="color: var(--cms-muted);">Supports rich HTML formatting &amp; paragraphs</small>
+              <span id="editor-word-count" style="font-size: 11.5px; font-weight: 700; color: var(--cms-blue);">0 words · ~1 min read</span>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="cms-form-group">
+            <label for="field-tags">Tags (comma-separated)</label>
+            <input type="text" id="field-tags" class="cms-input" placeholder="e.g. Announcements, Resumption, Sports, Parents">
+          </div>
+        </form>
+      </div>
+
+      <div class="cms-editor-footer">
+        <button type="button" id="cms-editor-cancel" class="cms-btn cms-btn-secondary">
+          Cancel
+        </button>
+        <button type="submit" form="cms-editor-form" class="cms-btn cms-btn-primary" style="min-width: 160px;">
+          ✓ Save Article
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cms-toast" class="pfs-toast"></div>
+</body>
+</html>
