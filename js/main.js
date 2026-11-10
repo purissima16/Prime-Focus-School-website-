@@ -1,142 +1,89 @@
 /**
  * Prime Focus Schools - Main JavaScript
- * Includes Universal Lightbox Engine for viewing photos widely on hover or tap.
+ * Powers dynamic facilities, past events, campus gallery, site highlights,
+ * contact form, navigation, and the Universal Lightbox Engine.
  */
 
-const facilities = [
-  {
-    name: "Main Academic Campus",
-    description: "Multi-storey purpose-built school building designed for safety, focus, and academic excellence.",
-    image: "images/school-2.webp"
-  },
-  {
-    name: "Courtyard & Basketball Court",
-    description: "Modern sports court and central courtyard facilitating physical education, recreation, and school assemblies.",
-    image: "images/school-1.webp"
-  },
-  {
-    name: "ICT Laboratory",
-    description: "A space for technology, digital learning and computer skills.",
-    image: "images/ict-lab.webp"
-  },
-  {
-    name: "Physics Laboratory",
-    description: "Supporting practical exploration of scientific principles.",
-    image: "images/physics-lab.webp"
-  },
-  {
-    name: "Chemistry Laboratory",
-    description: "A learning environment for chemistry experiments and discovery.",
-    image: "images/chemistry-lab.webp"
-  },
-  {
-    name: "Biology Laboratory",
-    description: "Encouraging students to explore life and the natural world.",
-    image: "images/biology-lab.webp"
-  },
-  {
-    name: "Technical Drawing",
-    description: "A space for technical drawing, design and visual problem-solving.",
-    image: "images/td-lab.webp"
-  }
-];
+function escapeHtml(value) {
+  if (value === null || value === undefined) return "";
+  const div = document.createElement("div");
+  div.textContent = String(value);
+  return div.innerHTML;
+}
 
-const events = [
-  {
-    id: "cultural-day",
-    title: "Annual Cultural Day",
-    category: "Culture & Heritage",
-    description: "A vibrant celebration of rich cultural heritage, diversity, creativity, and school community spirit.",
-    cover: "images/events/hausa2.webp",
-    photos: [
-      "images/events/edo.webp",
-      "images/events/efik.webp",
-      "images/events/yoruba.webp",
-      "images/events/igbo 2.webp",
-      "images/events/tiv2.webp",
-      "images/events/hausa2.webp",
-      "images/events/hausa.webp",
-      "images/events/efik1.webp",
-      "images/events/hausa1.webp",
-      "images/events/igbo1.webp",
-      "images/events/tiv1.webp",
-    ]
-  },
-  {
-    id: "graduation-day",
-    title: "Graduation/Prize-Giving Day",
-    category: "Academic & Valedictory",
-    description: "Honouring academic excellence, outstanding achievements, dedication, and student personal growth.",
-    cover: "images/events/anjola-award.webp",
-    photos: [
-      "images/events/meeee-award.webp",
-      "images/events/adeleye-award.webp",
-      "images/events/afoo-award.webp",
-      "images/events/anjola-award.webp",
-      "images/events/eniayo-award.webp",
-       "images/events/david.webp",
-      
+function sanitizeImageUrl(url, fallback = "images/school-1.webp") {
+  const raw = String(url || "").trim();
+  if (!raw) return fallback;
 
-     
-    
-      "images/events/divine.webp",
-      "images/events/fahamat.webp",
-      "images/events/feranmi.webp",
-      "images/events/ire.webp",
-      "images/events/joseph.webp",
-      "images/events/josy.webp",
-      "images/events/rebecca.webp",
-      "images/events/timiboy.webp",
-      "images/events/timigirl.webp",
-      "images/events/daniel.webp",
-"images/events/myset-award.webp",
-      "images/events/angel.webp",
-      "images/events/amanda.webp",
-      "images/events/betty.webp",
-      "images/events/bolu.webp",
-      "images/events/fikayo.webp",
-      "images/events/ore.webp",
-      "images/events/chidera.webp",
-      "images/events/dara.webp",
-      "images/events/dave.webp",
-      "images/events/destiny.webp",
-      "images/events/esther.webp",
-      "images/events/fola.webp",
-      "images/events/halimah.webp",
-      "images/events/mariam.webp",
-      "images/events/oyin.webp",
-      "images/events/taofeek.webp",
-      "images/events/temi.webp",
-      "images/events/timi.webp",
-      "images/events/idk.webp",
-      "images/events/idk2.webp",
-      "images/events/idk3.webp",
-      "images/events/josephine.webp",
-  
-      "images/events/jss3.webp",
-    ]
-  },
-  {
-    id: "activities-competitions",
-    title: "Other Activities/Competitions",
-    category: "Sports & Competitions",
-    description: "Exciting moments of teamwork, healthy sportsmanship, peer collaboration, and school spirit.",
-    cover: "images/events/ball.webp",
-    photos: [
-      "images/events/girlsball.webp",
-      "images/events/boysball.webp",
-      "images/events/boysteam.webp",
-      "images/events/girlsday.webp",
-      "images/events/ball.webp",
-      "images/events/donald.webp",
-      "images/events/rejoice.webp",
-    ]
+  const lower = raw.toLowerCase();
+  if (
+    lower.startsWith("https://") ||
+    lower.startsWith("http://") ||
+    lower.startsWith("images/") ||
+    lower.startsWith("./images/") ||
+    lower.startsWith("../images/") ||
+    /^data:image\/(png|jpeg|jpg|webp|gif);base64,[a-z0-9+/=]+$/i.test(raw)
+  ) {
+    return raw;
   }
-];
+
+  return fallback;
+}
+
+function getMediaFacilities(options = {}) {
+  if (window.MediaStore && typeof window.MediaStore.getFacilities === "function") {
+    return window.MediaStore.getFacilities(options);
+  }
+  const fallback =
+    typeof defaultSiteMedia !== "undefined" && Array.isArray(defaultSiteMedia.facilities)
+      ? [...defaultSiteMedia.facilities]
+      : [];
+  if (options.homeOnly) {
+    const home = fallback.filter(f => f.showOnHome);
+    return options.limit ? (home.length ? home : fallback).slice(0, options.limit) : home.length ? home : fallback;
+  }
+  return typeof options.limit === "number" ? fallback.slice(0, options.limit) : fallback;
+}
+
+function getMediaEvents(options = {}) {
+  if (window.MediaStore && typeof window.MediaStore.getEvents === "function") {
+    return window.MediaStore.getEvents(options);
+  }
+  const fallback =
+    typeof defaultSiteMedia !== "undefined" && Array.isArray(defaultSiteMedia.events)
+      ? [...defaultSiteMedia.events]
+      : [];
+  return typeof options.limit === "number" ? fallback.slice(0, options.limit) : fallback;
+}
+
+function getMediaGalleryPhotos(options = {}) {
+  if (window.MediaStore && typeof window.MediaStore.getGalleryPhotos === "function") {
+    return window.MediaStore.getGalleryPhotos(options);
+  }
+  const fallback =
+    typeof defaultSiteMedia !== "undefined" && Array.isArray(defaultSiteMedia.galleryPhotos)
+      ? [...defaultSiteMedia.galleryPhotos]
+      : [];
+  return typeof options.limit === "number" ? fallback.slice(0, options.limit) : fallback;
+}
+
+function getMediaSetting(key) {
+  if (window.MediaStore && typeof window.MediaStore.getSetting === "function") {
+    return window.MediaStore.getSetting(key);
+  }
+  if (
+    typeof defaultSiteMedia !== "undefined" &&
+    defaultSiteMedia.settings &&
+    defaultSiteMedia.settings[key]
+  ) {
+    return defaultSiteMedia.settings[key];
+  }
+  return null;
+}
 
 /* ==========================================================================
    Universal Lightbox Engine
-   Allows images across the entire website to be viewed widely on tap/click.
+   Allows images across the entire website to be viewed widely on hover or tap.
    ========================================================================== */
 
 let universalLightboxState = {
@@ -219,15 +166,21 @@ function updateUniversalLightboxPhoto() {
   const item = list[idx];
   if (!item) return;
 
+  const safeSrc = sanitizeImageUrl(item.src);
+
   if (imgEl) {
     imgEl.style.opacity = "0.3";
     const temp = new Image();
-    temp.src = item.src;
     temp.onload = () => {
-      imgEl.src = item.src;
+      imgEl.src = safeSrc;
       imgEl.alt = item.title || "School photograph";
       imgEl.style.opacity = "1";
     };
+    temp.onerror = () => {
+      imgEl.src = safeSrc;
+      imgEl.style.opacity = "1";
+    };
+    temp.src = safeSrc;
   }
 
   if (titleEl) titleEl.textContent = item.title || "";
@@ -261,34 +214,45 @@ window.UniversalLightbox = {
    ========================================================================== */
 
 function createFacilityCard(facility, index) {
+  const safeName = escapeHtml(facility.name || "School Facility");
+  const safeDesc = escapeHtml(facility.description || "");
+  const safeImg = escapeHtml(sanitizeImageUrl(facility.image));
+
   return `
     <article class="facility-card" data-idx="${index}">
-      <div class="card-media-wrap zoomable-img-trigger" data-title="${facility.name}" data-caption="${facility.description}" role="button" tabindex="0" aria-label="View ${facility.name} photograph widely">
-        <img src="${facility.image}" alt="${facility.name}" loading="lazy">
+      <div class="card-media-wrap zoomable-img-trigger" data-title="${safeName}" data-caption="${safeDesc}" role="button" tabindex="0" aria-label="View ${safeName} photograph widely">
+        <img src="${safeImg}" alt="${safeName}" loading="lazy" onerror="this.src='images/school-1.webp'">
         <span class="zoom-cue-badge">🔍 View Widely</span>
       </div>
       <div class="facility-copy">
-        <h3>${facility.name}</h3>
-        <p>${facility.description}</p>
+        <h3>${safeName}</h3>
+        <p>${safeDesc}</p>
       </div>
     </article>
   `;
 }
 
 function createEventCard(event, index) {
+  const safeTitle = escapeHtml(event.title || "School Event");
+  const safeDesc = escapeHtml(event.description || "");
+  const safeCategory = escapeHtml(event.category || "");
+  const safeCover = escapeHtml(sanitizeImageUrl(event.cover));
+  const eventLink = `event-photos.html?id=${encodeURIComponent(event.id || String(index))}`;
+  const photoCount = Array.isArray(event.photos) ? event.photos.length : 0;
+
   return `
-    <article class="event-card" id="event-${index}">
-      <div class="card-media-wrap zoomable-img-trigger" data-title="${event.title}" data-caption="${event.description}" role="button" tabindex="0" aria-label="View ${event.title} photograph widely">
-        <img src="${event.cover}" alt="${event.title}" loading="lazy">
+    <article class="event-card" id="event-${escapeHtml(event.id || String(index))}">
+      <div class="card-media-wrap zoomable-img-trigger" data-title="${safeTitle}" data-caption="${safeDesc}" role="button" tabindex="0" aria-label="View ${safeTitle} photograph widely">
+        <img src="${safeCover}" alt="${safeTitle}" loading="lazy" onerror="this.src='images/school-1.webp'">
         <span class="zoom-cue-badge">🔍 View Widely</span>
       </div>
       <div class="event-copy">
-        ${event.category ? `<p class="event-date">${event.category}</p>` : ""}
-        <h3><a href="event-photos.html?id=${index}">${event.title}</a></h3>
-        <p>${event.description}</p>
+        ${safeCategory ? `<p class="event-date">${safeCategory}</p>` : ""}
+        <h3><a href="${eventLink}">${safeTitle}</a></h3>
+        <p>${safeDesc}</p>
         <div style="display: flex; gap: 8px; align-items: center; margin-top: 14px; flex-wrap: wrap;">
-          <a class="button button-blue" href="event-photos.html?id=${index}">
-            Show Photos (${event.photos.length}) ↗
+          <a class="button button-blue" href="${eventLink}">
+            Show Photos (${photoCount}) ↗
           </a>
           <button type="button" class="btn-quick-zoom" data-event-idx="${index}">
             🔍 Full Photo
@@ -299,11 +263,19 @@ function createEventCard(event, index) {
   `;
 }
 
-function renderFacilities(targetId, limit) {
+function renderFacilities(targetId, limit, homeOnly = false) {
   const target = document.getElementById(targetId);
   if (!target) return;
 
-  const items = typeof limit === "number" ? facilities.slice(0, limit) : facilities;
+  const items = getMediaFacilities({ limit, homeOnly });
+  if (!items.length) {
+    target.innerHTML = `
+      <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 30px 12px;">
+        No facilities have been published yet.
+      </p>`;
+    return;
+  }
+
   target.innerHTML = items.map((f, i) => createFacilityCard(f, i)).join("");
   bindAllZoomableImages();
 }
@@ -312,7 +284,15 @@ function renderEvents(targetId, limit) {
   const target = document.getElementById(targetId);
   if (!target) return;
 
-  const items = typeof limit === "number" ? events.slice(0, limit) : events;
+  const items = getMediaEvents({ limit });
+  if (!items.length) {
+    target.innerHTML = `
+      <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 30px 12px;">
+        No past events have been published yet.
+      </p>`;
+    return;
+  }
+
   target.innerHTML = items.map((event, index) => createEventCard(event, index)).join("");
   bindAllZoomableImages();
 }
@@ -321,7 +301,111 @@ function renderEventAlbums() {
   const target = document.getElementById("all-events");
   if (!target) return;
 
+  const events = getMediaEvents();
+  if (!events.length) {
+    target.innerHTML = `
+      <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 30px 12px;">
+        No past events have been added yet.
+      </p>`;
+    return;
+  }
+
   target.innerHTML = events.map((event, index) => createEventCard(event, index)).join("");
+  bindAllZoomableImages();
+}
+
+let activeCampusGalleryCategory = "all";
+
+function renderCampusGallery() {
+  const section = document.getElementById("campus-gallery-section");
+  const grid = document.getElementById("campus-gallery-photos");
+  const filterWrap = document.getElementById("campus-gallery-filters");
+  if (!grid) return;
+
+  const allPhotos = getMediaGalleryPhotos();
+
+  if (!allPhotos.length) {
+    if (section) section.style.display = "none";
+    grid.innerHTML = "";
+    return;
+  }
+
+  if (section) section.style.display = "";
+
+  const categories = [
+    ...new Set(allPhotos.map(item => (item.category || "").trim()).filter(Boolean))
+  ];
+
+  if (
+    activeCampusGalleryCategory !== "all" &&
+    !categories.some(c => c.toLowerCase() === activeCampusGalleryCategory.toLowerCase())
+  ) {
+    activeCampusGalleryCategory = "all";
+  }
+
+  if (filterWrap) {
+    if (categories.length > 1) {
+      filterWrap.style.display = "flex";
+      filterWrap.innerHTML = `
+        <button type="button" class="gallery-filter-pill ${activeCampusGalleryCategory === "all" ? "active" : ""}" data-gallery-cat="all">
+          All Photos (${allPhotos.length})
+        </button>
+        ${categories
+          .map(cat => {
+            const active =
+              activeCampusGalleryCategory.toLowerCase() === cat.toLowerCase();
+            return `
+              <button type="button" class="gallery-filter-pill ${active ? "active" : ""}" data-gallery-cat="${escapeHtml(cat)}">
+                ${escapeHtml(cat)}
+              </button>`;
+          })
+          .join("")}
+      `;
+
+      filterWrap.querySelectorAll(".gallery-filter-pill").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeCampusGalleryCategory = btn.dataset.galleryCat || "all";
+          renderCampusGallery();
+        });
+      });
+    } else {
+      filterWrap.style.display = "none";
+      filterWrap.innerHTML = "";
+    }
+  }
+
+  const visiblePhotos =
+    activeCampusGalleryCategory === "all"
+      ? allPhotos
+      : allPhotos.filter(
+          item =>
+            (item.category || "").toLowerCase() ===
+            activeCampusGalleryCategory.toLowerCase()
+        );
+
+  grid.innerHTML = visiblePhotos
+    .map((photo, idx) => {
+      const safeTitle = escapeHtml(photo.title || photo.category || "Campus Photo");
+      const safeCategory = escapeHtml(photo.category || "Campus Life");
+      const safeCaption = escapeHtml(photo.caption || "");
+      const safeImg = escapeHtml(sanitizeImageUrl(photo.image));
+
+      return `
+        <article class="campus-gallery-card" data-idx="${idx}" data-title="${safeTitle}" data-caption="${safeCaption || safeCategory}">
+          <div class="card-media-wrap zoomable-img-trigger" role="button" tabindex="0" aria-label="View ${safeTitle} widely">
+            <img src="${safeImg}" alt="${safeTitle}" loading="lazy" onerror="this.src='images/school-1.webp'">
+            <span class="zoom-cue-badge">🔍 View Widely</span>
+          </div>
+          ${(photo.title || photo.caption || photo.category) ? `
+            <div class="campus-gallery-copy">
+              <span class="campus-gallery-cat">${safeCategory}</span>
+              ${photo.title ? `<h3>${safeTitle}</h3>` : ""}
+              ${photo.caption ? `<p>${safeCaption}</p>` : ""}
+            </div>` : ""}
+        </article>`;
+    })
+    .join("");
+
   bindAllZoomableImages();
 }
 
@@ -332,6 +416,15 @@ function renderSingleEventPage() {
   const target = document.getElementById("single-event-photos");
   if (!target) return;
 
+  const events = getMediaEvents();
+  if (!events.length) {
+    target.innerHTML = `
+      <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px 12px;">
+        No event photographs found.
+      </p>`;
+    return;
+  }
+
   const urlParams = new URLSearchParams(window.location.search);
   let eventParam = urlParams.get("id");
   if (eventParam === null) {
@@ -340,17 +433,25 @@ function renderSingleEventPage() {
 
   let eventIndex = 0;
   if (eventParam !== null) {
-    const parsed = parseInt(eventParam, 10);
-    if (!isNaN(parsed) && parsed >= 0 && parsed < events.length) {
-      eventIndex = parsed;
+    const foundById = events.findIndex(e => e.id === eventParam);
+    if (foundById !== -1) {
+      eventIndex = foundById;
     } else {
-      const foundIdx = events.findIndex(e => e.id === eventParam);
-      if (foundIdx !== -1) eventIndex = foundIdx;
+      const parsed = parseInt(eventParam, 10);
+      if (!isNaN(parsed) && parsed >= 0 && parsed < events.length) {
+        eventIndex = parsed;
+      }
     }
   } else if (window.location.hash) {
-    const hashIndex = parseInt(window.location.hash.replace(/[^0-9]/g, ""), 10);
-    if (!isNaN(hashIndex) && hashIndex >= 0 && hashIndex < events.length) {
-      eventIndex = hashIndex;
+    const hashVal = window.location.hash.replace(/^#/, "");
+    const foundById = events.findIndex(e => e.id === hashVal);
+    if (foundById !== -1) {
+      eventIndex = foundById;
+    } else {
+      const hashIndex = parseInt(hashVal.replace(/[^0-9]/g, ""), 10);
+      if (!isNaN(hashIndex) && hashIndex >= 0 && hashIndex < events.length) {
+        eventIndex = hashIndex;
+      }
     }
   }
 
@@ -364,21 +465,40 @@ function renderSingleEventPage() {
   const countEl = document.getElementById("event-photo-count");
   const eyebrowEl = document.getElementById("event-eyebrow");
 
+  const photoItems = Array.isArray(currentEvent.photoItems) && currentEvent.photoItems.length
+    ? currentEvent.photoItems
+    : (currentEvent.photos || []).map(src => ({ image: src, caption: "" }));
+
   if (titleEl) titleEl.textContent = currentEvent.title;
   if (descEl) descEl.textContent = currentEvent.description;
-  if (countEl) countEl.textContent = currentEvent.photos.length;
+  if (countEl) countEl.textContent = photoItems.length;
   if (eyebrowEl && currentEvent.category) eyebrowEl.textContent = currentEvent.category.toUpperCase();
 
   // Render photo cards for ONLY this event
-  target.innerHTML = currentEvent.photos.map((photo, pIdx) => `
-    <div class="photo-card" data-index="${pIdx}" role="button" tabindex="0" aria-label="View photograph ${pIdx + 1} of ${currentEvent.photos.length} widely">
-      <img src="${photo}" alt="${currentEvent.title} photo ${pIdx + 1}" loading="lazy">
-      <span class="zoom-cue-badge">🔍 View Widely</span>
-      <div class="photo-overlay">
-        <span class="photo-badge">🔍 View Full Photo</span>
-      </div>
-    </div>
-  `).join("");
+  if (!photoItems.length) {
+    target.innerHTML = `
+      <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px 12px;">
+        Photos for this event will be uploaded soon.
+      </p>`;
+  } else {
+    target.innerHTML = photoItems.map((photo, pIdx) => {
+      const safeSrc = escapeHtml(sanitizeImageUrl(photo.image));
+      const safeCaption = escapeHtml(photo.caption || "");
+      const safeAlt = escapeHtml(
+        photo.caption || `${currentEvent.title} photo ${pIdx + 1}`
+      );
+
+      return `
+        <div class="photo-card" data-index="${pIdx}" data-caption="${safeCaption}" role="button" tabindex="0" aria-label="View photograph ${pIdx + 1} of ${photoItems.length} widely">
+          <img src="${safeSrc}" alt="${safeAlt}" loading="lazy" onerror="this.src='images/school-1.webp'">
+          <span class="zoom-cue-badge">🔍 View Widely</span>
+          <div class="photo-overlay">
+            <span class="photo-badge">${safeCaption ? safeCaption : "🔍 View Full Photo"}</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
 
   // Render "Other Events" section
   const otherTarget = document.getElementById("other-events");
@@ -387,10 +507,58 @@ function renderSingleEventPage() {
       .map((ev, idx) => ({ ...ev, originalIndex: idx }))
       .filter((_, idx) => idx !== eventIndex);
 
-    otherTarget.innerHTML = otherEvents.map((event) => createEventCard(event, event.originalIndex)).join("");
+    otherTarget.innerHTML = otherEvents.map(event => createEventCard(event, event.originalIndex)).join("");
   }
 
   bindAllZoomableImages();
+}
+
+function applySiteMediaSettings() {
+  const heroSetting = getMediaSetting("hero_banner");
+  const heroEl = document.querySelector(".hero");
+  if (heroEl && heroSetting && heroSetting.value) {
+    const safeHero = sanitizeImageUrl(heroSetting.value, "images/school-hero.webp");
+    heroEl.style.backgroundImage = `url("${safeHero.replace(/"/g, '\\"')}")`;
+  }
+
+  const pageHeroSetting = getMediaSetting("page_hero_banner");
+  const pageHeroEl = document.querySelector(".page-hero");
+  if (pageHeroEl && pageHeroSetting && pageHeroSetting.value) {
+    const safePageHero = sanitizeImageUrl(pageHeroSetting.value, "images/school-hero.webp");
+    pageHeroEl.style.backgroundImage = `url("${safePageHero.replace(/"/g, '\\"')}")`;
+  }
+
+  const principalSetting = getMediaSetting("principal_portrait");
+  const principalImg = document.querySelector(".principal-photo img");
+  if (principalImg && principalSetting && principalSetting.value) {
+    principalImg.src = sanitizeImageUrl(principalSetting.value, "images/principal-pfs.webp");
+    if (principalSetting.caption) {
+      principalImg.dataset.caption = principalSetting.caption;
+    }
+  }
+}
+
+function renderAllMediaSections() {
+  applySiteMediaSettings();
+  renderFacilities("home-facilities", 3, true);
+  renderFacilities("all-facilities");
+
+  renderEvents("home-events", 3);
+  renderEvents("gallery-events");
+  renderEventAlbums();
+  renderCampusGallery();
+  renderSingleEventPage();
+}
+
+function bindKeyboardTrigger(el, handler) {
+  if (!el || el._keyBound) return;
+  el._keyBound = true;
+  el.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handler(e);
+    }
+  });
 }
 
 /**
@@ -398,7 +566,7 @@ function renderSingleEventPage() {
  * Binds click & touch listeners to all zoomable images across every page.
  */
 function bindAllZoomableImages() {
-  const lightbox = ensureLightboxModal();
+  ensureLightboxModal();
 
   const closeBtn = document.getElementById("lightbox-close");
   const backdrop = document.getElementById("lightbox-backdrop");
@@ -407,11 +575,11 @@ function bindAllZoomableImages() {
 
   if (closeBtn) closeBtn.onclick = closeUniversalLightbox;
   if (backdrop) backdrop.onclick = closeUniversalLightbox;
-  if (prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); stepUniversalLightbox(-1); };
-  if (nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); stepUniversalLightbox(1); };
+  if (prevBtn) prevBtn.onclick = e => { e.stopPropagation(); stepUniversalLightbox(-1); };
+  if (nextBtn) nextBtn.onclick = e => { e.stopPropagation(); stepUniversalLightbox(1); };
 
   if (!window._pfsLightboxKeyBound) {
-    window.addEventListener("keydown", (e) => {
+    window.addEventListener("keydown", e => {
       if (!universalLightboxState.isOpen) return;
       if (e.key === "Escape") closeUniversalLightbox();
       if (e.key === "ArrowLeft") stepUniversalLightbox(-1);
@@ -426,7 +594,7 @@ function bindAllZoomableImages() {
     if (trigger && !trigger._bound) {
       trigger._bound = true;
       trigger.style.cursor = "zoom-in";
-      trigger.addEventListener("click", () => {
+      const openFacility = () => {
         const list = Array.from(all).map(c => {
           const img = c.querySelector("img");
           const title = c.querySelector("h3") ? c.querySelector("h3").textContent : "";
@@ -434,7 +602,9 @@ function bindAllZoomableImages() {
           return { src: img ? img.src : "", title: `PFS Facility: ${title}`, caption: desc };
         });
         openUniversalLightbox(list, idx);
-      });
+      };
+      trigger.addEventListener("click", openFacility);
+      bindKeyboardTrigger(trigger, openFacility);
     }
   });
 
@@ -443,7 +613,7 @@ function bindAllZoomableImages() {
     const trigger = card.querySelector(".card-media-wrap") || card.querySelector("img");
     const zoomBtn = card.querySelector(".btn-quick-zoom");
 
-    const handleZoom = (e) => {
+    const handleZoom = e => {
       if (e) e.preventDefault();
       const list = Array.from(all).map(c => {
         const img = c.querySelector("img");
@@ -458,6 +628,7 @@ function bindAllZoomableImages() {
       trigger._bound = true;
       trigger.style.cursor = "zoom-in";
       trigger.addEventListener("click", handleZoom);
+      bindKeyboardTrigger(trigger, handleZoom);
     }
     if (zoomBtn && !zoomBtn._bound) {
       zoomBtn._bound = true;
@@ -465,50 +636,75 @@ function bindAllZoomableImages() {
     }
   });
 
-  // 3. Principal Photo on Home and About pages
+  // 3. Campus Gallery Cards
+  document.querySelectorAll(".campus-gallery-card").forEach((card, idx, all) => {
+    const trigger = card.querySelector(".zoomable-img-trigger") || card.querySelector("img");
+    if (trigger && !trigger._bound) {
+      trigger._bound = true;
+      trigger.style.cursor = "zoom-in";
+      const openCampusPhoto = () => {
+        const list = Array.from(all).map(c => {
+          const img = c.querySelector("img");
+          const title = c.dataset.title || "Prime Focus Schools Gallery";
+          const caption = c.dataset.caption || "";
+          return { src: img ? img.src : "", title, caption };
+        });
+        openUniversalLightbox(list, idx);
+      };
+      trigger.addEventListener("click", openCampusPhoto);
+      bindKeyboardTrigger(trigger, openCampusPhoto);
+    }
+  });
+
+  // 4. Principal Photo on Home and About pages
   document.querySelectorAll(".principal-photo").forEach(photoWrap => {
     if (!photoWrap._bound) {
       photoWrap._bound = true;
       photoWrap.style.cursor = "zoom-in";
-      photoWrap.addEventListener("click", () => {
+      const openPrincipal = () => {
         const img = photoWrap.querySelector("img");
         if (img) {
           openUniversalLightbox([{
             src: img.src,
             title: "Principal - Prime Focus Schools",
-            caption: "Every child deserves a future full of possibility. Glorify God Always."
+            caption: img.dataset.caption || "Every child deserves a future full of possibility. Glorify God Always."
           }], 0);
         }
-      });
+      };
+      photoWrap.addEventListener("click", openPrincipal);
+      bindKeyboardTrigger(photoWrap, openPrincipal);
     }
   });
 
-  // 4. Single Event Photo Album Gallery (event-photos.html)
+  // 5. Single Event Photo Album Gallery (event-photos.html)
   document.querySelectorAll(".photo-card").forEach((card, idx, all) => {
     if (!card._bound) {
       card._bound = true;
       card.style.cursor = "zoom-in";
-      card.addEventListener("click", () => {
+      const openEventPhoto = () => {
         const eventTitle = document.getElementById("event-title") ? document.getElementById("event-title").textContent : "School Event";
         const list = Array.from(all).map((c, i) => {
           const img = c.querySelector("img");
+          const customCaption = c.dataset.caption;
           return {
             src: img ? img.src : "",
             title: eventTitle,
-            caption: `Photo ${i + 1} of ${all.length}`
+            caption: customCaption || `Photo ${i + 1} of ${all.length}`
           };
         });
         openUniversalLightbox(list, idx);
-      });
+      };
+      card.addEventListener("click", openEventPhoto);
+      bindKeyboardTrigger(card, openEventPhoto);
     }
   });
 
-  // 5. Blog Featured Image, Cards & Article Covers
+  // 6. Blog Featured Image, Cards & Article Covers
   document.querySelectorAll(".featured-card-media, .blog-card-media, .post-hero-image-wrap").forEach(wrap => {
     if (!wrap._bound) {
       wrap._bound = true;
       wrap.style.cursor = "zoom-in";
-      wrap.addEventListener("click", () => {
+      const openBlogMedia = () => {
         const img = wrap.querySelector("img");
         if (img) {
           const article = wrap.closest("article");
@@ -520,11 +716,13 @@ function bindAllZoomableImages() {
             caption: img.alt || "Article image"
           }], 0);
         }
-      });
+      };
+      wrap.addEventListener("click", openBlogMedia);
+      bindKeyboardTrigger(wrap, openBlogMedia);
     }
   });
 
-  // 6. Inline images inside blog post body
+  // 7. Inline images inside blog post body
   document.querySelectorAll("#post-body-content img").forEach((img, idx, all) => {
     if (!img._bound) {
       img._bound = true;
@@ -548,15 +746,24 @@ window.bindAllZoomableImages = bindAllZoomableImages;
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
-  renderFacilities("home-facilities", 3);
-  renderFacilities("all-facilities");
-
-  renderEvents("home-events", 3);
-  renderEvents("gallery-events");
-  renderEventAlbums();
-  renderSingleEventPage();
-
+  renderAllMediaSections();
   bindAllZoomableImages();
+
+  window.addEventListener("pfs:media-updated", () => {
+    renderAllMediaSections();
+    bindAllZoomableImages();
+  });
+
+  if (window.MediaStore && typeof window.MediaStore.ready === "function") {
+    window.MediaStore.ready()
+      .then(() => {
+        renderAllMediaSections();
+        bindAllZoomableImages();
+      })
+      .catch(error => {
+        console.warn("Could not refresh media from Supabase:", error);
+      });
+  }
 
   // Mobile Navigation
   const menuToggle = document.querySelector(".menu-toggle");
@@ -573,7 +780,7 @@ document.addEventListener("DOMContentLoaded", () => {
       menuToggle.textContent = isOpen ? "✕" : "☰";
     });
 
-    mainNav.querySelectorAll("a").forEach((link) => {
+    mainNav.querySelectorAll("a").forEach(link => {
       link.addEventListener("click", () => {
         if (window.innerWidth <= 720) {
           mainNav.classList.remove("open");
@@ -586,26 +793,29 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Footer Current Year
-  document.querySelectorAll(".current-year").forEach((element) => {
+  document.querySelectorAll(".current-year").forEach(element => {
     element.textContent = new Date().getFullYear();
   });
 
-    // Contact Form Handler: submit enquiries to Supabase
+  // Contact Form Handler: submit enquiries to Supabase
   const contactForm = document.querySelector("#contact-form");
   const formMessage = document.querySelector("#form-message");
 
   if (contactForm) {
-    const contactSupabase = window.supabase.createClient(
-      "https://hztinvahixhvkfhpccrq.supabase.co",
-      "sb_publishable_Jx9KPHzuBIbJtG9rBr3MZA_iax1izan",
-      {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false
-        }
-      }
-    );
+    const contactSupabase =
+      window.MediaStore && typeof window.MediaStore.getClient === "function" && window.MediaStore.getClient()
+        ? window.MediaStore.getClient()
+        : window.supabase.createClient(
+            "https://hztinvahixhvkfhpccrq.supabase.co",
+            "sb_publishable_Jx9KPHzuBIbJtG9rBr3MZA_iax1izan",
+            {
+              auth: {
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false
+              }
+            }
+          );
 
     contactForm.addEventListener("submit", async event => {
       event.preventDefault();

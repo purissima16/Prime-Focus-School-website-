@@ -876,3 +876,420 @@ body.cms-body {
     align-items: flex-start;
   }
 }
+
+/* ==========================================================================
+   CMS Section Navigation Tabs & Panels
+   ========================================================================== */
+
+.cms-nav-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+  background: var(--cms-white);
+  border: 1px solid var(--cms-border);
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: var(--cms-shadow);
+}
+
+.cms-nav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--cms-muted);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cms-nav-tab:hover {
+  background: var(--cms-pale-blue);
+  color: var(--cms-navy);
+}
+
+.cms-nav-tab.active {
+  background: var(--cms-navy);
+  color: var(--cms-white);
+  box-shadow: 0 4px 12px rgba(8, 44, 89, 0.2);
+}
+
+.cms-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  background: #E8F0FA;
+  color: var(--cms-blue);
+}
+
+.cms-nav-tab.active .cms-tab-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--cms-white);
+}
+
+.cms-tab-panel {
+  display: none;
+}
+
+.cms-tab-panel.active {
+  display: block;
+}
+
+/* ==========================================================================
+   Supabase Setup Notice Banner
+   ========================================================================== */
+
+.cms-setup-banner {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border: 1px solid #F59E0B;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  color: #78350F;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.12);
+}
+
+.cms-setup-banner h3 {
+  margin: 0 0 6px;
+  font-family: "Manrope", sans-serif;
+  font-size: 17px;
+  color: #78350F;
+}
+
+.cms-setup-banner p {
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.cms-setup-steps {
+  margin: 0 0 16px 18px;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.cms-setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ==========================================================================
+   Media Manager Cards, Upload Dropzone & Photo Grids
+   ========================================================================== */
+
+.cms-events-grid,
+.cms-facilities-grid,
+.cms-site-banners-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  padding: 24px 28px;
+}
+
+.cms-media-card {
+  background: var(--cms-white);
+  border: 1px solid var(--cms-border);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.cms-media-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(8, 44, 89, 0.08);
+}
+
+.cms-media-card.is-selected {
+  border-color: var(--cms-blue);
+  box-shadow: 0 0 0 3px rgba(16, 75, 136, 0.14);
+}
+
+.cms-media-thumb-wrap {
+  position: relative;
+  height: 185px;
+  background: #0B2545;
+  overflow: hidden;
+}
+
+.cms-media-thumb-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cms-media-pill {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(6, 28, 58, 0.85);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+}
+
+.cms-media-pill.right {
+  left: auto;
+  right: 10px;
+  background: #10B981;
+}
+
+.cms-media-pill.cover-pill {
+  background: #F59E0B;
+  color: #1F2937;
+}
+
+.cms-media-card-body {
+  padding: 16px 18px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cms-media-card-body h3 {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--cms-navy);
+}
+
+.cms-media-card-body p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--cms-muted);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.cms-media-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid #EDF2F7;
+  align-items: center;
+}
+
+.cms-btn-sm {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.cms-album-toolbar {
+  padding: 18px 28px;
+  background: #FAFBFD;
+  border-bottom: 1px solid var(--cms-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cms-album-switcher {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cms-album-switcher select {
+  height: 42px;
+  min-width: 240px;
+  padding: 0 12px;
+  border: 1px solid var(--cms-border);
+  border-radius: 8px;
+  background: var(--cms-white);
+  color: var(--cms-ink);
+  font-weight: 700;
+  font-size: 13.5px;
+}
+
+.cms-upload-zone {
+  margin: 22px 28px 6px;
+  border: 2px dashed #9EC5E8;
+  border-radius: 12px;
+  background: #F6FAFF;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.cms-upload-zone.drag-over {
+  border-color: var(--cms-blue);
+  background: #E8F3FF;
+}
+
+.cms-upload-zone-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.cms-upload-zone-info strong {
+  display: block;
+  color: var(--cms-navy);
+  font-size: 14.5px;
+  margin-bottom: 4px;
+}
+
+.cms-upload-zone-info span {
+  font-size: 12.5px;
+  color: var(--cms-muted);
+}
+
+.cms-url-add-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #DCE8F5;
+}
+
+.cms-url-add-row input {
+  flex: 1;
+  min-width: 220px;
+  height: 40px;
+}
+
+.cms-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  padding: 22px 28px 28px;
+}
+
+.cms-photo-tile {
+  background: var(--cms-white);
+  border: 1px solid var(--cms-border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cms-photo-tile-media {
+  position: relative;
+  height: 160px;
+  background: #0B2545;
+  overflow: hidden;
+}
+
+.cms-photo-tile-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cms-photo-tile-body {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cms-photo-caption-input {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--cms-border);
+  border-radius: 6px;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.cms-photo-tile-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.cms-empty-box {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--cms-muted);
+  border: 1px dashed var(--cms-border);
+  border-radius: 10px;
+  background: #FAFBFD;
+}
+
+.cms-upload-progress {
+  display: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #EAF4FF;
+  color: var(--cms-navy);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.cms-upload-progress.active {
+  display: block;
+}
+
+@media (max-width: 1100px) {
+  .cms-photos-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cms-events-grid,
+  .cms-facilities-grid,
+  .cms-site-banners-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .cms-photos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 18px;
+  }
+  .cms-events-grid,
+  .cms-facilities-grid,
+  .cms-site-banners-grid {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+  .cms-upload-zone {
+    margin: 18px 18px 4px;
+  }
+  .cms-album-toolbar {
+    padding: 16px 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cms-photos-grid {
+    grid-template-columns: 1fr;
+  }
+}

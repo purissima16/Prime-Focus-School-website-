@@ -10,9 +10,12 @@
   <link rel="stylesheet" href="css/cms.css">
 
   <script src="js/blog-data.js"></script>
+  <script src="js/media-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/blog-store.js"></script>
+  <script src="js/media-store.js"></script>
   <script src="js/cms.js" defer></script>
+  <script src="js/cms-media.js" defer></script>
 
   <style>
     .cms-enquiries {
@@ -397,9 +400,9 @@
       <div class="cms-auth-logo">
         <img src="images/pfs undone logo.webp" alt="Prime Focus Schools">
       </div>
-      <h2>PFS Blog CMS Portal</h2>
+      <h2>Prime Focus Schools CMS Portal</h2>
       <p class="auth-sub">
-        Enter the administrative passcode to manage school articles and enquiries.
+        Enter the administrative passcode to manage school articles, event photos, galleries, facilities, and enquiries.
       </p>
 
       <form id="cms-auth-form">
@@ -454,9 +457,17 @@
     </div>
 
     <div class="cms-header-actions">
+      <a href="index.html" class="cms-btn cms-btn-outline"
+        style="font-size:12px;height:38px">
+        View Website ↗
+      </a>
+      <a href="gallery.html" class="cms-btn cms-btn-outline"
+        style="font-size:12px;height:38px">
+        View Gallery ↗
+      </a>
       <a href="blog.html" class="cms-btn cms-btn-outline"
         style="font-size:12px;height:38px">
-        View Live Blog ↗
+        View Blog ↗
       </a>
       <span class="badge-user">👤 Admin Staff</span>
       <button type="button" id="cms-logout-btn"
@@ -468,6 +479,55 @@
   </header>
 
   <main class="cms-main">
+    <nav class="cms-nav-tabs" role="tablist" aria-label="CMS Management Sections">
+      <button type="button" id="tab-btn-blog" class="cms-nav-tab active"
+        data-tab="blog" role="tab" aria-selected="true">
+        📝 Blog Articles <span id="tab-badge-blog" class="cms-tab-badge">0</span>
+      </button>
+      <button type="button" id="tab-btn-events" class="cms-nav-tab"
+        data-tab="events" role="tab" aria-selected="false">
+        📸 Past Events &amp; Photos <span id="tab-badge-events" class="cms-tab-badge">0</span>
+      </button>
+      <button type="button" id="tab-btn-facilities" class="cms-nav-tab"
+        data-tab="facilities" role="tab" aria-selected="false">
+        🏫 Explore Facilities <span id="tab-badge-facilities" class="cms-tab-badge">0</span>
+      </button>
+      <button type="button" id="tab-btn-gallery" class="cms-nav-tab"
+        data-tab="gallery" role="tab" aria-selected="false">
+        🖼️ Galleries &amp; Site Photos <span id="tab-badge-gallery" class="cms-tab-badge">0</span>
+      </button>
+      <button type="button" id="tab-btn-enquiries" class="cms-nav-tab"
+        data-tab="enquiries" role="tab" aria-selected="false">
+        ✉ Enquiries Inbox <span id="tab-badge-enquiries" class="cms-tab-badge">0</span>
+      </button>
+    </nav>
+
+    <!-- One-time Supabase media schema setup helper (auto-hides once ready) -->
+    <section id="cms-media-setup-banner" class="cms-setup-banner" style="display:none">
+      <h3>One-Time Supabase Photo Database Setup Required</h3>
+      <p>
+        Your blog and enquiries tables are active, and now you just need to create the
+        <strong>Facilities, Past Events, Galleries, and Photo Storage</strong> tables in your Supabase database once.
+      </p>
+      <ol class="cms-setup-steps">
+        <li>Click <strong>Copy SQL Setup Script</strong> below (or open <code>supabase-media-setup.sql</code>).</li>
+        <li>Open your <strong>Supabase Dashboard → SQL Editor → New query</strong>.</li>
+        <li>Paste the script, click <strong>Run</strong>, then come back here and click <strong>Check Connection &amp; Sync Default Photos</strong>.</li>
+      </ol>
+      <div class="cms-setup-actions">
+        <button type="button" id="btn-copy-media-sql" class="cms-btn cms-btn-primary cms-btn-sm">
+          📋 Copy SQL Setup Script
+        </button>
+        <button type="button" id="btn-download-media-sql" class="cms-btn cms-btn-secondary cms-btn-sm">
+          ⬇ Download supabase-media-setup.sql
+        </button>
+        <button type="button" id="btn-recheck-media-db" class="cms-btn cms-btn-success cms-btn-sm">
+          🔄 Check Connection &amp; Sync Default Photos
+        </button>
+      </div>
+    </section>
+
+    <div id="cms-panel-blog" class="cms-tab-panel active">
     <div class="cms-stats-grid">
       <div class="cms-stat-card">
         <div class="cms-stat-info">
@@ -563,8 +623,227 @@
       </div>
     </section>
 
+    <section class="cms-toolbox-card">
+      <h3>CMS Backup &amp; Deployment Tools</h3>
+      <p>
+        Export JSON backups, import articles, or download the updated
+        <code>blog-data.js</code> file for a static backup.
+      </p>
+
+      <div class="cms-toolbox-btns">
+        <button type="button" id="btn-download-js"
+          class="cms-btn cms-btn-secondary">
+          ⬇ Download updated <code>blog-data.js</code>
+        </button>
+
+        <button type="button" id="btn-export-json"
+          class="cms-btn cms-btn-secondary">
+          💾 Export JSON Backup
+        </button>
+
+        <button type="button" id="btn-import-json"
+          class="cms-btn cms-btn-secondary">
+          📂 Import Articles JSON
+        </button>
+        <input type="file" id="file-import-input"
+          accept=".json" style="display:none">
+
+        <button type="button" id="btn-change-password"
+          class="cms-btn cms-btn-secondary">
+          🔑 Change Passcode
+        </button>
+
+        <button type="button" id="btn-reset-defaults"
+          class="cms-btn cms-btn-danger" style="margin-left:auto">
+          ↺ Reset to Sample Articles
+        </button>
+      </div>
+    </section>
+    </div>
+
+    <!-- Past Events & Event Photos Panel -->
+    <div id="cms-panel-events" class="cms-tab-panel">
+      <section class="cms-content-card" aria-labelledby="cms-events-heading">
+        <div class="cms-card-header">
+          <div>
+            <h2 id="cms-events-heading">Past Events &amp; Event Galleries</h2>
+            <p style="font-size:13px;color:var(--cms-muted);margin-top:4px">
+              Create past event albums, set cover images, and manage photos displayed on Home, Gallery, and Past Events.
+            </p>
+          </div>
+          <div class="cms-card-actions">
+            <a href="events.html" target="_blank" rel="noopener" class="cms-btn cms-btn-secondary">
+              View Past Events ↗
+            </a>
+            <button type="button" id="cms-new-event-btn" class="cms-btn cms-btn-primary">
+              + Add New Past Event
+            </button>
+          </div>
+        </div>
+        <div id="cms-events-grid" class="cms-events-grid"></div>
+      </section>
+
+      <section id="cms-event-album-panel" class="cms-content-card" aria-labelledby="cms-album-active-title">
+        <div class="cms-card-header">
+          <div>
+            <h2 id="cms-album-active-title">Event Photo Album</h2>
+            <p style="font-size:13px;color:var(--cms-muted);margin-top:4px">
+              Add multiple photos at once, reorder, set the event cover, or remove photographs from this album.
+            </p>
+          </div>
+          <div class="cms-card-actions">
+            <span id="cms-album-photo-count" class="enquiries-count">0 photos</span>
+            <a id="cms-album-view-live" href="event-photos.html" target="_blank" rel="noopener"
+              class="cms-btn cms-btn-secondary">
+              View Public Album ↗
+            </a>
+          </div>
+        </div>
+
+        <div class="cms-album-toolbar">
+          <div class="cms-album-switcher">
+            <label for="cms-album-event-select" style="font-size:12px;font-weight:800;color:var(--cms-muted);text-transform:uppercase">
+              Editing Album:
+            </label>
+            <select id="cms-album-event-select"></select>
+          </div>
+        </div>
+
+        <div id="cms-event-upload-zone" class="cms-upload-zone">
+          <div class="cms-upload-zone-top">
+            <div class="cms-upload-zone-info">
+              <strong>Upload Event Photographs (Single or Multiple)</strong>
+              <span>Drag &amp; drop images here, or pick files from your device. Photos are automatically optimized for fast loading.</span>
+            </div>
+            <label for="cms-event-photos-file" class="cms-btn cms-btn-primary" style="cursor:pointer">
+              📁 Select Photos to Upload
+            </label>
+            <input type="file" id="cms-event-photos-file" accept="image/*" multiple style="display:none">
+          </div>
+
+          <div class="cms-url-add-row">
+            <input type="text" id="cms-event-photo-caption" class="cms-input"
+              placeholder="Optional caption for uploaded photo(s)..." style="max-width:260px">
+            <input type="text" id="cms-event-photo-url" class="cms-input"
+              placeholder="Or paste an image URL / path (e.g. https://... or images/events/...)">
+            <button type="button" id="cms-event-photo-url-btn" class="cms-btn cms-btn-secondary cms-btn-sm">
+              + Add Photo URL
+            </button>
+          </div>
+
+          <div id="cms-event-upload-progress" class="cms-upload-progress"></div>
+        </div>
+
+        <div id="cms-event-photos-grid" class="cms-photos-grid"></div>
+      </section>
+    </div>
+
+    <!-- Explore Facilities Panel -->
+    <div id="cms-panel-facilities" class="cms-tab-panel">
+      <section class="cms-content-card" aria-labelledby="cms-facilities-heading">
+        <div class="cms-card-header">
+          <div>
+            <h2 id="cms-facilities-heading">Explore Facilities</h2>
+            <p style="font-size:13px;color:var(--cms-muted);margin-top:4px">
+              Add, edit, reorder, or remove facility cards and photos displayed on the Homepage and Gallery page.
+            </p>
+          </div>
+          <div class="cms-card-actions">
+            <a href="gallery.html" target="_blank" rel="noopener" class="cms-btn cms-btn-secondary">
+              View Facilities Page ↗
+            </a>
+            <button type="button" id="cms-new-facility-btn" class="cms-btn cms-btn-primary">
+              + Add New Facility
+            </button>
+          </div>
+        </div>
+        <div id="cms-facilities-grid" class="cms-facilities-grid"></div>
+      </section>
+    </div>
+
+    <!-- Campus Gallery & Site Highlights Panel -->
+    <div id="cms-panel-gallery" class="cms-tab-panel">
+      <section class="cms-content-card" aria-labelledby="cms-gallery-heading">
+        <div class="cms-card-header">
+          <div>
+            <h2 id="cms-gallery-heading">Campus &amp; School Life Gallery</h2>
+            <p style="font-size:13px;color:var(--cms-muted);margin-top:4px">
+              Add or remove general school gallery photos displayed in the "Campus &amp; School Life Gallery" section on the Gallery page.
+            </p>
+          </div>
+          <div class="cms-card-actions">
+            <select id="cms-gallery-category-filter" class="cms-input"
+              style="height:40px;width:auto;min-width:170px;font-size:13px;font-weight:600"
+              aria-label="Filter gallery photos by category">
+              <option value="all">All Categories</option>
+            </select>
+            <a href="gallery.html" target="_blank" rel="noopener" class="cms-btn cms-btn-secondary">
+              View Live Gallery ↗
+            </a>
+          </div>
+        </div>
+
+        <div id="cms-gallery-upload-zone" class="cms-upload-zone">
+          <div class="cms-upload-zone-top">
+            <div class="cms-upload-zone-info">
+              <strong>Upload Campus Gallery Photos (Single or Multiple)</strong>
+              <span>Drag &amp; drop images here or pick files from your device to add directly to your public Gallery page.</span>
+            </div>
+            <label for="cms-gallery-photos-file" class="cms-btn cms-btn-primary" style="cursor:pointer">
+              📁 Upload Gallery Photos
+            </label>
+            <input type="file" id="cms-gallery-photos-file" accept="image/*" multiple style="display:none">
+          </div>
+
+          <div class="cms-url-add-row">
+            <select id="cms-gallery-upload-category" class="cms-input" style="max-width:190px;height:40px">
+              <option value="Campus Life">Campus Life</option>
+              <option value="Student Leadership">Student Leadership</option>
+              <option value="Awards & Honours">Awards &amp; Honours</option>
+              <option value="Academics & Labs">Academics &amp; Labs</option>
+              <option value="Sports & Clubs">Sports &amp; Clubs</option>
+              <option value="__new__">+ Custom Category...</option>
+            </select>
+            <input type="text" id="cms-gallery-upload-category-custom" class="cms-input"
+              placeholder="Custom category..." style="display:none;max-width:170px;height:40px">
+            <input type="text" id="cms-gallery-upload-title" class="cms-input"
+              placeholder="Optional title..." style="max-width:180px">
+            <input type="text" id="cms-gallery-upload-caption" class="cms-input"
+              placeholder="Optional caption..." style="max-width:210px">
+            <input type="text" id="cms-gallery-photo-url" class="cms-input"
+              placeholder="Or paste an image URL / path...">
+            <button type="button" id="cms-gallery-photo-url-btn" class="cms-btn cms-btn-secondary cms-btn-sm">
+              + Add Photo URL
+            </button>
+          </div>
+
+          <div id="cms-gallery-upload-progress" class="cms-upload-progress"></div>
+        </div>
+
+        <div id="cms-campus-gallery-grid" class="cms-photos-grid"></div>
+      </section>
+
+      <section class="cms-content-card" aria-labelledby="cms-banners-heading">
+        <div class="cms-card-header">
+          <div>
+            <h2 id="cms-banners-heading">Website Banners &amp; Principal Portrait</h2>
+            <p style="font-size:13px;color:var(--cms-muted);margin-top:4px">
+              Update the Homepage Hero background, Subpages header banner, and Principal's portrait shown on the Home page.
+            </p>
+          </div>
+          <div class="cms-card-actions">
+            <button type="button" id="btn-restore-media-defaults" class="cms-btn cms-btn-danger cms-btn-sm">
+              ↺ Restore Default Website Photos
+            </button>
+          </div>
+        </div>
+        <div id="cms-site-banners-grid" class="cms-site-banners-grid"></div>
+      </section>
+    </div>
+
     <!-- Enquiries inbox -->
-    <section class="cms-enquiries" aria-labelledby="enquiries-heading">
+    <div id="cms-panel-enquiries" class="cms-tab-panel">
+    <section class="cms-enquiries" style="margin-top:0" aria-labelledby="enquiries-heading">
       <div class="enquiries-heading">
         <div class="enquiries-title-group">
           <div class="enquiries-title-icon" aria-hidden="true">✉</div>
@@ -642,43 +921,7 @@
         </table>
       </div>
     </section>
-
-    <section class="cms-toolbox-card">
-      <h3>CMS Backup &amp; Deployment Tools</h3>
-      <p>
-        Export JSON backups, import articles, or download the updated
-        <code>blog-data.js</code> file for a static backup.
-      </p>
-
-      <div class="cms-toolbox-btns">
-        <button type="button" id="btn-download-js"
-          class="cms-btn cms-btn-secondary">
-          ⬇ Download updated <code>blog-data.js</code>
-        </button>
-
-        <button type="button" id="btn-export-json"
-          class="cms-btn cms-btn-secondary">
-          💾 Export JSON Backup
-        </button>
-
-        <button type="button" id="btn-import-json"
-          class="cms-btn cms-btn-secondary">
-          📂 Import Articles JSON
-        </button>
-        <input type="file" id="file-import-input"
-          accept=".json" style="display:none">
-
-        <button type="button" id="btn-change-password"
-          class="cms-btn cms-btn-secondary">
-          🔑 Change Passcode
-        </button>
-
-        <button type="button" id="btn-reset-defaults"
-          class="cms-btn cms-btn-danger" style="margin-left:auto">
-          ↺ Reset to Sample Articles
-        </button>
-      </div>
-    </section>
+    </div>
   </main>
 
   <!-- Enquiry detail dialog -->
@@ -903,6 +1146,201 @@
     </div>
   </div>
 
+  <!-- Past Event Modal -->
+  <div id="cms-event-modal" class="cms-editor-modal"
+    role="dialog" aria-modal="true" aria-labelledby="event-modal-title-text">
+    <div class="cms-editor-pane" style="max-width:680px">
+      <div class="cms-editor-header">
+        <h3 id="event-modal-title-text">Add New Past Event</h3>
+        <button type="button" id="cms-event-modal-close"
+          class="cms-editor-close" aria-label="Close event editor">✕</button>
+      </div>
+
+      <div class="cms-editor-body">
+        <form id="cms-event-form">
+          <input type="hidden" id="event-field-id">
+
+          <div class="cms-form-group">
+            <label for="event-field-title">Event Title *</label>
+            <input type="text" id="event-field-title" class="cms-input"
+              placeholder="e.g. Inter-House Sports Festival 2026" required>
+          </div>
+
+          <div class="cms-form-group">
+            <label for="event-field-category">Category / Tagline</label>
+            <input type="text" id="event-field-category" class="cms-input"
+              placeholder="e.g. Sports & Competitions">
+          </div>
+
+          <div class="cms-form-group">
+            <label for="event-field-description">Event Description</label>
+            <textarea id="event-field-description" class="cms-textarea"
+              placeholder="Short summary of the event highlights..."></textarea>
+          </div>
+
+          <div class="cms-form-group">
+            <label for="event-field-cover">Event Cover Photo</label>
+            <div class="image-selector-wrap">
+              <input type="text" id="event-field-cover" class="cms-input"
+                placeholder="Image URL or local path">
+              <div id="event-cover-quick-picks" class="quick-image-pills"></div>
+              <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
+                <label for="event-field-cover-file" class="cms-btn cms-btn-secondary"
+                  style="font-size:12px;height:36px;cursor:pointer">
+                  📁 Upload Cover Photo...
+                </label>
+                <input type="file" id="event-field-cover-file"
+                  accept="image/*" style="display:none">
+              </div>
+              <div class="image-preview-box">
+                <img id="event-cover-preview" src="images/school-1.webp" alt="Event Cover Preview">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="cms-editor-footer">
+        <button type="button" id="cms-event-modal-cancel"
+          class="cms-btn cms-btn-secondary">Cancel</button>
+        <button type="submit" form="cms-event-form"
+          class="cms-btn cms-btn-primary" style="min-width:150px">
+          ✓ Save Event
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Facility Modal -->
+  <div id="cms-facility-modal" class="cms-editor-modal"
+    role="dialog" aria-modal="true" aria-labelledby="facility-modal-title-text">
+    <div class="cms-editor-pane" style="max-width:680px">
+      <div class="cms-editor-header">
+        <h3 id="facility-modal-title-text">Add New School Facility</h3>
+        <button type="button" id="cms-facility-modal-close"
+          class="cms-editor-close" aria-label="Close facility editor">✕</button>
+      </div>
+
+      <div class="cms-editor-body">
+        <form id="cms-facility-form">
+          <input type="hidden" id="facility-field-id">
+
+          <div class="cms-form-group">
+            <label for="facility-field-name">Facility Name *</label>
+            <input type="text" id="facility-field-name" class="cms-input"
+              placeholder="e.g. Modern Library & Media Suite" required>
+          </div>
+
+          <div class="cms-form-group">
+            <label for="facility-field-description">Description</label>
+            <textarea id="facility-field-description" class="cms-textarea"
+              placeholder="Describe how this facility supports students..."></textarea>
+          </div>
+
+          <div class="cms-form-group">
+            <label class="cms-checkbox-label">
+              <input type="checkbox" id="facility-field-show-home" checked>
+              <span>🏠 Feature in "Explore Our Facilities" preview on Homepage (top 3 featured)</span>
+            </label>
+          </div>
+
+          <div class="cms-form-group">
+            <label for="facility-field-image">Facility Photo</label>
+            <div class="image-selector-wrap">
+              <input type="text" id="facility-field-image" class="cms-input"
+                placeholder="Image URL or local path">
+              <div id="facility-image-quick-picks" class="quick-image-pills"></div>
+              <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
+                <label for="facility-field-image-file" class="cms-btn cms-btn-secondary"
+                  style="font-size:12px;height:36px;cursor:pointer">
+                  📁 Upload Facility Photo...
+                </label>
+                <input type="file" id="facility-field-image-file"
+                  accept="image/*" style="display:none">
+              </div>
+              <div class="image-preview-box">
+                <img id="facility-image-preview" src="images/school-2.webp" alt="Facility Preview">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="cms-editor-footer">
+        <button type="button" id="cms-facility-modal-cancel"
+          class="cms-btn cms-btn-secondary">Cancel</button>
+        <button type="submit" form="cms-facility-form"
+          class="cms-btn cms-btn-primary" style="min-width:150px">
+          ✓ Save Facility
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Campus Gallery Photo Edit Modal -->
+  <div id="cms-gallery-modal" class="cms-editor-modal"
+    role="dialog" aria-modal="true" aria-labelledby="gallery-modal-title-text">
+    <div class="cms-editor-pane" style="max-width:620px">
+      <div class="cms-editor-header">
+        <h3 id="gallery-modal-title-text">Edit Gallery Photograph</h3>
+        <button type="button" id="cms-gallery-modal-close"
+          class="cms-editor-close" aria-label="Close gallery photo editor">✕</button>
+      </div>
+
+      <div class="cms-editor-body">
+        <form id="cms-gallery-form">
+          <input type="hidden" id="gallery-field-id">
+
+          <div class="cms-form-group">
+            <label for="gallery-field-title">Photo Title</label>
+            <input type="text" id="gallery-field-title" class="cms-input"
+              placeholder="e.g. Science Exhibition Winners">
+          </div>
+
+          <div class="cms-form-group">
+            <label for="gallery-field-category">Category</label>
+            <input type="text" id="gallery-field-category" class="cms-input"
+              placeholder="e.g. Campus Life, Student Leadership, Awards & Honours">
+          </div>
+
+          <div class="cms-form-group">
+            <label for="gallery-field-caption">Caption</label>
+            <textarea id="gallery-field-caption" class="cms-textarea"
+              placeholder="Optional caption displayed under the photo..."></textarea>
+          </div>
+
+          <div class="cms-form-group">
+            <label for="gallery-field-image">Photo URL / Upload Replacement</label>
+            <div class="image-selector-wrap">
+              <input type="text" id="gallery-field-image" class="cms-input"
+                placeholder="Image URL or path" required>
+              <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
+                <label for="gallery-field-image-file" class="cms-btn cms-btn-secondary"
+                  style="font-size:12px;height:36px;cursor:pointer">
+                  📁 Upload Replacement Photo...
+                </label>
+                <input type="file" id="gallery-field-image-file"
+                  accept="image/*" style="display:none">
+              </div>
+              <div class="image-preview-box">
+                <img id="gallery-image-preview" src="images/school-1.webp" alt="Gallery Photo Preview">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="cms-editor-footer">
+        <button type="button" id="cms-gallery-modal-cancel"
+          class="cms-btn cms-btn-secondary">Cancel</button>
+        <button type="submit" form="cms-gallery-form"
+          class="cms-btn cms-btn-primary" style="min-width:150px">
+          ✓ Save Photo
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="cms-toast" class="pfs-toast"></div>
 
   <!-- Enquiries inbox behavior: uses the existing BlogStore Supabase client. -->
@@ -968,8 +1406,10 @@
 
       function updateSummary() {
         const unread = enquiries.filter(item => item.status === "new").length;
+        const tabBadge = document.getElementById("tab-badge-enquiries");
 
         if (countBadge) countBadge.textContent = unread;
+        if (tabBadge) tabBadge.textContent = unread;
         if (newCount) newCount.textContent = unread;
         if (totalCount) totalCount.textContent = enquiries.length;
         if (latestLabel) {

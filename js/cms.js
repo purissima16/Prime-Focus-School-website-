@@ -153,6 +153,10 @@
     if (authOverlay) authOverlay.classList.add("hidden");
     if (authErrorMsg) authErrorMsg.style.display = "none";
     loadDashboard();
+    window.__pfsCmsAuthReady = true;
+    window.dispatchEvent(
+      new CustomEvent("pfs:cms-auth-ready", { detail: { session } })
+    );
     return true;
   }
 
@@ -249,6 +253,9 @@
     if (statPublishedPosts) statPublishedPosts.textContent = published.length;
     if (statDraftPosts) statDraftPosts.textContent = drafts.length;
     if (statCategories) statCategories.textContent = categories.length;
+
+    const tabBadgeBlog = $("tab-badge-blog");
+    if (tabBadgeBlog) tabBadgeBlog.textContent = posts.length;
   }
 
   function populateCategoryDropdowns() {
@@ -559,9 +566,30 @@
   });
 
   if (fieldCoverFile) {
-    fieldCoverFile.addEventListener("change", event => {
+    fieldCoverFile.addEventListener("change", async event => {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
+
+      if (
+        window.MediaStore &&
+        typeof window.MediaStore.uploadImageWithInfo === "function"
+      ) {
+        try {
+          showToast("Uploading cover photo...");
+          const uploaded = await window.MediaStore.uploadImageWithInfo(file, "blog");
+          if (fieldCover) fieldCover.value = uploaded.url;
+          if (coverPreviewImg) coverPreviewImg.src = uploaded.url;
+          showToast(
+            uploaded.usedFallback
+              ? "Image optimized locally. Save the article to keep the change."
+              : "Cover photo uploaded to Supabase Storage! Save the article to keep it."
+          );
+          fieldCoverFile.value = "";
+          return;
+        } catch (err) {
+          console.warn("Falling back to Data URL for blog cover:", err);
+        }
+      }
 
       const reader = new FileReader();
       reader.onload = loadEvent => {

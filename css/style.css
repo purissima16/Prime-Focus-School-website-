@@ -701,6 +701,81 @@ button, input, textarea {
   color: #B5CCE2;
 }
 
+.footer-developer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+  padding: 18px 22px;
+  margin-bottom: 28px;
+  border-radius: 10px;
+  background: rgba(16, 75, 136, 0.28);
+  border: 1px solid rgba(120, 200, 240, 0.28);
+}
+
+.footer-developer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.footer-developer-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--light-blue);
+}
+
+.footer-developer-name {
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.3;
+}
+
+.footer-developer-contacts {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.footer-dev-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #EAF5FF;
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.footer-dev-link svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.footer-dev-whatsapp {
+  background: rgba(120, 200, 240, 0.16);
+  border-color: rgba(120, 200, 240, 0.48);
+  color: var(--white);
+}
+
+.footer-dev-link:hover {
+  background: var(--light-blue);
+  border-color: var(--light-blue);
+  color: var(--navy);
+  transform: translateY(-2px);
+}
+
 .page-hero {
   position: relative;
   padding: 115px 8% 95px;
@@ -1001,6 +1076,17 @@ button, input, textarea {
     flex-direction: column;
   }
 
+  .footer-developer {
+    padding: 16px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .footer-dev-link {
+    font-size: 12px;
+    word-break: break-word;
+  }
+
   .footer-bottom {
     padding: 18px 0;
   }
@@ -1289,4 +1375,91 @@ button, input, textarea {
     right: 10px;
     background: rgba(6, 28, 58, 0.9);
   }
+}
+
+/* ==========================================================================
+   Campus & School Life Gallery Section (gallery.html)
+   ========================================================================== */
+
+.gallery-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+.gallery-filter-pill {
+  padding: 8px 18px;
+  border-radius: 30px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gallery-filter-pill:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--pale-blue);
+}
+
+.gallery-filter-pill.active {
+  background: var(--navy);
+  color: var(--white);
+  border-color: var(--navy);
+}
+
+.campus-gallery-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.campus-gallery-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow);
+}
+
+.campus-gallery-card img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.campus-gallery-card:hover img {
+  transform: scale(1.06);
+}
+
+.campus-gallery-copy {
+  padding: 18px 20px;
+}
+
+.campus-gallery-cat {
+  display: inline-block;
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.campus-gallery-copy h3 {
+  color: var(--navy);
+  font-family: "Manrope", sans-serif;
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.campus-gallery-copy p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 6px;
 }
