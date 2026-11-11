@@ -108,7 +108,7 @@ function ensureLightboxModal() {
         <button class="lightbox-close" id="lightbox-close" aria-label="Close photo viewer">✕</button>
         <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous photo">❮</button>
         <div class="lightbox-body">
-          <img id="lightbox-img" src="" alt="Enlarged school photograph">
+          <img id="lightbox-img" src="" alt="Enlarged school photograph" decoding="async" fetchpriority="low">
           <div class="lightbox-caption">
             <p id="lightbox-title"></p>
             <span id="lightbox-counter"></span>
@@ -146,6 +146,10 @@ function closeUniversalLightbox() {
   setTimeout(() => {
     if (!universalLightboxState.isOpen) {
       lightbox.hidden = true;
+      const lightboxImg = document.getElementById("lightbox-img");
+      if (lightboxImg) {
+        lightboxImg.removeAttribute("src");
+      }
       document.body.style.overflow = "";
     }
   }, 250);
@@ -169,6 +173,7 @@ function updateUniversalLightboxPhoto() {
   const safeSrc = sanitizeImageUrl(item.src);
 
   if (imgEl) {
+    imgEl.decoding = "async";
     imgEl.style.opacity = "0.3";
     const temp = new Image();
     temp.onload = () => {
@@ -221,7 +226,7 @@ function createFacilityCard(facility, index) {
   return `
     <article class="facility-card" data-idx="${index}">
       <div class="card-media-wrap zoomable-img-trigger" data-title="${safeName}" data-caption="${safeDesc}" role="button" tabindex="0" aria-label="View ${safeName} photograph widely">
-        <img src="${safeImg}" alt="${safeName}" loading="lazy" onerror="this.src='images/school-1.webp'">
+        <img src="${safeImg}" alt="${safeName}" width="1200" height="800" loading="lazy" decoding="async" onerror="this.src='images/school-1.webp'">
         <span class="zoom-cue-badge">View Widely</span>
       </div>
       <div class="facility-copy">
@@ -243,7 +248,7 @@ function createEventCard(event, index) {
   return `
     <article class="event-card" id="event-${escapeHtml(event.id || String(index))}">
       <div class="card-media-wrap zoomable-img-trigger" data-title="${safeTitle}" data-caption="${safeDesc}" role="button" tabindex="0" aria-label="View ${safeTitle} photograph widely">
-        <img src="${safeCover}" alt="${safeTitle}" loading="lazy" onerror="this.src='images/school-1.webp'">
+        <img src="${safeCover}" alt="${safeTitle}" width="1200" height="800" loading="lazy" decoding="async" onerror="this.src='images/school-1.webp'">
         <span class="zoom-cue-badge">View Widely</span>
       </div>
       <div class="event-copy">
@@ -393,7 +398,7 @@ function renderCampusGallery() {
       return `
         <article class="campus-gallery-card" data-idx="${idx}" data-title="${safeTitle}" data-caption="${safeCaption || safeCategory}">
           <div class="card-media-wrap zoomable-img-trigger" role="button" tabindex="0" aria-label="View ${safeTitle} widely">
-            <img src="${safeImg}" alt="${safeTitle}" loading="lazy" onerror="this.src='images/school-1.webp'">
+            <img src="${safeImg}" alt="${safeTitle}" width="1200" height="800" loading="lazy" decoding="async" onerror="this.src='images/school-1.webp'">
             <span class="zoom-cue-badge">View Widely</span>
           </div>
           ${(photo.title || photo.caption || photo.category) ? `
@@ -487,10 +492,14 @@ function renderSingleEventPage() {
       const safeAlt = escapeHtml(
         photo.caption || `${currentEvent.title} photo ${pIdx + 1}`
       );
+      const priorityAttrs =
+        pIdx < 3
+          ? 'decoding="async"'
+          : 'loading="lazy" decoding="async"';
 
       return `
         <div class="photo-card" data-index="${pIdx}" data-caption="${safeCaption}" role="button" tabindex="0" aria-label="View photograph ${pIdx + 1} of ${photoItems.length} widely">
-          <img src="${safeSrc}" alt="${safeAlt}" loading="lazy" onerror="this.src='images/school-1.webp'">
+          <img src="${safeSrc}" alt="${safeAlt}" width="1200" height="800" ${priorityAttrs} onerror="this.src='images/school-1.webp'">
           <span class="zoom-cue-badge">View Widely</span>
           <div class="photo-overlay">
             <span class="photo-badge">${safeCaption ? safeCaption : "View Full Photo"}</span>
@@ -514,24 +523,53 @@ function renderSingleEventPage() {
 }
 
 function applySiteMediaSettings() {
+  const defaultHeroImage = "images/school-hero.webp";
+
   const heroSetting = getMediaSetting("hero_banner");
   const heroEl = document.querySelector(".hero");
   if (heroEl && heroSetting && heroSetting.value) {
-    const safeHero = sanitizeImageUrl(heroSetting.value, "images/school-hero.webp");
-    heroEl.style.backgroundImage = `url("${safeHero.replace(/"/g, '\\"')}")`;
+    const safeHero = sanitizeImageUrl(heroSetting.value, defaultHeroImage);
+    if (safeHero === defaultHeroImage || safeHero === `./${defaultHeroImage}`) {
+      if (heroEl.style.backgroundImage) {
+        heroEl.style.removeProperty("background-image");
+      }
+    } else {
+      const nextBg = `url("${safeHero.replace(/"/g, '\\"')}")`;
+      if (heroEl.style.backgroundImage !== nextBg) {
+        heroEl.style.backgroundImage = nextBg;
+      }
+    }
   }
 
   const pageHeroSetting = getMediaSetting("page_hero_banner");
   const pageHeroEl = document.querySelector(".page-hero");
   if (pageHeroEl && pageHeroSetting && pageHeroSetting.value) {
-    const safePageHero = sanitizeImageUrl(pageHeroSetting.value, "images/school-hero.webp");
-    pageHeroEl.style.backgroundImage = `url("${safePageHero.replace(/"/g, '\\"')}")`;
+    const safePageHero = sanitizeImageUrl(pageHeroSetting.value, defaultHeroImage);
+    if (
+      safePageHero === defaultHeroImage ||
+      safePageHero === `./${defaultHeroImage}`
+    ) {
+      if (pageHeroEl.style.backgroundImage) {
+        pageHeroEl.style.removeProperty("background-image");
+      }
+    } else {
+      const nextBg = `url("${safePageHero.replace(/"/g, '\\"')}")`;
+      if (pageHeroEl.style.backgroundImage !== nextBg) {
+        pageHeroEl.style.backgroundImage = nextBg;
+      }
+    }
   }
 
   const principalSetting = getMediaSetting("principal_portrait");
   const principalImg = document.querySelector(".principal-photo img");
   if (principalImg && principalSetting && principalSetting.value) {
-    principalImg.src = sanitizeImageUrl(principalSetting.value, "images/principal-pfs.webp");
+    const safePrincipal = sanitizeImageUrl(
+      principalSetting.value,
+      "images/principal-pfs.webp"
+    );
+    if (principalImg.getAttribute("src") !== safePrincipal) {
+      principalImg.src = safePrincipal;
+    }
     if (principalSetting.caption) {
       principalImg.dataset.caption = principalSetting.caption;
     }

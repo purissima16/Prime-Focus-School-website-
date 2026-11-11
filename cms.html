@@ -5,15 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PFS Content Management System | Prime Focus Schools</title>
   <link rel="icon" type="image/webp" href="images/pfs undone logo.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://hztinvahixhvkfhpccrq.supabase.co" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/blog.css">
   <link rel="stylesheet" href="css/cms.css">
 
-  <script src="js/blog-data.js"></script>
-  <script src="js/media-data.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/blog-store.js"></script>
-  <script src="js/media-store.js"></script>
+  <script src="js/blog-data.js" defer></script>
+  <script src="js/media-data.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="js/blog-store.js" defer></script>
+  <script src="js/media-store.js" defer></script>
   <script src="js/cms.js" defer></script>
   <script src="js/cms-media.js" defer></script>
 
@@ -398,7 +403,7 @@
   <div id="cms-auth-overlay" class="cms-auth-overlay">
     <div class="cms-auth-box">
       <div class="cms-auth-logo">
-        <img src="images/pfs undone logo.webp" alt="Prime Focus Schools">
+        <img src="images/pfs undone logo.webp" alt="Prime Focus Schools" width="64" height="64" decoding="async">
       </div>
       <h2>Prime Focus Schools CMS Portal</h2>
       <p class="auth-sub">
@@ -449,7 +454,7 @@
 
   <header class="cms-header">
     <div class="cms-brand-group">
-      <img src="images/pfs undone logo.webp" alt="Prime Focus Schools Logo">
+      <img src="images/pfs undone logo.webp" alt="Prime Focus Schools Logo" width="44" height="44" decoding="async">
       <div class="cms-brand-title">
         PRIME FOCUS SCHOOLS
         <small>CONTENT MANAGEMENT SYSTEM</small>
@@ -1081,7 +1086,10 @@
 
               <div class="image-preview-box">
                 <img id="editor-cover-preview"
-                  src="images/school-1.webp" alt="Cover Preview">
+                  src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                  data-default-src="images/school-1.webp"
+                  alt="Cover Preview"
+                  loading="lazy" decoding="async" fetchpriority="low">
               </div>
 
               <input type="text" id="field-cover-caption" class="cms-input"
@@ -1203,7 +1211,7 @@
                   accept="image/*" style="display:none">
               </div>
               <div class="image-preview-box">
-                <img id="event-cover-preview" src="images/school-1.webp" alt="Event Cover Preview">
+                <img id="event-cover-preview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-default-src="images/school-1.webp" alt="Event Cover Preview" loading="lazy" decoding="async" fetchpriority="low">
               </div>
             </div>
           </div>
@@ -1269,7 +1277,7 @@
                   accept="image/*" style="display:none">
               </div>
               <div class="image-preview-box">
-                <img id="facility-image-preview" src="images/school-2.webp" alt="Facility Preview">
+                <img id="facility-image-preview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-default-src="images/school-2.webp" alt="Facility Preview" loading="lazy" decoding="async" fetchpriority="low">
               </div>
             </div>
           </div>
@@ -1333,7 +1341,7 @@
                   accept="image/*" style="display:none">
               </div>
               <div class="image-preview-box">
-                <img id="gallery-image-preview" src="images/school-1.webp" alt="Gallery Photo Preview">
+                <img id="gallery-image-preview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-default-src="images/school-1.webp" alt="Gallery Photo Preview" loading="lazy" decoding="async" fetchpriority="low">
               </div>
             </div>
           </div>
@@ -1358,10 +1366,11 @@
     (() => {
       "use strict";
 
-      const client =
-        window.BlogStore && typeof window.BlogStore.getClient === "function"
-          ? window.BlogStore.getClient()
-          : null;
+      function initEnquiriesInbox() {
+        const client =
+          window.BlogStore && typeof window.BlogStore.getClient === "function"
+            ? window.BlogStore.getClient()
+            : null;
 
       const body = document.getElementById("cms-enquiries-tbody");
       const searchInput = document.getElementById("cms-enquiry-search");
@@ -1667,6 +1676,13 @@
         });
       } else {
         showInboxError("The shared Supabase client is not available.");
+      }
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initEnquiriesInbox);
+      } else {
+        initEnquiriesInbox();
       }
     })();
   </script>

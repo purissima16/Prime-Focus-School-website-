@@ -581,13 +581,16 @@ body.cms-body {
   display: flex;
   justify-content: flex-end;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.25s ease, visibility 0s linear 0.25s;
 }
 
 .cms-editor-modal.open {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
+  transition: opacity 0.25s ease, visibility 0s;
 }
 
 .cms-editor-pane {
@@ -1014,6 +1017,8 @@ body.cms-body {
   display: flex;
   flex-direction: column;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 340px;
 }
 
 .cms-media-card:hover {
@@ -1200,6 +1205,8 @@ body.cms-body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 256px;
 }
 
 .cms-photo-tile-media {

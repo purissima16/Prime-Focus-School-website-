@@ -6,20 +6,26 @@
   <meta name="description" content="Read the latest news, academic updates, student achievements, and insightful articles from Prime Focus Schools, Ipaja, Lagos.">
   <title>School Blog & News | Prime Focus Schools</title>
   <link rel="icon" type="image/webp" href="images/pfs undone logo.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://hztinvahixhvkfhpccrq.supabase.co" crossorigin>
+  <link rel="preload" as="image" href="images/school-hero.webp" fetchpriority="high">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/blog.css">
-  <script src="js/blog-data.js"></script>
-  <script src="js/media-data.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/blog-store.js"></script>
-<script src="js/media-store.js"></script>
-<script src="js/main.js" defer></script>
-<script src="js/blog.js" defer></script>
+  <script src="js/blog-data.js" defer></script>
+  <script src="js/media-data.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="js/blog-store.js" defer></script>
+  <script src="js/media-store.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/blog.js" defer></script>
 </head>
 <body>
   <header class="site-header">
     <a class="brand" href="index.html">
-      <img src="images/pfs undone logo.webp" alt="PFS school logo">
+      <img src="images/pfs undone logo.webp" alt="PFS school logo" width="52" height="52" decoding="async">
       <span>PRIME FOCUS <small>SCHOOLS</small></span>
     </a>
 
@@ -140,7 +146,7 @@
   <footer class="site-footer">
     <div class="footer-main">
       <a class="brand footer-brand" href="index.html">
-        <img src="images/pfs undone logo.webp" alt="Prime Focus Schools logo">
+        <img src="images/pfs undone logo.webp" alt="Prime Focus Schools logo" width="52" height="52" loading="lazy" decoding="async">
         <span>PRIME FOCUS <small>SCHOOLS</small></span>
       </a>
       <p>Glorify God Always.</p>
@@ -179,5 +185,23 @@
       <span>LEARN · GROW · EXCEL</span>
     </div>
   </footer>
+  <script type="speculationrules">
+    {
+      "prefetch": [
+        {
+          "source": "document",
+          "where": {
+            "and": [
+              { "href_matches": "/*" },
+              { "not": { "href_matches": "/*cms.html*" } },
+              { "not": { "selector_matches": "[href*='cms.html']" } },
+              { "not": { "selector_matches": "[target='_blank']" } }
+            ]
+          },
+          "eagerness": "moderate"
+        }
+      ]
+    }
+  </script>
 </body>
 </html>

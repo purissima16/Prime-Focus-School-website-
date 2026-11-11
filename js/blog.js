@@ -48,6 +48,14 @@
      Blog Listing Page
      ======================================================================== */
 
+  let blogPageInitialized = false;
+  let blogSelectedCategory = "all";
+  let blogSelectedTag = null;
+  let blogSearchQuery = "";
+  let blogSortOrder = "newest";
+  let blogStoreSettled = false;
+  let singlePostFound = false;
+
   function initBlogPage() {
     const blogGrid = document.getElementById("blog-posts-grid");
     if (!blogGrid) return;
@@ -62,29 +70,18 @@
     const resultsCountEl = document.getElementById("results-count-text");
     const emptyStateEl = document.getElementById("blog-empty-state");
 
-    const urlParams = new URLSearchParams(window.location.search);
-    let selectedCategory = urlParams.get("category") || "all";
-    let selectedTag = urlParams.get("tag") || null;
-    let searchQuery = urlParams.get("search") || "";
-    let sortOrder = "newest";
-
-    if (searchInput && searchQuery) {
-      searchInput.value = searchQuery;
-      if (searchClearBtn) searchClearBtn.classList.add("visible");
-    }
-
     function renderCategoryPills() {
       if (!categoryContainer) return;
 
       const categories = BlogStore.getCategories();
       let html = `
         <button type="button"
-          class="category-pill ${selectedCategory === "all" ? "active" : ""}"
+          class="category-pill ${blogSelectedCategory === "all" ? "active" : ""}"
           data-category="all">All Stories</button>`;
 
       categories.forEach(category => {
         const active =
-          selectedCategory.toLowerCase() === category.toLowerCase();
+          blogSelectedCategory.toLowerCase() === category.toLowerCase();
 
         html += `
           <button type="button"
@@ -98,8 +95,8 @@
 
       categoryContainer.querySelectorAll(".category-pill").forEach(pill => {
         pill.addEventListener("click", () => {
-          selectedCategory = pill.dataset.category;
-          selectedTag = null;
+          blogSelectedCategory = pill.dataset.category;
+          blogSelectedTag = null;
 
           categoryContainer.querySelectorAll(".category-pill")
             .forEach(item => item.classList.remove("active"));
@@ -121,7 +118,9 @@
             role="button" tabindex="0"
             aria-label="View ${escapeHtml(post.title)} photo widely">
             <img src="${escapeHtml(coverImg)}"
-              alt="${escapeHtml(post.title)}" loading="lazy">
+              alt="${escapeHtml(post.title)}"
+              width="1200" height="750"
+              loading="lazy" decoding="async">
             <span class="zoom-cue-badge">View Widely</span>
           </div>
           <div class="blog-card-body">
@@ -161,7 +160,9 @@
             role="button" tabindex="0"
             aria-label="View featured story: ${escapeHtml(post.title)} widely">
             <img src="${escapeHtml(coverImg)}"
-              alt="${escapeHtml(post.title)}" loading="lazy">
+              alt="${escapeHtml(post.title)}"
+              width="1200" height="750"
+              loading="lazy" decoding="async">
             <span class="featured-badge">FEATURED STORY</span>
             <span class="zoom-cue-badge">View Widely</span>
           </div>
@@ -192,18 +193,18 @@
     function updateBlogView() {
       const posts = BlogStore.getPosts({
         includeDrafts: false,
-        category: selectedCategory === "all" ? null : selectedCategory,
-        tag: selectedTag,
-        search: searchQuery,
-        sort: sortOrder
+        category: blogSelectedCategory === "all" ? null : blogSelectedCategory,
+        tag: blogSelectedTag,
+        search: blogSearchQuery,
+        sort: blogSortOrder
       });
 
       let gridPosts = posts;
 
       if (
-        selectedCategory === "all" &&
-        !searchQuery &&
-        !selectedTag &&
+        blogSelectedCategory === "all" &&
+        !blogSearchQuery &&
+        !blogSelectedTag &&
         posts.length
       ) {
         const featured = posts.find(post => post.featured) || posts[0];
@@ -231,39 +232,53 @@
       }
     }
 
-    if (searchInput) {
-      searchInput.addEventListener("input", event => {
-        searchQuery = event.target.value.trim();
-        if (searchClearBtn) {
-          searchClearBtn.classList.toggle("visible", Boolean(searchQuery));
+    if (!blogPageInitialized) {
+      const urlParams = new URLSearchParams(window.location.search);
+      blogSelectedCategory = urlParams.get("category") || "all";
+      blogSelectedTag = urlParams.get("tag") || null;
+      blogSearchQuery = urlParams.get("search") || "";
+      blogSortOrder =
+        sortSelect && sortSelect.value ? sortSelect.value : "newest";
+
+      if (searchInput) {
+        if (blogSearchQuery) {
+          searchInput.value = blogSearchQuery;
+          if (searchClearBtn) searchClearBtn.classList.add("visible");
+        } else if (searchInput.value.trim()) {
+          blogSearchQuery = searchInput.value.trim();
+          if (searchClearBtn) searchClearBtn.classList.add("visible");
         }
-        updateBlogView();
-      });
-    }
 
-    if (searchClearBtn) {
-      searchClearBtn.addEventListener("click", () => {
-        if (searchInput) searchInput.value = "";
-        searchQuery = "";
-        searchClearBtn.classList.remove("visible");
-        updateBlogView();
-      });
-    }
+        searchInput.addEventListener("input", event => {
+          blogSearchQuery = event.target.value.trim();
+          if (searchClearBtn) {
+            searchClearBtn.classList.toggle("visible", Boolean(blogSearchQuery));
+          }
+          updateBlogView();
+        });
+      }
 
-    if (sortSelect) {
-      sortSelect.addEventListener("change", event => {
-        sortOrder = event.target.value;
-        updateBlogView();
-      });
+      if (searchClearBtn) {
+        searchClearBtn.addEventListener("click", () => {
+          if (searchInput) searchInput.value = "";
+          blogSearchQuery = "";
+          searchClearBtn.classList.remove("visible");
+          updateBlogView();
+        });
+      }
+
+      if (sortSelect) {
+        sortSelect.addEventListener("change", event => {
+          blogSortOrder = event.target.value;
+          updateBlogView();
+        });
+      }
+
+      blogPageInitialized = true;
     }
 
     renderCategoryPills();
     updateBlogView();
-
-    window.addEventListener("pfs:blog-updated", () => {
-      renderCategoryPills();
-      updateBlogView();
-    });
   }
 
   /* ========================================================================
@@ -273,6 +288,8 @@
   function initSinglePostPage() {
     const postWrapper = document.getElementById("single-post-content");
     if (!postWrapper) return;
+
+    singlePostFound = false;
 
     const params = new URLSearchParams(window.location.search);
     const postParam = params.get("slug") || params.get("id");
@@ -284,10 +301,13 @@
 
     const post = BlogStore.getPostByIdOrSlug(postParam);
     if (!post) {
-      renderNotFound();
+      if (blogStoreSettled) {
+        renderNotFound();
+      }
       return;
     }
 
+    singlePostFound = true;
     document.title = `${post.title} | Prime Focus Schools Blog`;
 
     const breadcrumbCategory =
@@ -329,7 +349,13 @@
       post.authorRole || "Editorial Board";
 
     if (coverImage) {
-      coverImage.src = post.cover || "images/school-1.webp";
+      const nextCover = post.cover || "images/school-1.webp";
+      coverImage.removeAttribute("loading");
+      coverImage.fetchPriority = "high";
+      coverImage.decoding = "sync";
+      if (coverImage.getAttribute("src") !== nextCover) {
+        coverImage.src = nextCover;
+      }
       coverImage.alt = post.title;
     }
 
@@ -353,7 +379,9 @@
       post.authorRole || "Editorial Board";
 
     if (tagsEl) {
+      const container = tagsEl.closest(".post-tags-container");
       if (Array.isArray(post.tags) && post.tags.length) {
+        if (container) container.style.display = "";
         tagsEl.innerHTML = post.tags.map(tag =>
           `<a class="tag-badge"
             href="blog.html?tag=${encodeURIComponent(tag)}">
@@ -361,7 +389,7 @@
           </a>`
         ).join("");
       } else {
-        const container = tagsEl.closest(".post-tags-container");
+        tagsEl.innerHTML = "";
         if (container) container.style.display = "none";
       }
     }
@@ -369,6 +397,10 @@
     setupSocialShare(post);
     setupPostNavigation(post);
     renderRelatedPosts(post);
+
+    if (window.bindAllZoomableImages) {
+      window.bindAllZoomableImages();
+    }
   }
 
   function renderNotFound() {
@@ -400,13 +432,15 @@
     const xButton = document.getElementById("share-btn-x");
     const facebook = document.getElementById("share-btn-facebook");
 
-    if (copyButton) {
+    if (copyButton && !copyButton._pfsBound) {
+      copyButton._pfsBound = true;
       copyButton.addEventListener("click", () => {
-        navigator.clipboard.writeText(url).then(
+        const currentUrl = window.location.href;
+        navigator.clipboard.writeText(currentUrl).then(
           () => showToast("Article link copied to clipboard!"),
           () => {
             const input = document.createElement("input");
-            input.value = url;
+            input.value = currentUrl;
             document.body.appendChild(input);
             input.select();
             document.execCommand("copy");
@@ -462,12 +496,15 @@
     const grid = document.getElementById("related-posts-grid");
     if (!grid) return;
 
+    const section = document.getElementById("related-posts-section");
     const related = BlogStore.getRelatedPosts(currentPost.id, 3);
     if (!related.length) {
-      const section = document.getElementById("related-posts-section");
+      grid.innerHTML = "";
       if (section) section.style.display = "none";
       return;
     }
+
+    if (section) section.style.display = "";
 
     grid.innerHTML = related.map(post => {
       const url =
@@ -478,7 +515,9 @@
           <div class="blog-card-media">
             <a href="${url}">
               <img src="${escapeHtml(post.cover || "images/school-1.webp")}"
-                alt="${escapeHtml(post.title)}" loading="lazy">
+                alt="${escapeHtml(post.title)}"
+                width="1200" height="750"
+                loading="lazy" decoding="async">
             </a>
           </div>
           <div class="blog-card-body">
@@ -527,7 +566,9 @@
             data-caption="${escapeHtml(post.excerpt || "")}"
             role="button" tabindex="0">
             <img src="${escapeHtml(cover)}"
-              alt="${escapeHtml(post.title)}" loading="lazy">
+              alt="${escapeHtml(post.title)}"
+              width="1200" height="750"
+              loading="lazy" decoding="async">
             <span class="zoom-cue-badge">View Widely</span>
           </div>
           <div class="event-copy">
@@ -551,21 +592,47 @@
      Initialization
      ======================================================================== */
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    try {
-      await BlogStore.ready();
-    } catch (error) {
-      console.error("Using cached blog articles because Supabase could not load:", error);
+  function renderAllBlogViews() {
+    initBlogPage();
+    initSinglePostPage();
+    initHomeBlogPreview();
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // Render cached or default articles immediately before remote refresh.
+    renderAllBlogViews();
+
+    if (typeof BlogStore.ready === "function") {
+      let updatedDuringReady = false;
+      const markUpdated = () => {
+        updatedDuringReady = true;
+      };
+      window.addEventListener("pfs:blog-updated", markUpdated, { once: true });
+
+      BlogStore.ready()
+        .then(() => {
+          window.removeEventListener("pfs:blog-updated", markUpdated);
+          blogStoreSettled = true;
+          const needsNotFoundCheck =
+            Boolean(document.getElementById("single-post-content")) &&
+            !singlePostFound;
+          if (!updatedDuringReady || needsNotFoundCheck) {
+            renderAllBlogViews();
+          }
+        })
+        .catch(error => {
+          window.removeEventListener("pfs:blog-updated", markUpdated);
+          blogStoreSettled = true;
+          console.error(
+            "Using cached blog articles because Supabase could not load:",
+            error
+          );
+          renderAllBlogViews();
+        });
+    } else {
+      blogStoreSettled = true;
     }
-
-    initBlogPage();
-    initSinglePostPage();
-    initHomeBlogPreview();
   });
 
-  window.addEventListener("pfs:blog-updated", () => {
-    initBlogPage();
-    initSinglePostPage();
-    initHomeBlogPreview();
-  });
+  window.addEventListener("pfs:blog-updated", renderAllBlogViews);
 })();

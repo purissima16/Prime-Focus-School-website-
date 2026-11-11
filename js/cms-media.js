@@ -324,6 +324,8 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
                 <div class="cms-media-thumb-wrap">
                   <img src="${escapeHtml(ev.cover || "images/school-1.webp")}"
                     alt="${escapeHtml(ev.title)}"
+                    width="1200" height="800"
+                    loading="lazy" decoding="async" fetchpriority="low"
                     onerror="this.src='images/school-1.webp'">
                   <span class="cms-media-pill">${escapeHtml(ev.category || "Event")}</span>
                   <span class="cms-media-pill right">${photoCount} ${photoCount === 1 ? "photo" : "photos"}</span>
@@ -420,7 +422,8 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
             <div class="cms-photo-tile-media">
               <img src="${escapeHtml(photo.image)}"
                 alt="${escapeHtml(photo.caption || `${ev.title} photo ${idx + 1}`)}"
-                loading="lazy"
+                width="1200" height="800"
+                loading="lazy" decoding="async" fetchpriority="low"
                 onerror="this.src='images/school-1.webp'">
               ${isCover ? `<span class="cms-media-pill cover-pill">Event Cover</span>` : `<span class="cms-media-pill">#${idx + 1}</span>`}
             </div>
@@ -537,6 +540,9 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
     const coverField = $("event-field-cover");
     const coverPreview = $("event-cover-preview");
     const modalTitle = $("event-modal-title-text");
+    const defaultCover =
+      (coverPreview && coverPreview.dataset && coverPreview.dataset.defaultSrc) ||
+      "images/school-1.webp";
 
     if (eventId) {
       const ev = MediaStore.getEventByIdOrIndex(eventId);
@@ -549,14 +555,22 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
       if (titleField) titleField.value = ev.title || "";
       if (categoryField) categoryField.value = ev.category || "";
       if (descField) descField.value = ev.description || "";
-      if (coverField) coverField.value = ev.cover || "images/school-1.webp";
-      if (coverPreview) coverPreview.src = ev.cover || "images/school-1.webp";
+      if (coverField) coverField.value = ev.cover || defaultCover;
+      if (coverPreview) {
+        coverPreview.removeAttribute("loading");
+        coverPreview.removeAttribute("fetchpriority");
+        coverPreview.src = ev.cover || defaultCover;
+      }
     } else {
       if (modalTitle) modalTitle.textContent = "Add New Past Event";
       if (idField) idField.value = "";
       if (categoryField) categoryField.value = "School Celebration";
-      if (coverField) coverField.value = "images/school-1.webp";
-      if (coverPreview) coverPreview.src = "images/school-1.webp";
+      if (coverField) coverField.value = defaultCover;
+      if (coverPreview) {
+        coverPreview.removeAttribute("loading");
+        coverPreview.removeAttribute("fetchpriority");
+        coverPreview.src = defaultCover;
+      }
     }
 
     modal.classList.add("open");
@@ -591,6 +605,8 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
             <div class="cms-media-thumb-wrap">
               <img src="${escapeHtml(fac.image)}"
                 alt="${escapeHtml(fac.name)}"
+                width="1200" height="800"
+                loading="lazy" decoding="async" fetchpriority="low"
                 onerror="this.src='images/school-1.webp'">
               <span class="cms-media-pill">#${idx + 1}</span>
               ${fac.showOnHome ? `<span class="cms-media-pill right">Homepage</span>` : ""}
@@ -638,6 +654,9 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
     const imgPreview = $("facility-image-preview");
     const homeCheck = $("facility-field-show-home");
     const modalTitle = $("facility-modal-title-text");
+    const defaultImg =
+      (imgPreview && imgPreview.dataset && imgPreview.dataset.defaultSrc) ||
+      "images/school-2.webp";
 
     if (facilityId) {
       const fac = MediaStore.getFacilities().find(f => f.id === facilityId);
@@ -649,14 +668,22 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
       if (idField) idField.value = fac.id;
       if (nameField) nameField.value = fac.name || "";
       if (descField) descField.value = fac.description || "";
-      if (imgField) imgField.value = fac.image || "images/school-1.webp";
-      if (imgPreview) imgPreview.src = fac.image || "images/school-1.webp";
+      if (imgField) imgField.value = fac.image || defaultImg;
+      if (imgPreview) {
+        imgPreview.removeAttribute("loading");
+        imgPreview.removeAttribute("fetchpriority");
+        imgPreview.src = fac.image || defaultImg;
+      }
       if (homeCheck) homeCheck.checked = Boolean(fac.showOnHome);
     } else {
       if (modalTitle) modalTitle.textContent = "Add New School Facility";
       if (idField) idField.value = "";
-      if (imgField) imgField.value = "images/school-2.webp";
-      if (imgPreview) imgPreview.src = "images/school-2.webp";
+      if (imgField) imgField.value = defaultImg;
+      if (imgPreview) {
+        imgPreview.removeAttribute("loading");
+        imgPreview.removeAttribute("fetchpriority");
+        imgPreview.src = defaultImg;
+      }
       if (homeCheck) homeCheck.checked = true;
     }
 
@@ -716,7 +743,8 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
                 <div class="cms-photo-tile-media">
                   <img src="${escapeHtml(item.image)}"
                     alt="${escapeHtml(item.title || item.category || "Gallery photo")}"
-                    loading="lazy"
+                    width="1200" height="800"
+                    loading="lazy" decoding="async" fetchpriority="low"
                     onerror="this.src='images/school-1.webp'">
                   <span class="cms-media-pill">${escapeHtml(item.category || "Campus Life")}</span>
                 </div>
@@ -759,6 +787,8 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
             <div class="cms-media-thumb-wrap">
               <img src="${escapeHtml(item.value || item.defaultValue)}"
                 alt="${escapeHtml(item.label)}"
+                width="1200" height="800"
+                loading="lazy" decoding="async" fetchpriority="low"
                 onerror="this.src='${escapeHtml(item.defaultValue)}'">
               <span class="cms-media-pill">${escapeHtml(item.label)}</span>
             </div>
@@ -886,12 +916,20 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
     }
 
     form.reset();
+    const imgPreview = $("gallery-image-preview");
+    const defaultImg =
+      (imgPreview && imgPreview.dataset && imgPreview.dataset.defaultSrc) ||
+      "images/school-1.webp";
     $("gallery-field-id").value = item.id;
     $("gallery-field-title").value = item.title || "";
     $("gallery-field-category").value = item.category || "Campus Life";
     $("gallery-field-caption").value = item.caption || "";
     $("gallery-field-image").value = item.image || "";
-    $("gallery-image-preview").src = item.image || "images/school-1.webp";
+    if (imgPreview) {
+      imgPreview.removeAttribute("loading");
+      imgPreview.removeAttribute("fetchpriority");
+      imgPreview.src = item.image || defaultImg;
+    }
 
     modal.classList.add("open");
     $("gallery-field-title").focus();
@@ -1145,7 +1183,10 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
     const eventCoverPreview = $("event-cover-preview");
     if (eventCoverInput && eventCoverPreview) {
       eventCoverInput.addEventListener("input", e => {
-        eventCoverPreview.src = e.target.value || "images/school-1.webp";
+        eventCoverPreview.src =
+          e.target.value ||
+          (eventCoverPreview.dataset && eventCoverPreview.dataset.defaultSrc) ||
+          "images/school-1.webp";
       });
     }
 
@@ -1262,7 +1303,10 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
     const facImgPreview = $("facility-image-preview");
     if (facImgInput && facImgPreview) {
       facImgInput.addEventListener("input", e => {
-        facImgPreview.src = e.target.value || "images/school-1.webp";
+        facImgPreview.src =
+          e.target.value ||
+          (facImgPreview.dataset && facImgPreview.dataset.defaultSrc) ||
+          "images/school-2.webp";
       });
     }
 
@@ -1442,7 +1486,10 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
     const galFieldPreview = $("gallery-image-preview");
     if (galFieldImg && galFieldPreview) {
       galFieldImg.addEventListener("input", e => {
-        galFieldPreview.src = e.target.value || "images/school-1.webp";
+        galFieldPreview.src =
+          e.target.value ||
+          (galFieldPreview.dataset && galFieldPreview.dataset.defaultSrc) ||
+          "images/school-1.webp";
       });
     }
 

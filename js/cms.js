@@ -362,6 +362,8 @@
           <td>
             <img src="${escapeHtml(cover)}" alt=""
               class="post-thumb-preview"
+              width="58" height="42"
+              loading="lazy" decoding="async"
               onerror="this.src='images/school-1.webp'">
           </td>
           <td class="post-title-cell">
@@ -470,16 +472,24 @@
     cmsStatusFilter.addEventListener("change", renderPostsTable);
   }
 
+  function getDefaultEditorCover() {
+    return (
+      (coverPreviewImg && coverPreviewImg.dataset && coverPreviewImg.dataset.defaultSrc) ||
+      "images/school-1.webp"
+    );
+  }
+
   function resetEditorForm() {
     if (editorForm) editorForm.reset();
     if (fieldId) fieldId.value = "";
     if (fieldCategoryCustom) fieldCategoryCustom.style.display = "none";
-    if (coverPreviewImg) coverPreviewImg.src = "images/school-1.webp";
+    if (coverPreviewImg) coverPreviewImg.src = getDefaultEditorCover();
   }
 
   function openEditor(postId = null) {
     if (!editorModal) return;
 
+    const defaultCover = getDefaultEditorCover();
     populateCategoryDropdowns();
     resetEditorForm();
 
@@ -521,7 +531,9 @@
         fieldCoverCaption.value = post.coverCaption || "";
       }
       if (coverPreviewImg) {
-        coverPreviewImg.src = post.cover || "images/school-1.webp";
+        coverPreviewImg.removeAttribute("loading");
+        coverPreviewImg.removeAttribute("fetchpriority");
+        coverPreviewImg.src = post.cover || defaultCover;
       }
       if (fieldExcerpt) fieldExcerpt.value = post.excerpt || "";
       if (fieldContent) fieldContent.value = post.content || "";
@@ -535,8 +547,12 @@
       if (fieldAuthor) fieldAuthor.value = "Prime Focus Schools";
       if (fieldAuthorRole) fieldAuthorRole.value = "Editorial Board";
       if (fieldDate) fieldDate.value = BlogStore.formatDate(new Date());
-      if (fieldCover) fieldCover.value = "images/school-1.webp";
-      if (coverPreviewImg) coverPreviewImg.src = "images/school-1.webp";
+      if (fieldCover) fieldCover.value = defaultCover;
+      if (coverPreviewImg) {
+        coverPreviewImg.removeAttribute("loading");
+        coverPreviewImg.removeAttribute("fetchpriority");
+        coverPreviewImg.src = defaultCover;
+      }
       if (fieldStatus) fieldStatus.value = "published";
     }
 
@@ -576,7 +592,7 @@
     fieldCover.addEventListener("input", event => {
       if (coverPreviewImg) {
         coverPreviewImg.src =
-          event.target.value || "images/school-1.webp";
+          event.target.value || getDefaultEditorCover();
       }
     });
   }
