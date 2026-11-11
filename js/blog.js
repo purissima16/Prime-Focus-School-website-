@@ -122,7 +122,7 @@
             aria-label="View ${escapeHtml(post.title)} photo widely">
             <img src="${escapeHtml(coverImg)}"
               alt="${escapeHtml(post.title)}" loading="lazy">
-            <span class="zoom-cue-badge">🔍 View Widely</span>
+            <span class="zoom-cue-badge">View Widely</span>
           </div>
           <div class="blog-card-body">
             <div>
@@ -162,8 +162,8 @@
             aria-label="View featured story: ${escapeHtml(post.title)} widely">
             <img src="${escapeHtml(coverImg)}"
               alt="${escapeHtml(post.title)}" loading="lazy">
-            <span class="featured-badge">⭐ FEATURED STORY</span>
-            <span class="zoom-cue-badge">🔍 View Widely</span>
+            <span class="featured-badge">FEATURED STORY</span>
+            <span class="zoom-cue-badge">View Widely</span>
           </div>
           <div class="featured-card-body">
             <span class="article-category-badge">
@@ -173,7 +173,7 @@
             <p class="excerpt">${escapeHtml(post.excerpt || "")}</p>
             <div class="post-meta-row">
               <span class="meta-author">
-                ✍ ${escapeHtml(post.author || "Prime Focus Schools")}
+                By ${escapeHtml(post.author || "Prime Focus Schools")}
               </span>
               <span class="meta-dot"></span>
               <span>${escapeHtml(post.date || "")}</span>
@@ -377,7 +377,12 @@
 
     wrapper.innerHTML = `
       <div class="blog-empty-state" style="padding:100px 20px">
-        <div class="blog-empty-icon" style="font-size:50px">📰</div>
+        <div class="blog-empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+        </div>
         <h3>Article Not Found</h3>
         <p>The article may not exist or may have been updated.</p>
         <a class="button button-blue" href="blog.html">
@@ -523,7 +528,7 @@
             role="button" tabindex="0">
             <img src="${escapeHtml(cover)}"
               alt="${escapeHtml(post.title)}" loading="lazy">
-            <span class="zoom-cue-badge">🔍 View Widely</span>
+            <span class="zoom-cue-badge">View Widely</span>
           </div>
           <div class="event-copy">
             <p class="event-date">

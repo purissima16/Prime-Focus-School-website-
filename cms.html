@@ -469,7 +469,7 @@
         style="font-size:12px;height:38px">
         View Blog ↗
       </a>
-      <span class="badge-user">👤 Admin Staff</span>
+      <span class="badge-user">Admin Staff</span>
       <button type="button" id="cms-logout-btn"
         class="cms-btn cms-btn-secondary"
         style="font-size:12px;height:38px">
@@ -482,23 +482,23 @@
     <nav class="cms-nav-tabs" role="tablist" aria-label="CMS Management Sections">
       <button type="button" id="tab-btn-blog" class="cms-nav-tab active"
         data-tab="blog" role="tab" aria-selected="true">
-        📝 Blog Articles <span id="tab-badge-blog" class="cms-tab-badge">0</span>
+        Blog Articles <span id="tab-badge-blog" class="cms-tab-badge">0</span>
       </button>
       <button type="button" id="tab-btn-events" class="cms-nav-tab"
         data-tab="events" role="tab" aria-selected="false">
-        📸 Past Events &amp; Photos <span id="tab-badge-events" class="cms-tab-badge">0</span>
+        Past Events &amp; Photos <span id="tab-badge-events" class="cms-tab-badge">0</span>
       </button>
       <button type="button" id="tab-btn-facilities" class="cms-nav-tab"
         data-tab="facilities" role="tab" aria-selected="false">
-        🏫 Explore Facilities <span id="tab-badge-facilities" class="cms-tab-badge">0</span>
+        Explore Facilities <span id="tab-badge-facilities" class="cms-tab-badge">0</span>
       </button>
       <button type="button" id="tab-btn-gallery" class="cms-nav-tab"
         data-tab="gallery" role="tab" aria-selected="false">
-        🖼️ Galleries &amp; Site Photos <span id="tab-badge-gallery" class="cms-tab-badge">0</span>
+        Galleries &amp; Site Photos <span id="tab-badge-gallery" class="cms-tab-badge">0</span>
       </button>
       <button type="button" id="tab-btn-enquiries" class="cms-nav-tab"
         data-tab="enquiries" role="tab" aria-selected="false">
-        ✉ Enquiries Inbox <span id="tab-badge-enquiries" class="cms-tab-badge">0</span>
+        Enquiries Inbox <span id="tab-badge-enquiries" class="cms-tab-badge">0</span>
       </button>
     </nav>
 
@@ -516,13 +516,13 @@
       </ol>
       <div class="cms-setup-actions">
         <button type="button" id="btn-copy-media-sql" class="cms-btn cms-btn-primary cms-btn-sm">
-          📋 Copy SQL Setup Script
+          Copy SQL Setup Script
         </button>
         <button type="button" id="btn-download-media-sql" class="cms-btn cms-btn-secondary cms-btn-sm">
-          ⬇ Download supabase-media-setup.sql
+          Download supabase-media-setup.sql
         </button>
         <button type="button" id="btn-recheck-media-db" class="cms-btn cms-btn-success cms-btn-sm">
-          🔄 Check Connection &amp; Sync Default Photos
+          Check Connection &amp; Sync Default Photos
         </button>
       </div>
     </section>
@@ -534,7 +534,9 @@
           <p>Total Articles</p>
           <h3 id="stat-total-posts">0</h3>
         </div>
-        <div class="cms-stat-icon">📚</div>
+        <div class="cms-stat-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
       </div>
 
       <div class="cms-stat-card">
@@ -543,7 +545,9 @@
           <h3 id="stat-published-posts" style="color:var(--cms-success)">0</h3>
         </div>
         <div class="cms-stat-icon"
-          style="color:var(--cms-success);background:#ECFDF5">✓</div>
+          style="color:var(--cms-success);background:#ECFDF5" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
       </div>
 
       <div class="cms-stat-card">
@@ -552,7 +556,9 @@
           <h3 id="stat-draft-posts" style="color:var(--cms-warning)">0</h3>
         </div>
         <div class="cms-stat-icon"
-          style="color:var(--cms-warning);background:#FFFBEB">📝</div>
+          style="color:var(--cms-warning);background:#FFFBEB" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
       </div>
 
       <div class="cms-stat-card">
@@ -560,7 +566,9 @@
           <p>Categories</p>
           <h3 id="stat-categories" style="color:var(--cms-blue)">0</h3>
         </div>
-        <div class="cms-stat-icon">🏷</div>
+        <div class="cms-stat-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        </div>
       </div>
     </div>
 
@@ -633,29 +641,29 @@
       <div class="cms-toolbox-btns">
         <button type="button" id="btn-download-js"
           class="cms-btn cms-btn-secondary">
-          ⬇ Download updated <code>blog-data.js</code>
+          Download updated <code>blog-data.js</code>
         </button>
 
         <button type="button" id="btn-export-json"
           class="cms-btn cms-btn-secondary">
-          💾 Export JSON Backup
+          Export JSON Backup
         </button>
 
         <button type="button" id="btn-import-json"
           class="cms-btn cms-btn-secondary">
-          📂 Import Articles JSON
+          Import Articles JSON
         </button>
         <input type="file" id="file-import-input"
           accept=".json" style="display:none">
 
         <button type="button" id="btn-change-password"
           class="cms-btn cms-btn-secondary">
-          🔑 Change Passcode
+          Change Passcode
         </button>
 
         <button type="button" id="btn-reset-defaults"
           class="cms-btn cms-btn-danger" style="margin-left:auto">
-          ↺ Reset to Sample Articles
+          Reset to Sample Articles
         </button>
       </div>
     </section>
@@ -716,7 +724,7 @@
               <span>Drag &amp; drop images here, or pick files from your device. Photos are automatically optimized for fast loading.</span>
             </div>
             <label for="cms-event-photos-file" class="cms-btn cms-btn-primary" style="cursor:pointer">
-              📁 Select Photos to Upload
+              Select Photos to Upload
             </label>
             <input type="file" id="cms-event-photos-file" accept="image/*" multiple style="display:none">
           </div>
@@ -790,7 +798,7 @@
               <span>Drag &amp; drop images here or pick files from your device to add directly to your public Gallery page.</span>
             </div>
             <label for="cms-gallery-photos-file" class="cms-btn cms-btn-primary" style="cursor:pointer">
-              📁 Upload Gallery Photos
+              Upload Gallery Photos
             </label>
             <input type="file" id="cms-gallery-photos-file" accept="image/*" multiple style="display:none">
           </div>
@@ -833,7 +841,7 @@
           </div>
           <div class="cms-card-actions">
             <button type="button" id="btn-restore-media-defaults" class="cms-btn cms-btn-danger cms-btn-sm">
-              ↺ Restore Default Website Photos
+              Restore Default Website Photos
             </button>
           </div>
         </div>
@@ -846,7 +854,9 @@
     <section class="cms-enquiries" style="margin-top:0" aria-labelledby="enquiries-heading">
       <div class="enquiries-heading">
         <div class="enquiries-title-group">
-          <div class="enquiries-title-icon" aria-hidden="true">✉</div>
+          <div class="enquiries-title-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </div>
           <div>
             <h2 id="enquiries-heading">
               Enquiries inbox
@@ -861,7 +871,7 @@
 
         <button type="button" id="cms-enquiries-refresh"
           class="enquiries-refresh">
-          ↻ Refresh inbox
+          Refresh inbox
         </button>
       </div>
 
@@ -1011,7 +1021,7 @@
               style="display:flex;flex-direction:column;justify-content:center">
               <label class="cms-checkbox-label" style="margin-top:18px">
                 <input type="checkbox" id="field-featured">
-                <span>⭐ Feature this article at top</span>
+                <span>Feature this article at top</span>
               </label>
             </div>
           </div>
@@ -1060,7 +1070,7 @@
               <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
                 <label for="field-cover-file" class="cms-btn cms-btn-secondary"
                   style="font-size:12px;height:36px;cursor:pointer">
-                  📁 Upload Photo from Computer...
+                  Upload Photo from Computer...
                 </label>
                 <input type="file" id="field-cover-file"
                   accept="image/*" style="display:none">
@@ -1099,8 +1109,8 @@
               <button type="button" class="toolbar-btn" data-action="ul">• List</button>
               <button type="button" class="toolbar-btn" data-action="ol">1. List</button>
               <button type="button" class="toolbar-btn" data-action="quote">“ Quote</button>
-              <button type="button" class="toolbar-btn" data-action="callout">💡 Notice Box</button>
-              <button type="button" class="toolbar-btn" data-action="link">🔗 Link</button>
+              <button type="button" class="toolbar-btn" data-action="callout">Notice Box</button>
+              <button type="button" class="toolbar-btn" data-action="link">Link</button>
               <button type="button" class="toolbar-btn" data-action="hr">— Line</button>
 
               <div class="editor-mode-tabs">
@@ -1140,7 +1150,7 @@
           class="cms-btn cms-btn-secondary">Cancel</button>
         <button type="submit" form="cms-editor-form"
           class="cms-btn cms-btn-primary" style="min-width:160px">
-          ✓ Save Article
+          Save Article
         </button>
       </div>
     </div>
@@ -1187,7 +1197,7 @@
               <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
                 <label for="event-field-cover-file" class="cms-btn cms-btn-secondary"
                   style="font-size:12px;height:36px;cursor:pointer">
-                  📁 Upload Cover Photo...
+                  Upload Cover Photo...
                 </label>
                 <input type="file" id="event-field-cover-file"
                   accept="image/*" style="display:none">
@@ -1205,7 +1215,7 @@
           class="cms-btn cms-btn-secondary">Cancel</button>
         <button type="submit" form="cms-event-form"
           class="cms-btn cms-btn-primary" style="min-width:150px">
-          ✓ Save Event
+          Save Event
         </button>
       </div>
     </div>
@@ -1240,7 +1250,7 @@
           <div class="cms-form-group">
             <label class="cms-checkbox-label">
               <input type="checkbox" id="facility-field-show-home" checked>
-              <span>🏠 Feature in "Explore Our Facilities" preview on Homepage (top 3 featured)</span>
+              <span>Feature in "Explore Our Facilities" preview on Homepage (top 3 featured)</span>
             </label>
           </div>
 
@@ -1253,7 +1263,7 @@
               <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
                 <label for="facility-field-image-file" class="cms-btn cms-btn-secondary"
                   style="font-size:12px;height:36px;cursor:pointer">
-                  📁 Upload Facility Photo...
+                  Upload Facility Photo...
                 </label>
                 <input type="file" id="facility-field-image-file"
                   accept="image/*" style="display:none">
@@ -1271,7 +1281,7 @@
           class="cms-btn cms-btn-secondary">Cancel</button>
         <button type="submit" form="cms-facility-form"
           class="cms-btn cms-btn-primary" style="min-width:150px">
-          ✓ Save Facility
+          Save Facility
         </button>
       </div>
     </div>
@@ -1317,7 +1327,7 @@
               <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
                 <label for="gallery-field-image-file" class="cms-btn cms-btn-secondary"
                   style="font-size:12px;height:36px;cursor:pointer">
-                  📁 Upload Replacement Photo...
+                  Upload Replacement Photo...
                 </label>
                 <input type="file" id="gallery-field-image-file"
                   accept="image/*" style="display:none">
@@ -1335,7 +1345,7 @@
           class="cms-btn cms-btn-secondary">Cancel</button>
         <button type="submit" form="cms-gallery-form"
           class="cms-btn cms-btn-primary" style="min-width:150px">
-          ✓ Save Photo
+          Save Photo
         </button>
       </div>
     </div>
@@ -1521,7 +1531,7 @@
         } finally {
           if (refreshButton) {
             refreshButton.disabled = false;
-            refreshButton.textContent = "↻ Refresh inbox";
+            refreshButton.textContent = "Refresh inbox";
           }
         }
       }

@@ -162,6 +162,13 @@ create policy "Admins can update pfs-media files" on storage.objects for update 
 drop policy if exists "Admins can delete pfs-media files" on storage.objects;
 create policy "Admins can delete pfs-media files" on storage.objects for delete to authenticated using (bucket_id = 'pfs-media' and exists (select 1 from public.admins where user_id = auth.uid()));`;
 
+  function svgIcon(name, size = 15) {
+    if (window.PfsCmsIcons && typeof window.PfsCmsIcons.svgIcon === "function") {
+      return window.PfsCmsIcons.svgIcon(name, size);
+    }
+    return "";
+  }
+
   function escapeHtml(value) {
     if (value === null || value === undefined) return "";
     const div = document.createElement("div");
@@ -179,7 +186,7 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
     }
 
     toast.innerHTML =
-      `<span>${type === "error" ? "⚠" : "✓"}</span> ` +
+      `<span style="display:inline-flex;align-items:center">${svgIcon(type === "error" ? "alert" : "check", 16)}</span> ` +
       `<span>${escapeHtml(message)}</span>`;
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 3800);
@@ -327,16 +334,16 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
                   <div class="cms-media-card-actions">
                     <button type="button" class="cms-btn cms-btn-primary cms-btn-sm"
                       data-event-action="photos" data-id="${escapeHtml(ev.id)}">
-                      📷 Manage Photos (${photoCount})
+                      Manage Photos (${photoCount})
                     </button>
                     <button type="button" class="table-action-btn"
-                      data-event-action="edit" data-id="${escapeHtml(ev.id)}" title="Edit Event">✏</button>
+                      data-event-action="edit" data-id="${escapeHtml(ev.id)}" title="Edit Event">${svgIcon("edit")}</button>
                     <a href="${publicUrl}" target="_blank" rel="noopener"
-                      class="table-action-btn" title="View Public Event Album">👁</a>
+                      class="table-action-btn" title="View Public Event Album">${svgIcon("view")}</a>
                     ${idx > 0 ? `<button type="button" class="table-action-btn" data-event-action="up" data-id="${escapeHtml(ev.id)}" title="Move Earlier">↑</button>` : ""}
                     ${idx < events.length - 1 ? `<button type="button" class="table-action-btn" data-event-action="down" data-id="${escapeHtml(ev.id)}" title="Move Later">↓</button>` : ""}
                     <button type="button" class="table-action-btn btn-delete"
-                      data-event-action="delete" data-id="${escapeHtml(ev.id)}" title="Delete Event">🗑</button>
+                      data-event-action="delete" data-id="${escapeHtml(ev.id)}" title="Delete Event">${svgIcon("trash")}</button>
                   </div>
                 </div>
               </article>`;
@@ -415,7 +422,7 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
                 alt="${escapeHtml(photo.caption || `${ev.title} photo ${idx + 1}`)}"
                 loading="lazy"
                 onerror="this.src='images/school-1.webp'">
-              ${isCover ? `<span class="cms-media-pill cover-pill">★ Event Cover</span>` : `<span class="cms-media-pill">#${idx + 1}</span>`}
+              ${isCover ? `<span class="cms-media-pill cover-pill">Event Cover</span>` : `<span class="cms-media-pill">#${idx + 1}</span>`}
             </div>
             <div class="cms-photo-tile-body">
               <div style="display:flex;gap:6px">
@@ -425,7 +432,7 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
                   data-photo-caption-input="${escapeHtml(photo.id)}">
                 <button type="button" class="table-action-btn"
                   data-photo-action="save-caption" data-photo-id="${escapeHtml(photo.id)}"
-                  title="Save caption">✓</button>
+                  title="Save caption">${svgIcon("check")}</button>
               </div>
               <div class="cms-photo-tile-actions">
                 <div style="display:flex;gap:4px">
@@ -433,13 +440,13 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
                     data-photo-action="set-cover" data-photo-id="${escapeHtml(photo.id)}"
                     data-photo-url="${escapeHtml(photo.image)}"
                     title="${isCover ? "Current Event Cover" : "Set as Event Cover"}"
-                    ${isCover ? "disabled" : ""}>★</button>
+                    ${isCover ? "disabled" : ""}>${svgIcon(isCover ? "starFilled" : "starOutline")}</button>
                   ${idx > 0 ? `<button type="button" class="table-action-btn" data-photo-action="prev" data-photo-id="${escapeHtml(photo.id)}" title="Move Left">←</button>` : ""}
                   ${idx < photos.length - 1 ? `<button type="button" class="table-action-btn" data-photo-action="next" data-photo-id="${escapeHtml(photo.id)}" title="Move Right">→</button>` : ""}
                 </div>
                 <button type="button" class="table-action-btn btn-delete"
                   data-photo-action="delete" data-photo-id="${escapeHtml(photo.id)}"
-                  title="Remove photo from event">🗑</button>
+                  title="Remove photo from event">${svgIcon("trash")}</button>
               </div>
             </div>
           </div>`;
@@ -586,7 +593,7 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
                 alt="${escapeHtml(fac.name)}"
                 onerror="this.src='images/school-1.webp'">
               <span class="cms-media-pill">#${idx + 1}</span>
-              ${fac.showOnHome ? `<span class="cms-media-pill right">🏠 Homepage</span>` : ""}
+              ${fac.showOnHome ? `<span class="cms-media-pill right">Homepage</span>` : ""}
             </div>
             <div class="cms-media-card-body">
               <h3>${escapeHtml(fac.name)}</h3>
@@ -594,17 +601,17 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
               <div class="cms-media-card-actions">
                 <button type="button" class="cms-btn cms-btn-secondary cms-btn-sm"
                   data-facility-action="edit" data-id="${escapeHtml(fac.id)}">
-                  ✏ Edit / Photo
+                  Edit / Photo
                 </button>
                 <button type="button" class="table-action-btn"
                   data-facility-action="toggle-home" data-id="${escapeHtml(fac.id)}"
                   title="${fac.showOnHome ? "Remove from Homepage preview" : "Feature on Homepage"}">
-                  ${fac.showOnHome ? "🏠" : "☆"}
+                  ${svgIcon(fac.showOnHome ? "homeActive" : "homeOutline")}
                 </button>
                 ${idx > 0 ? `<button type="button" class="table-action-btn" data-facility-action="up" data-id="${escapeHtml(fac.id)}" title="Move Earlier">↑</button>` : ""}
                 ${idx < facilities.length - 1 ? `<button type="button" class="table-action-btn" data-facility-action="down" data-id="${escapeHtml(fac.id)}" title="Move Later">↓</button>` : ""}
                 <button type="button" class="table-action-btn btn-delete"
-                  data-facility-action="delete" data-id="${escapeHtml(fac.id)}" title="Delete Facility">🗑</button>
+                  data-facility-action="delete" data-id="${escapeHtml(fac.id)}" title="Delete Facility">${svgIcon("trash")}</button>
               </div>
             </div>
           </article>`
@@ -723,12 +730,12 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
                   <div class="cms-photo-tile-actions" style="margin-top:4px">
                     <div style="display:flex;gap:4px">
                       <button type="button" class="table-action-btn"
-                        data-gallery-action="edit" data-id="${escapeHtml(item.id)}" title="Edit Photo Details">✏</button>
+                        data-gallery-action="edit" data-id="${escapeHtml(item.id)}" title="Edit Photo Details">${svgIcon("edit")}</button>
                       ${galleryCategoryFilter === "all" && idx > 0 ? `<button type="button" class="table-action-btn" data-gallery-action="up" data-id="${escapeHtml(item.id)}" title="Move Left">←</button>` : ""}
                       ${galleryCategoryFilter === "all" && idx < photos.length - 1 ? `<button type="button" class="table-action-btn" data-gallery-action="down" data-id="${escapeHtml(item.id)}" title="Move Right">→</button>` : ""}
                     </div>
                     <button type="button" class="table-action-btn btn-delete"
-                      data-gallery-action="delete" data-id="${escapeHtml(item.id)}" title="Remove Photo">🗑</button>
+                      data-gallery-action="delete" data-id="${escapeHtml(item.id)}" title="Remove Photo">${svgIcon("trash")}</button>
                   </div>
                 </div>
               </div>`
@@ -770,7 +777,7 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
                     placeholder="Principal portrait caption">` : ""}
                 <div class="cms-media-card-actions">
                   <label class="cms-btn cms-btn-primary cms-btn-sm" style="cursor:pointer">
-                    📁 Upload Photo
+                    Upload Photo
                     <input type="file" accept="image/*" style="display:none"
                       data-setting-file-input="${escapeHtml(item.key)}">
                   </label>
@@ -964,7 +971,7 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
           showToast(error.message || "Could not verify media tables.", "error");
         } finally {
           recheckSqlBtn.disabled = false;
-          recheckSqlBtn.textContent = "🔄 Check Connection & Sync Default Photos";
+          recheckSqlBtn.textContent = "Check Connection & Sync Default Photos";
         }
       });
     }

@@ -556,6 +556,12 @@ body.cms-body {
   color: var(--cms-blue);
 }
 
+.table-action-btn svg,
+.cms-stat-icon svg {
+  pointer-events: none;
+  display: block;
+}
+
 .table-action-btn.btn-delete:hover {
   background: #FEE2E2;
   border-color: #EF4444;

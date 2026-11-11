@@ -22,6 +22,29 @@
 
   const $ = id => document.getElementById(id);
 
+  const ICON_PATHS = {
+    edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>',
+    view: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+    trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+    pause: '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>',
+    play: '<polygon points="5 3 19 12 5 21 5 3"/>',
+    starFilled: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#F59E0B" stroke="#F59E0B"/>',
+    starOutline: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    homeActive: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="currentColor" fill-opacity="0.16" stroke="var(--cms-blue)"/><polyline points="9 22 9 12 15 12 15 22" stroke="var(--cms-blue)"/>',
+    homeOutline: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+    check: '<polyline points="20 6 9 17 4 12"/>',
+    alert: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'
+  };
+
+  /**
+   * Render a crisp monochrome inline SVG icon for CMS controls.
+   */
+  function svgIcon(name, size = 15) {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name] || ""}</svg>`;
+  }
+
+  window.PfsCmsIcons = { svgIcon };
+
   function escapeHtml(value) {
     if (!value) return "";
     const element = document.createElement("div");
@@ -40,7 +63,7 @@
     }
 
     toast.innerHTML =
-      `<span>${type === "error" ? "⚠" : "✓"}</span> ` +
+      `<span style="display:inline-flex;align-items:center">${svgIcon(type === "error" ? "alert" : "check", 16)}</span> ` +
       `<span>${escapeHtml(message)}</span>`;
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 3500);
@@ -361,7 +384,7 @@
             <button type="button" class="table-action-btn"
               data-action="feature" data-id="${escapeHtml(post.id)}"
               title="${featured ? "Unfeature article" : "Feature article"}">
-              ${featured ? "⭐" : "☆"}
+              ${svgIcon(featured ? "starFilled" : "starOutline")}
             </button>
           </td>
           <td>
@@ -376,17 +399,17 @@
             <div class="table-actions">
               <button type="button" class="table-action-btn"
                 data-action="edit" data-id="${escapeHtml(post.id)}"
-                title="Edit Article">✏</button>
+                title="Edit Article">${svgIcon("edit")}</button>
               <a href="${url}" target="_blank" rel="noopener"
-                class="table-action-btn" title="View Public Article">👁</a>
+                class="table-action-btn" title="View Public Article">${svgIcon("view")}</a>
               <button type="button" class="table-action-btn"
                 data-action="status" data-id="${escapeHtml(post.id)}"
                 title="${published ? "Switch to Draft" : "Publish Article"}">
-                ${published ? "⏸" : "▶"}
+                ${svgIcon(published ? "pause" : "play")}
               </button>
               <button type="button" class="table-action-btn btn-delete"
                 data-action="delete" data-id="${escapeHtml(post.id)}"
-                title="Delete Article">🗑</button>
+                title="Delete Article">${svgIcon("trash")}</button>
             </div>
           </td>
         </tr>`;

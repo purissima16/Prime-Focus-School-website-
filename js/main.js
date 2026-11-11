@@ -222,7 +222,7 @@ function createFacilityCard(facility, index) {
     <article class="facility-card" data-idx="${index}">
       <div class="card-media-wrap zoomable-img-trigger" data-title="${safeName}" data-caption="${safeDesc}" role="button" tabindex="0" aria-label="View ${safeName} photograph widely">
         <img src="${safeImg}" alt="${safeName}" loading="lazy" onerror="this.src='images/school-1.webp'">
-        <span class="zoom-cue-badge">🔍 View Widely</span>
+        <span class="zoom-cue-badge">View Widely</span>
       </div>
       <div class="facility-copy">
         <h3>${safeName}</h3>
@@ -244,7 +244,7 @@ function createEventCard(event, index) {
     <article class="event-card" id="event-${escapeHtml(event.id || String(index))}">
       <div class="card-media-wrap zoomable-img-trigger" data-title="${safeTitle}" data-caption="${safeDesc}" role="button" tabindex="0" aria-label="View ${safeTitle} photograph widely">
         <img src="${safeCover}" alt="${safeTitle}" loading="lazy" onerror="this.src='images/school-1.webp'">
-        <span class="zoom-cue-badge">🔍 View Widely</span>
+        <span class="zoom-cue-badge">View Widely</span>
       </div>
       <div class="event-copy">
         ${safeCategory ? `<p class="event-date">${safeCategory}</p>` : ""}
@@ -255,7 +255,7 @@ function createEventCard(event, index) {
             Show Photos (${photoCount}) ↗
           </a>
           <button type="button" class="btn-quick-zoom" data-event-idx="${index}">
-            🔍 Full Photo
+            Full Photo
           </button>
         </div>
       </div>
@@ -394,7 +394,7 @@ function renderCampusGallery() {
         <article class="campus-gallery-card" data-idx="${idx}" data-title="${safeTitle}" data-caption="${safeCaption || safeCategory}">
           <div class="card-media-wrap zoomable-img-trigger" role="button" tabindex="0" aria-label="View ${safeTitle} widely">
             <img src="${safeImg}" alt="${safeTitle}" loading="lazy" onerror="this.src='images/school-1.webp'">
-            <span class="zoom-cue-badge">🔍 View Widely</span>
+            <span class="zoom-cue-badge">View Widely</span>
           </div>
           ${(photo.title || photo.caption || photo.category) ? `
             <div class="campus-gallery-copy">
@@ -491,9 +491,9 @@ function renderSingleEventPage() {
       return `
         <div class="photo-card" data-index="${pIdx}" data-caption="${safeCaption}" role="button" tabindex="0" aria-label="View photograph ${pIdx + 1} of ${photoItems.length} widely">
           <img src="${safeSrc}" alt="${safeAlt}" loading="lazy" onerror="this.src='images/school-1.webp'">
-          <span class="zoom-cue-badge">🔍 View Widely</span>
+          <span class="zoom-cue-badge">View Widely</span>
           <div class="photo-overlay">
-            <span class="photo-badge">${safeCaption ? safeCaption : "🔍 View Full Photo"}</span>
+            <span class="photo-badge">${safeCaption ? safeCaption : "View Full Photo"}</span>
           </div>
         </div>
       `;
