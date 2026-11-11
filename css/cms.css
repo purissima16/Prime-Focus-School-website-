@@ -11,13 +11,26 @@
   --cms-bg: #F4F7FB;
   --cms-white: #FFFFFF;
   --cms-ink: #172D45;
-  --cms-muted: #62778C;
+  --cms-muted: #506377;
   --cms-border: #D7E2ED;
-  --cms-success: #10B981;
-  --cms-warning: #F59E0B;
-  --cms-danger: #EF4444;
+  --cms-success: #047857;
+  --cms-warning: #B45309;
+  --cms-danger: #DC2626;
   --cms-shadow: 0 10px 30px rgba(8, 44, 89, 0.08);
   --cms-radius: 10px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 body.cms-body {
@@ -120,7 +133,6 @@ body.cms-body {
 }
 
 .cms-input:focus {
-  outline: none;
   border-color: var(--cms-blue);
   box-shadow: 0 0 0 3px rgba(16, 75, 136, 0.15);
 }
@@ -140,9 +152,25 @@ body.cms-body {
 }
 
 .cms-textarea:focus {
-  outline: none;
   border-color: var(--cms-blue);
   box-shadow: 0 0 0 3px rgba(16, 75, 136, 0.15);
+}
+
+.cms-input:focus-visible,
+.cms-textarea:focus-visible,
+.cms-btn:focus-visible,
+.cms-nav-tab:focus-visible,
+.table-action-btn:focus-visible,
+.cms-filter-selects select:focus-visible,
+.cms-album-switcher select:focus-visible,
+.cms-photo-caption-input:focus-visible {
+  outline: 2px solid var(--cms-blue);
+  outline-offset: 2px;
+}
+
+.cms-btn-outline:focus-visible {
+  outline: 2px solid var(--cms-light-blue);
+  outline-offset: 2px;
 }
 
 .cms-btn {
@@ -177,7 +205,7 @@ body.cms-body {
 }
 
 .cms-btn-success:hover {
-  background: #059669;
+  background: #065F46;
   transform: translateY(-2px);
 }
 
@@ -434,7 +462,13 @@ body.cms-body {
   background: white;
   color: var(--cms-ink);
   cursor: pointer;
-  outline: none;
+}
+
+.cms-filter-selects select:focus,
+.cms-album-switcher select:focus,
+.cms-photo-caption-input:focus {
+  border-color: var(--cms-blue);
+  box-shadow: 0 0 0 3px rgba(16, 75, 136, 0.15);
 }
 
 /* Posts Table */
@@ -525,7 +559,6 @@ body.cms-body {
   color: #F59E0B;
   font-size: 15px;
   margin-left: 4px;
-  title: "Featured Article";
 }
 
 .table-actions {
@@ -1061,7 +1094,7 @@ body.cms-body {
 .cms-media-pill.right {
   left: auto;
   right: 10px;
-  background: #10B981;
+  background: var(--cms-success);
 }
 
 .cms-media-pill.cover-pill {

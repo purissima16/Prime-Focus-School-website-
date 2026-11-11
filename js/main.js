@@ -18,16 +18,71 @@ function sanitizeImageUrl(url, fallback = "images/school-1.webp") {
   const lower = raw.toLowerCase();
   if (
     lower.startsWith("https://") ||
-    lower.startsWith("http://") ||
-    lower.startsWith("images/") ||
-    lower.startsWith("./images/") ||
-    lower.startsWith("../images/") ||
-    /^data:image\/(png|jpeg|jpg|webp|gif);base64,[a-z0-9+/=]+$/i.test(raw)
+    lower.startsWith("blob:") ||
+    /^data:image\/(png|jpeg|webp|gif);base64,[a-z0-9+/=]+$/i.test(raw)
+  ) {
+    return raw;
+  }
+
+  if (lower.startsWith("http://")) {
+    try {
+      const parsed = new URL(raw);
+      const isLocalHost =
+        parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
+      const isSameOrigin =
+        typeof window !== "undefined" &&
+        window.location &&
+        parsed.origin === window.location.origin;
+      if (isLocalHost && isSameOrigin) {
+        return raw;
+      }
+    } catch (e) {
+      return fallback;
+    }
+    return fallback;
+  }
+
+  if (
+    !raw.startsWith("//") &&
+    !raw.startsWith("\\") &&
+    !/^[a-z][a-z0-9+.-]*:/i.test(raw)
   ) {
     return raw;
   }
 
   return fallback;
+}
+
+const LIGHTBOX_PLACEHOLDER_SRC =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+function toThumbUrl(url) {
+  if (
+    window.PfsMediaThumb &&
+    typeof window.PfsMediaThumb.toThumbSrc === "function"
+  ) {
+    return window.PfsMediaThumb.toThumbSrc(url);
+  }
+  return url;
+}
+
+function getMediaOnerrorAttr() {
+  if (window.PfsMediaThumb && window.PfsMediaThumb.onerrorAttr) {
+    return window.PfsMediaThumb.onerrorAttr;
+  }
+  return "if(this.dataset.fullSrc&&this.getAttribute('src')!==this.dataset.fullSrc){this.src=this.dataset.fullSrc;}else{this.onerror=null;this.src='images/school-1.webp';}";
+}
+
+function getFullZoomSrc(el, img) {
+  const raw =
+    (el && el.dataset && el.dataset.fullSrc) ||
+    (img && img.dataset && img.dataset.fullSrc) ||
+    (img ? img.getAttribute("src") || img.src : "");
+  const full =
+    window.PfsMediaThumb && typeof window.PfsMediaThumb.toFullSrc === "function"
+      ? window.PfsMediaThumb.toFullSrc(raw)
+      : String(raw || "").replace(/(^|\/)images\/thumbs\//i, "$1images/");
+  return sanitizeImageUrl(full);
 }
 
 function getMediaFacilities(options = {}) {
@@ -89,8 +144,23 @@ function getMediaSetting(key) {
 let universalLightboxState = {
   activeList: [],
   currentIndex: 0,
-  isOpen: false
+  isOpen: false,
+  lastFocusedTrigger: null,
+  loadToken: 0
 };
+
+function getLightboxFocusableElements(lightbox) {
+  const dialog = lightbox ? lightbox.querySelector(".lightbox-dialog") : null;
+  if (!dialog) return [];
+  return Array.from(
+    dialog.querySelectorAll(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+  ).filter(el => {
+    const style = window.getComputedStyle(el);
+    return style.display !== "none" && style.visibility !== "hidden";
+  });
+}
 
 function ensureLightboxModal() {
   let lightbox = document.getElementById("lightbox");
@@ -108,7 +178,7 @@ function ensureLightboxModal() {
         <button class="lightbox-close" id="lightbox-close" aria-label="Close photo viewer">✕</button>
         <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous photo">❮</button>
         <div class="lightbox-body">
-          <img id="lightbox-img" src="" alt="Enlarged school photograph" decoding="async" fetchpriority="low">
+          <img id="lightbox-img" src="${LIGHTBOX_PLACEHOLDER_SRC}" alt="Enlarged school photograph" decoding="async" fetchpriority="low">
           <div class="lightbox-caption">
             <p id="lightbox-title"></p>
             <span id="lightbox-counter"></span>
@@ -125,6 +195,12 @@ function ensureLightboxModal() {
 function openUniversalLightbox(items, startIndex = 0) {
   if (!items || !items.length) return;
   const lightbox = ensureLightboxModal();
+  if (!universalLightboxState.isOpen) {
+    universalLightboxState.lastFocusedTrigger =
+      document.activeElement && document.activeElement !== document.body
+        ? document.activeElement
+        : null;
+  }
   universalLightboxState.activeList = items;
   universalLightboxState.currentIndex = Math.max(0, Math.min(startIndex, items.length - 1));
   universalLightboxState.isOpen = true;
@@ -136,6 +212,11 @@ function openUniversalLightbox(items, startIndex = 0) {
     lightbox.classList.add("active");
   });
   document.body.style.overflow = "hidden";
+
+  const closeBtn = document.getElementById("lightbox-close");
+  if (closeBtn) {
+    closeBtn.focus({ preventScroll: true });
+  }
 }
 
 function closeUniversalLightbox() {
@@ -143,12 +224,24 @@ function closeUniversalLightbox() {
   if (!lightbox) return;
   lightbox.classList.remove("active");
   universalLightboxState.isOpen = false;
+  const triggerToRestore = universalLightboxState.lastFocusedTrigger;
+  universalLightboxState.lastFocusedTrigger = null;
+  if (
+    triggerToRestore &&
+    typeof triggerToRestore.focus === "function" &&
+    document.contains(triggerToRestore)
+  ) {
+    triggerToRestore.focus({ preventScroll: true });
+  }
   setTimeout(() => {
     if (!universalLightboxState.isOpen) {
       lightbox.hidden = true;
       const lightboxImg = document.getElementById("lightbox-img");
       if (lightboxImg) {
-        lightboxImg.removeAttribute("src");
+        lightboxImg.onload = null;
+        lightboxImg.onerror = null;
+        lightboxImg.fetchPriority = "low";
+        lightboxImg.src = LIGHTBOX_PLACEHOLDER_SRC;
       }
       document.body.style.overflow = "";
     }
@@ -174,18 +267,62 @@ function updateUniversalLightboxPhoto() {
 
   if (imgEl) {
     imgEl.decoding = "async";
+    imgEl.fetchPriority = "high";
+    imgEl.alt = item.title || "School photograph";
     imgEl.style.opacity = "0.3";
-    const temp = new Image();
-    temp.onload = () => {
+    const loadToken = ++universalLightboxState.loadToken;
+    const currentAttr = imgEl.getAttribute("src") || "";
+    const isInitialOpen = !currentAttr || currentAttr === LIGHTBOX_PLACEHOLDER_SRC;
+
+    if (isInitialOpen) {
+      imgEl.onload = () => {
+        if (
+          !universalLightboxState.isOpen ||
+          universalLightboxState.loadToken !== loadToken
+        ) {
+          return;
+        }
+        imgEl.style.opacity = "1";
+      };
+      imgEl.onerror = () => {
+        if (
+          !universalLightboxState.isOpen ||
+          universalLightboxState.loadToken !== loadToken
+        ) {
+          return;
+        }
+        imgEl.onerror = null;
+        if (safeSrc !== "images/school-1.webp") {
+          imgEl.src = "images/school-1.webp";
+        }
+        imgEl.style.opacity = "1";
+      };
       imgEl.src = safeSrc;
-      imgEl.alt = item.title || "School photograph";
-      imgEl.style.opacity = "1";
-    };
-    temp.onerror = () => {
-      imgEl.src = safeSrc;
-      imgEl.style.opacity = "1";
-    };
-    temp.src = safeSrc;
+    } else {
+      const temp = new Image();
+      temp.onload = () => {
+        if (
+          !universalLightboxState.isOpen ||
+          universalLightboxState.loadToken !== loadToken
+        ) {
+          return;
+        }
+        imgEl.src = safeSrc;
+        imgEl.style.opacity = "1";
+      };
+      temp.onerror = () => {
+        if (
+          !universalLightboxState.isOpen ||
+          universalLightboxState.loadToken !== loadToken
+        ) {
+          return;
+        }
+        imgEl.src =
+          safeSrc !== "images/school-1.webp" ? "images/school-1.webp" : safeSrc;
+        imgEl.style.opacity = "1";
+      };
+      temp.src = safeSrc;
+    }
   }
 
   if (titleEl) titleEl.textContent = item.title || "";
@@ -221,12 +358,15 @@ window.UniversalLightbox = {
 function createFacilityCard(facility, index) {
   const safeName = escapeHtml(facility.name || "School Facility");
   const safeDesc = escapeHtml(facility.description || "");
-  const safeImg = escapeHtml(sanitizeImageUrl(facility.image));
+  const fullImg = sanitizeImageUrl(facility.image);
+  const safeFullImg = escapeHtml(fullImg);
+  const safeThumbImg = escapeHtml(toThumbUrl(fullImg));
+  const onerrorAttr = getMediaOnerrorAttr();
 
   return `
     <article class="facility-card" data-idx="${index}">
-      <div class="card-media-wrap zoomable-img-trigger" data-title="${safeName}" data-caption="${safeDesc}" role="button" tabindex="0" aria-label="View ${safeName} photograph widely">
-        <img src="${safeImg}" alt="${safeName}" width="1200" height="800" loading="lazy" decoding="async" onerror="this.src='images/school-1.webp'">
+      <div class="card-media-wrap zoomable-img-trigger" data-title="${safeName}" data-caption="${safeDesc}" data-full-src="${safeFullImg}" role="button" tabindex="0" aria-label="View ${safeName} photograph widely">
+        <img src="${safeThumbImg}" data-full-src="${safeFullImg}" alt="${safeName}" width="1200" height="800" loading="lazy" decoding="async" onerror="${onerrorAttr}">
         <span class="zoom-cue-badge">View Widely</span>
       </div>
       <div class="facility-copy">
@@ -241,14 +381,17 @@ function createEventCard(event, index) {
   const safeTitle = escapeHtml(event.title || "School Event");
   const safeDesc = escapeHtml(event.description || "");
   const safeCategory = escapeHtml(event.category || "");
-  const safeCover = escapeHtml(sanitizeImageUrl(event.cover));
+  const fullCover = sanitizeImageUrl(event.cover);
+  const safeFullCover = escapeHtml(fullCover);
+  const safeThumbCover = escapeHtml(toThumbUrl(fullCover));
+  const onerrorAttr = getMediaOnerrorAttr();
   const eventLink = `event-photos.html?id=${encodeURIComponent(event.id || String(index))}`;
   const photoCount = Array.isArray(event.photos) ? event.photos.length : 0;
 
   return `
     <article class="event-card" id="event-${escapeHtml(event.id || String(index))}">
-      <div class="card-media-wrap zoomable-img-trigger" data-title="${safeTitle}" data-caption="${safeDesc}" role="button" tabindex="0" aria-label="View ${safeTitle} photograph widely">
-        <img src="${safeCover}" alt="${safeTitle}" width="1200" height="800" loading="lazy" decoding="async" onerror="this.src='images/school-1.webp'">
+      <div class="card-media-wrap zoomable-img-trigger" data-title="${safeTitle}" data-caption="${safeDesc}" data-full-src="${safeFullCover}" role="button" tabindex="0" aria-label="View ${safeTitle} photograph widely">
+        <img src="${safeThumbCover}" data-full-src="${safeFullCover}" alt="${safeTitle}" width="1200" height="800" loading="lazy" decoding="async" onerror="${onerrorAttr}">
         <span class="zoom-cue-badge">View Widely</span>
       </div>
       <div class="event-copy">
@@ -259,7 +402,7 @@ function createEventCard(event, index) {
           <a class="button button-blue" href="${eventLink}">
             Show Photos (${photoCount}) ↗
           </a>
-          <button type="button" class="btn-quick-zoom" data-event-idx="${index}">
+          <button type="button" class="btn-quick-zoom" data-event-idx="${index}" aria-label="View full photo of ${safeTitle}">
             Full Photo
           </button>
         </div>
@@ -273,6 +416,7 @@ function renderFacilities(targetId, limit, homeOnly = false) {
   if (!target) return;
 
   const items = getMediaFacilities({ limit, homeOnly });
+  target.classList.toggle("is-empty", !items.length);
   if (!items.length) {
     target.innerHTML = `
       <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 30px 12px;">
@@ -290,6 +434,7 @@ function renderEvents(targetId, limit) {
   if (!target) return;
 
   const items = getMediaEvents({ limit });
+  target.classList.toggle("is-empty", !items.length);
   if (!items.length) {
     target.innerHTML = `
       <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 30px 12px;">
@@ -307,6 +452,7 @@ function renderEventAlbums() {
   if (!target) return;
 
   const events = getMediaEvents();
+  target.classList.toggle("is-empty", !events.length);
   if (!events.length) {
     target.innerHTML = `
       <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 30px 12px;">
@@ -331,6 +477,7 @@ function renderCampusGallery() {
 
   if (!allPhotos.length) {
     if (section) section.style.display = "none";
+    grid.classList.add("is-empty");
     grid.innerHTML = "";
     return;
   }
@@ -388,17 +535,21 @@ function renderCampusGallery() {
             activeCampusGalleryCategory.toLowerCase()
         );
 
+  grid.classList.toggle("is-empty", !visiblePhotos.length);
+  const onerrorAttr = getMediaOnerrorAttr();
   grid.innerHTML = visiblePhotos
     .map((photo, idx) => {
       const safeTitle = escapeHtml(photo.title || photo.category || "Campus Photo");
       const safeCategory = escapeHtml(photo.category || "Campus Life");
       const safeCaption = escapeHtml(photo.caption || "");
-      const safeImg = escapeHtml(sanitizeImageUrl(photo.image));
+      const fullImg = sanitizeImageUrl(photo.image);
+      const safeFullImg = escapeHtml(fullImg);
+      const safeThumbImg = escapeHtml(toThumbUrl(fullImg));
 
       return `
         <article class="campus-gallery-card" data-idx="${idx}" data-title="${safeTitle}" data-caption="${safeCaption || safeCategory}">
-          <div class="card-media-wrap zoomable-img-trigger" role="button" tabindex="0" aria-label="View ${safeTitle} widely">
-            <img src="${safeImg}" alt="${safeTitle}" width="1200" height="800" loading="lazy" decoding="async" onerror="this.src='images/school-1.webp'">
+          <div class="card-media-wrap zoomable-img-trigger" data-full-src="${safeFullImg}" role="button" tabindex="0" aria-label="View ${safeTitle} widely">
+            <img src="${safeThumbImg}" data-full-src="${safeFullImg}" alt="${safeTitle}" width="1200" height="800" loading="lazy" decoding="async" onerror="${onerrorAttr}">
             <span class="zoom-cue-badge">View Widely</span>
           </div>
           ${(photo.title || photo.caption || photo.category) ? `
@@ -423,6 +574,7 @@ function renderSingleEventPage() {
 
   const events = getMediaEvents();
   if (!events.length) {
+    target.classList.add("is-empty");
     target.innerHTML = `
       <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px 12px;">
         No event photographs found.
@@ -480,6 +632,8 @@ function renderSingleEventPage() {
   if (eyebrowEl && currentEvent.category) eyebrowEl.textContent = currentEvent.category.toUpperCase();
 
   // Render photo cards for ONLY this event
+  target.classList.toggle("is-empty", !photoItems.length);
+  const onerrorAttr = getMediaOnerrorAttr();
   if (!photoItems.length) {
     target.innerHTML = `
       <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px 12px;">
@@ -487,7 +641,9 @@ function renderSingleEventPage() {
       </p>`;
   } else {
     target.innerHTML = photoItems.map((photo, pIdx) => {
-      const safeSrc = escapeHtml(sanitizeImageUrl(photo.image));
+      const fullSrc = sanitizeImageUrl(photo.image);
+      const safeFullSrc = escapeHtml(fullSrc);
+      const safeThumbSrc = escapeHtml(toThumbUrl(fullSrc));
       const safeCaption = escapeHtml(photo.caption || "");
       const safeAlt = escapeHtml(
         photo.caption || `${currentEvent.title} photo ${pIdx + 1}`
@@ -498,8 +654,8 @@ function renderSingleEventPage() {
           : 'loading="lazy" decoding="async"';
 
       return `
-        <div class="photo-card" data-index="${pIdx}" data-caption="${safeCaption}" role="button" tabindex="0" aria-label="View photograph ${pIdx + 1} of ${photoItems.length} widely">
-          <img src="${safeSrc}" alt="${safeAlt}" width="1200" height="800" ${priorityAttrs} onerror="this.src='images/school-1.webp'">
+        <div class="photo-card" data-index="${pIdx}" data-caption="${safeCaption}" data-full-src="${safeFullSrc}" role="button" tabindex="0" aria-label="View photograph ${pIdx + 1} of ${photoItems.length} widely">
+          <img src="${safeThumbSrc}" data-full-src="${safeFullSrc}" alt="${safeAlt}" width="1200" height="800" ${priorityAttrs} onerror="${onerrorAttr}">
           <span class="zoom-cue-badge">View Widely</span>
           <div class="photo-overlay">
             <span class="photo-badge">${safeCaption ? safeCaption : "View Full Photo"}</span>
@@ -516,6 +672,7 @@ function renderSingleEventPage() {
       .map((ev, idx) => ({ ...ev, originalIndex: idx }))
       .filter((_, idx) => idx !== eventIndex);
 
+    otherTarget.classList.toggle("is-empty", !otherEvents.length);
     otherTarget.innerHTML = otherEvents.map(event => createEventCard(event, event.originalIndex)).join("");
   }
 
@@ -619,9 +776,45 @@ function bindAllZoomableImages() {
   if (!window._pfsLightboxKeyBound) {
     window.addEventListener("keydown", e => {
       if (!universalLightboxState.isOpen) return;
-      if (e.key === "Escape") closeUniversalLightbox();
-      if (e.key === "ArrowLeft") stepUniversalLightbox(-1);
-      if (e.key === "ArrowRight") stepUniversalLightbox(1);
+      if (e.key === "Escape") {
+        closeUniversalLightbox();
+        return;
+      }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        stepUniversalLightbox(-1);
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        stepUniversalLightbox(1);
+        return;
+      }
+      if (e.key === "Tab") {
+        const lightbox = document.getElementById("lightbox");
+        const focusables = getLightboxFocusableElements(lightbox);
+        if (!focusables.length) {
+          e.preventDefault();
+          return;
+        }
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey) {
+          if (
+            document.activeElement === first ||
+            !lightbox.contains(document.activeElement)
+          ) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else if (
+          document.activeElement === last ||
+          !lightbox.contains(document.activeElement)
+        ) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     });
     window._pfsLightboxKeyBound = true;
   }
@@ -634,10 +827,15 @@ function bindAllZoomableImages() {
       trigger.style.cursor = "zoom-in";
       const openFacility = () => {
         const list = Array.from(all).map(c => {
+          const trg = c.querySelector(".zoomable-img-trigger");
           const img = c.querySelector("img");
           const title = c.querySelector("h3") ? c.querySelector("h3").textContent : "";
           const desc = c.querySelector("p") ? c.querySelector("p").textContent : "";
-          return { src: img ? img.src : "", title: `PFS Facility: ${title}`, caption: desc };
+          return {
+            src: getFullZoomSrc(trg, img),
+            title: `PFS Facility: ${title}`,
+            caption: desc
+          };
         });
         openUniversalLightbox(list, idx);
       };
@@ -654,10 +852,15 @@ function bindAllZoomableImages() {
     const handleZoom = e => {
       if (e) e.preventDefault();
       const list = Array.from(all).map(c => {
+        const trg = c.querySelector(".card-media-wrap");
         const img = c.querySelector("img");
         const title = c.querySelector("h3") ? c.querySelector("h3").textContent : "";
         const desc = c.querySelector("p") ? c.querySelector("p").textContent : "";
-        return { src: img ? img.src : "", title: `PFS Event: ${title}`, caption: desc };
+        return {
+          src: getFullZoomSrc(trg, img),
+          title: `PFS Event: ${title}`,
+          caption: desc
+        };
       });
       openUniversalLightbox(list, idx);
     };
@@ -682,10 +885,11 @@ function bindAllZoomableImages() {
       trigger.style.cursor = "zoom-in";
       const openCampusPhoto = () => {
         const list = Array.from(all).map(c => {
+          const trg = c.querySelector(".zoomable-img-trigger");
           const img = c.querySelector("img");
           const title = c.dataset.title || "Prime Focus Schools Gallery";
           const caption = c.dataset.caption || "";
-          return { src: img ? img.src : "", title, caption };
+          return { src: getFullZoomSrc(trg, img), title, caption };
         });
         openUniversalLightbox(list, idx);
       };
@@ -703,7 +907,7 @@ function bindAllZoomableImages() {
         const img = photoWrap.querySelector("img");
         if (img) {
           openUniversalLightbox([{
-            src: img.src,
+            src: getFullZoomSrc(photoWrap, img),
             title: "Principal - Prime Focus Schools",
             caption: img.dataset.caption || "Every child deserves a future full of possibility. Glorify God Always."
           }], 0);
@@ -725,7 +929,7 @@ function bindAllZoomableImages() {
           const img = c.querySelector("img");
           const customCaption = c.dataset.caption;
           return {
-            src: img ? img.src : "",
+            src: getFullZoomSrc(c, img),
             title: eventTitle,
             caption: customCaption || `Photo ${i + 1} of ${all.length}`
           };
@@ -749,7 +953,7 @@ function bindAllZoomableImages() {
           const heading = article ? article.querySelector("h2, h3") : null;
           const title = heading ? heading.textContent : document.title;
           openUniversalLightbox([{
-            src: img.src,
+            src: getFullZoomSrc(wrap, img),
             title: title || "Prime Focus Schools Story",
             caption: img.alt || "Article image"
           }], 0);
@@ -765,14 +969,24 @@ function bindAllZoomableImages() {
     if (!img._bound) {
       img._bound = true;
       img.style.cursor = "zoom-in";
-      img.addEventListener("click", () => {
+      img.setAttribute("role", "button");
+      img.setAttribute("tabindex", "0");
+      if (!img.getAttribute("aria-label")) {
+        img.setAttribute(
+          "aria-label",
+          img.alt ? `View ${img.alt} widely` : `View article photo ${idx + 1} widely`
+        );
+      }
+      const openBodyImage = () => {
         const list = Array.from(all).map(im => ({
-          src: im.src,
+          src: getFullZoomSrc(im, im),
           title: im.alt || "Article Photo",
           caption: "Prime Focus Schools Blog"
         }));
         openUniversalLightbox(list, idx);
-      });
+      };
+      img.addEventListener("click", openBodyImage);
+      bindKeyboardTrigger(img, openBodyImage);
     }
   });
 }

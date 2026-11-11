@@ -56,9 +56,16 @@
 }
 
 .search-input-group input:focus {
-  outline: none;
   border-color: var(--blue);
   box-shadow: 0 0 0 3px rgba(16, 75, 136, 0.12);
+}
+
+.search-input-group input:focus-visible,
+.blog-sort-group select:focus-visible,
+.category-pill:focus-visible,
+.cms-access-pill:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
 }
 
 .search-clear-btn {
@@ -98,11 +105,11 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  outline: none;
 }
 
 .blog-sort-group select:focus {
   border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(16, 75, 136, 0.12);
 }
 
 .category-filter-pills {
@@ -110,6 +117,7 @@
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
+  min-height: 38px;
 }
 
 .category-pill {
@@ -153,6 +161,12 @@
 .featured-article-container {
   max-width: 1200px;
   margin: 40px auto 10px;
+  min-height: 380px;
+}
+
+.featured-article-container.is-empty {
+  min-height: 0;
+  margin: 0;
 }
 
 .featured-article-card {
@@ -473,11 +487,18 @@
   flex-wrap: wrap;
 }
 
+.blog-card-media:focus-visible,
+.featured-card-media:focus-visible {
+  outline: 3px solid var(--light-blue);
+  outline-offset: -3px;
+}
+
 .post-header h1 {
   font-family: "Manrope", sans-serif;
   font-size: clamp(30px, 4.2vw, 46px);
   font-weight: 800;
   line-height: 1.2;
+  min-height: 2.4em;
   color: var(--navy);
   margin-bottom: 24px;
   letter-spacing: -0.8px;
@@ -547,6 +568,11 @@
   object-fit: cover;
 }
 
+.post-hero-image-wrap:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
 .post-image-caption {
   padding: 10px 16px;
   font-size: 12px;
@@ -561,6 +587,7 @@
   font-size: 16.5px;
   line-height: 1.85;
   color: #21354A;
+  min-height: 360px;
   margin-bottom: 48px;
 }
 
@@ -635,11 +662,13 @@
   border-radius: 10px;
 }
 
+.post-body .blog-callout h3,
 .post-body .blog-callout h4 {
   font-family: "Manrope", sans-serif;
   font-size: 16px;
   font-weight: 800;
   color: var(--navy);
+  margin-top: 0;
   margin-bottom: 8px;
 }
 
@@ -782,6 +811,7 @@
   flex-shrink: 0;
 }
 
+.author-bio-copy h3,
 .author-bio-copy h4 {
   font-family: "Manrope", sans-serif;
   font-size: 17px;
@@ -940,24 +970,25 @@
   font-size: 15px;
 }
 
-/* CMS Badge Pill in public footer */
+/* CMS Badge Pill */
 .cms-access-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #E0EDFA;
+  background: #EAF4FE;
+  color: var(--navy);
   font-size: 11px;
   font-weight: 700;
   border-radius: 20px;
-  transition: background 0.2s, color 0.2s;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  border: 1px solid #C5DCF2;
 }
 
 .cms-access-pill:hover {
   background: var(--light-blue);
   color: var(--navy);
+  border-color: var(--light-blue);
 }
 
 /* ==========================================================================
@@ -965,6 +996,9 @@
    ========================================================================== */
 
 @media (max-width: 1024px) {
+  .featured-article-container:not(.is-empty) {
+    min-height: 280px;
+  }
   .featured-article-card {
     grid-template-columns: 1fr;
   }
@@ -982,6 +1016,27 @@
 }
 
 @media (max-width: 720px) {
+  .post-breadcrumbs {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  #post-breadcrumb-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .post-header-meta {
+    min-height: 64px;
+    align-content: flex-start;
+  }
+  .post-header-meta .article-category-badge {
+    margin-bottom: 0;
+  }
+  .post-header h1 {
+    font-size: clamp(25px, 6vw, 32px);
+    min-height: 3.6em;
+  }
   .featured-card-media {
     min-height: 220px;
     height: 240px;

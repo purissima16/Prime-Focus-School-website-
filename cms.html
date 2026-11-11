@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Prime Focus Schools Content Management System for managing blog articles, past events, facilities, galleries, and enquiries.">
+  <meta name="robots" content="noindex, nofollow">
   <title>PFS Content Management System | Prime Focus Schools</title>
   <link rel="icon" type="image/webp" href="images/pfs undone logo.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://hztinvahixhvkfhpccrq.supabase.co" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"></noscript>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/blog.css">
   <link rel="stylesheet" href="css/cms.css">
@@ -403,9 +407,9 @@
   <div id="cms-auth-overlay" class="cms-auth-overlay">
     <div class="cms-auth-box">
       <div class="cms-auth-logo">
-        <img src="images/pfs undone logo.webp" alt="Prime Focus Schools" width="64" height="64" decoding="async">
+        <img src="images/pfs-logo-128.webp" alt="Prime Focus Schools" width="64" height="64" decoding="async">
       </div>
-      <h2>Prime Focus Schools CMS Portal</h2>
+      <p style="font-family:'Manrope',sans-serif;color:var(--cms-navy);font-size:22px;font-weight:800;margin:0 0 6px">Prime Focus Schools CMS Portal</p>
       <p class="auth-sub">
         Enter the administrative passcode to manage school articles, event photos, galleries, facilities, and enquiries.
       </p>
@@ -454,7 +458,7 @@
 
   <header class="cms-header">
     <div class="cms-brand-group">
-      <img src="images/pfs undone logo.webp" alt="Prime Focus Schools Logo" width="44" height="44" decoding="async">
+      <img src="images/pfs-logo-128.webp" alt="Prime Focus Schools Logo" width="44" height="44" decoding="async">
       <div class="cms-brand-title">
         PRIME FOCUS SCHOOLS
         <small>CONTENT MANAGEMENT SYSTEM</small>
@@ -484,32 +488,34 @@
   </header>
 
   <main class="cms-main">
-    <nav class="cms-nav-tabs" role="tablist" aria-label="CMS Management Sections">
+    <h1 class="sr-only">Prime Focus Schools Content Management System</h1>
+
+    <div class="cms-nav-tabs" role="tablist" aria-label="CMS Management Sections">
       <button type="button" id="tab-btn-blog" class="cms-nav-tab active"
-        data-tab="blog" role="tab" aria-selected="true">
+        data-tab="blog" role="tab" aria-selected="true" aria-controls="cms-panel-blog">
         Blog Articles <span id="tab-badge-blog" class="cms-tab-badge">0</span>
       </button>
       <button type="button" id="tab-btn-events" class="cms-nav-tab"
-        data-tab="events" role="tab" aria-selected="false">
+        data-tab="events" role="tab" aria-selected="false" aria-controls="cms-panel-events">
         Past Events &amp; Photos <span id="tab-badge-events" class="cms-tab-badge">0</span>
       </button>
       <button type="button" id="tab-btn-facilities" class="cms-nav-tab"
-        data-tab="facilities" role="tab" aria-selected="false">
+        data-tab="facilities" role="tab" aria-selected="false" aria-controls="cms-panel-facilities">
         Explore Facilities <span id="tab-badge-facilities" class="cms-tab-badge">0</span>
       </button>
       <button type="button" id="tab-btn-gallery" class="cms-nav-tab"
-        data-tab="gallery" role="tab" aria-selected="false">
+        data-tab="gallery" role="tab" aria-selected="false" aria-controls="cms-panel-gallery">
         Galleries &amp; Site Photos <span id="tab-badge-gallery" class="cms-tab-badge">0</span>
       </button>
       <button type="button" id="tab-btn-enquiries" class="cms-nav-tab"
-        data-tab="enquiries" role="tab" aria-selected="false">
+        data-tab="enquiries" role="tab" aria-selected="false" aria-controls="cms-panel-enquiries">
         Enquiries Inbox <span id="tab-badge-enquiries" class="cms-tab-badge">0</span>
       </button>
-    </nav>
+    </div>
 
     <!-- One-time Supabase media schema setup helper (auto-hides once ready) -->
     <section id="cms-media-setup-banner" class="cms-setup-banner" style="display:none">
-      <h3>One-Time Supabase Photo Database Setup Required</h3>
+      <h2 style="margin:0 0 6px;font-family:'Manrope',sans-serif;font-size:17px;color:#78350F">One-Time Supabase Photo Database Setup Required</h2>
       <p>
         Your blog and enquiries tables are active, and now you just need to create the
         <strong>Facilities, Past Events, Galleries, and Photo Storage</strong> tables in your Supabase database once.
@@ -532,7 +538,8 @@
       </div>
     </section>
 
-    <div id="cms-panel-blog" class="cms-tab-panel active">
+    <div id="cms-panel-blog" class="cms-tab-panel active" role="tabpanel" aria-labelledby="tab-btn-blog">
+    <h2 class="sr-only">Blog Overview Statistics</h2>
     <div class="cms-stats-grid">
       <div class="cms-stat-card">
         <div class="cms-stat-info">
@@ -602,7 +609,8 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
           <input type="text" id="cms-search-input"
-            placeholder="Filter articles by title, author, keyword...">
+            placeholder="Filter articles by title, author, keyword..."
+            aria-label="Filter articles by title, author, or keyword">
         </div>
 
         <div class="cms-filter-selects">
@@ -659,7 +667,8 @@
           Import Articles JSON
         </button>
         <input type="file" id="file-import-input"
-          accept=".json" style="display:none">
+          accept=".json" style="display:none"
+          aria-label="Import articles JSON file">
 
         <button type="button" id="btn-change-password"
           class="cms-btn cms-btn-secondary">
@@ -675,7 +684,7 @@
     </div>
 
     <!-- Past Events & Event Photos Panel -->
-    <div id="cms-panel-events" class="cms-tab-panel">
+    <div id="cms-panel-events" class="cms-tab-panel" role="tabpanel" aria-labelledby="tab-btn-events">
       <section class="cms-content-card" aria-labelledby="cms-events-heading">
         <div class="cms-card-header">
           <div>
@@ -731,14 +740,17 @@
             <label for="cms-event-photos-file" class="cms-btn cms-btn-primary" style="cursor:pointer">
               Select Photos to Upload
             </label>
-            <input type="file" id="cms-event-photos-file" accept="image/*" multiple style="display:none">
+            <input type="file" id="cms-event-photos-file" accept="image/*" multiple style="display:none"
+              aria-label="Select event photos to upload">
           </div>
 
           <div class="cms-url-add-row">
             <input type="text" id="cms-event-photo-caption" class="cms-input"
-              placeholder="Optional caption for uploaded photo(s)..." style="max-width:260px">
+              placeholder="Optional caption for uploaded photo(s)..." style="max-width:260px"
+              aria-label="Optional caption for uploaded event photos">
             <input type="text" id="cms-event-photo-url" class="cms-input"
-              placeholder="Or paste an image URL / path (e.g. https://... or images/events/...)">
+              placeholder="Or paste an image URL / path (e.g. https://... or images/events/...)"
+              aria-label="Event photo URL or path">
             <button type="button" id="cms-event-photo-url-btn" class="cms-btn cms-btn-secondary cms-btn-sm">
               + Add Photo URL
             </button>
@@ -752,7 +764,7 @@
     </div>
 
     <!-- Explore Facilities Panel -->
-    <div id="cms-panel-facilities" class="cms-tab-panel">
+    <div id="cms-panel-facilities" class="cms-tab-panel" role="tabpanel" aria-labelledby="tab-btn-facilities">
       <section class="cms-content-card" aria-labelledby="cms-facilities-heading">
         <div class="cms-card-header">
           <div>
@@ -775,7 +787,7 @@
     </div>
 
     <!-- Campus Gallery & Site Highlights Panel -->
-    <div id="cms-panel-gallery" class="cms-tab-panel">
+    <div id="cms-panel-gallery" class="cms-tab-panel" role="tabpanel" aria-labelledby="tab-btn-gallery">
       <section class="cms-content-card" aria-labelledby="cms-gallery-heading">
         <div class="cms-card-header">
           <div>
@@ -805,11 +817,13 @@
             <label for="cms-gallery-photos-file" class="cms-btn cms-btn-primary" style="cursor:pointer">
               Upload Gallery Photos
             </label>
-            <input type="file" id="cms-gallery-photos-file" accept="image/*" multiple style="display:none">
+            <input type="file" id="cms-gallery-photos-file" accept="image/*" multiple style="display:none"
+              aria-label="Upload campus gallery photos">
           </div>
 
           <div class="cms-url-add-row">
-            <select id="cms-gallery-upload-category" class="cms-input" style="max-width:190px;height:40px">
+            <select id="cms-gallery-upload-category" class="cms-input" style="max-width:190px;height:40px"
+              aria-label="Gallery photo category">
               <option value="Campus Life">Campus Life</option>
               <option value="Student Leadership">Student Leadership</option>
               <option value="Awards & Honours">Awards &amp; Honours</option>
@@ -818,13 +832,17 @@
               <option value="__new__">+ Custom Category...</option>
             </select>
             <input type="text" id="cms-gallery-upload-category-custom" class="cms-input"
-              placeholder="Custom category..." style="display:none;max-width:170px;height:40px">
+              placeholder="Custom category..." style="display:none;max-width:170px;height:40px"
+              aria-label="Custom gallery category name">
             <input type="text" id="cms-gallery-upload-title" class="cms-input"
-              placeholder="Optional title..." style="max-width:180px">
+              placeholder="Optional title..." style="max-width:180px"
+              aria-label="Optional gallery photo title">
             <input type="text" id="cms-gallery-upload-caption" class="cms-input"
-              placeholder="Optional caption..." style="max-width:210px">
+              placeholder="Optional caption..." style="max-width:210px"
+              aria-label="Optional gallery photo caption">
             <input type="text" id="cms-gallery-photo-url" class="cms-input"
-              placeholder="Or paste an image URL / path...">
+              placeholder="Or paste an image URL / path..."
+              aria-label="Gallery photo URL or path">
             <button type="button" id="cms-gallery-photo-url-btn" class="cms-btn cms-btn-secondary cms-btn-sm">
               + Add Photo URL
             </button>
@@ -855,7 +873,7 @@
     </div>
 
     <!-- Enquiries inbox -->
-    <div id="cms-panel-enquiries" class="cms-tab-panel">
+    <div id="cms-panel-enquiries" class="cms-tab-panel" role="tabpanel" aria-labelledby="tab-btn-enquiries">
     <section class="cms-enquiries" style="margin-top:0" aria-labelledby="enquiries-heading">
       <div class="enquiries-heading">
         <div class="enquiries-title-group">
@@ -958,15 +976,15 @@
         </div>
         <div class="enquiry-detail">
           <span>Email</span>
-          <a id="cms-enquiry-dialog-email" href="#">—</a>
+          <a id="cms-enquiry-dialog-email">—</a>
         </div>
         <div class="enquiry-detail">
           <span>Phone</span>
-          <a id="cms-enquiry-dialog-phone" href="#">—</a>
+          <a id="cms-enquiry-dialog-phone">—</a>
         </div>
         <div class="enquiry-detail">
           <span>Status</span>
-          <select id="cms-enquiry-dialog-status" class="enquiry-status-select">
+          <select id="cms-enquiry-dialog-status" class="enquiry-status-select" aria-label="Enquiry status">
             <option value="new">New</option>
             <option value="read">Read</option>
             <option value="replied">Replied</option>
@@ -1013,7 +1031,8 @@
               <select id="field-category" class="cms-input"></select>
               <input type="text" id="field-category-custom" class="cms-input"
                 placeholder="Type new category name..."
-                style="display:none;margin-top:6px">
+                style="display:none;margin-top:6px"
+                aria-label="Custom article category name">
             </div>
             <div class="cms-form-group">
               <label for="field-status">Status</label>
@@ -1078,7 +1097,8 @@
                   Upload Photo from Computer...
                 </label>
                 <input type="file" id="field-cover-file"
-                  accept="image/*" style="display:none">
+                  accept="image/*" style="display:none"
+                  aria-label="Upload article cover photo">
                 <span style="font-size:11.5px;color:var(--cms-muted)">
                   Image automatically optimizes for web preview
                 </span>
@@ -1093,7 +1113,8 @@
               </div>
 
               <input type="text" id="field-cover-caption" class="cms-input"
-                placeholder="Optional image caption">
+                placeholder="Optional image caption"
+                aria-label="Optional article cover image caption">
             </div>
           </div>
 
@@ -1208,7 +1229,8 @@
                   Upload Cover Photo...
                 </label>
                 <input type="file" id="event-field-cover-file"
-                  accept="image/*" style="display:none">
+                  accept="image/*" style="display:none"
+                  aria-label="Upload event cover photo">
               </div>
               <div class="image-preview-box">
                 <img id="event-cover-preview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-default-src="images/school-1.webp" alt="Event Cover Preview" loading="lazy" decoding="async" fetchpriority="low">
@@ -1274,7 +1296,8 @@
                   Upload Facility Photo...
                 </label>
                 <input type="file" id="facility-field-image-file"
-                  accept="image/*" style="display:none">
+                  accept="image/*" style="display:none"
+                  aria-label="Upload facility photo">
               </div>
               <div class="image-preview-box">
                 <img id="facility-image-preview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-default-src="images/school-2.webp" alt="Facility Preview" loading="lazy" decoding="async" fetchpriority="low">
@@ -1338,7 +1361,8 @@
                   Upload Replacement Photo...
                 </label>
                 <input type="file" id="gallery-field-image-file"
-                  accept="image/*" style="display:none">
+                  accept="image/*" style="display:none"
+                  aria-label="Upload replacement gallery photo">
               </div>
               <div class="image-preview-box">
                 <img id="gallery-image-preview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-default-src="images/school-1.webp" alt="Gallery Photo Preview" loading="lazy" decoding="async" fetchpriority="low">
@@ -1582,15 +1606,22 @@
 
         const email = document.getElementById("cms-enquiry-dialog-email");
         email.textContent = item.email || "—";
-        email.href = item.email
-          ? `mailto:${encodeURIComponent(item.email)}`
-          : "#";
+        if (item.email) {
+          email.href = `mailto:${encodeURIComponent(item.email)}`;
+        } else {
+          email.removeAttribute("href");
+        }
 
         const phone = document.getElementById("cms-enquiry-dialog-phone");
         phone.textContent = item.phone || "—";
-        phone.href = item.phone
-          ? `tel:${String(item.phone).replace(/[^\d+]/g, "")}`
-          : "#";
+        const phoneHref = item.phone
+          ? String(item.phone).replace(/[^\d+]/g, "")
+          : "";
+        if (phoneHref) {
+          phone.href = `tel:${phoneHref}`;
+        } else {
+          phone.removeAttribute("href");
+        }
 
         document.getElementById("cms-enquiry-dialog-message").textContent =
           item.message || "";

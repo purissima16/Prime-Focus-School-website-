@@ -52,6 +52,23 @@
     return element.innerHTML;
   }
 
+  function toThumbUrl(url) {
+    if (
+      window.PfsMediaThumb &&
+      typeof window.PfsMediaThumb.toThumbSrc === "function"
+    ) {
+      return window.PfsMediaThumb.toThumbSrc(url);
+    }
+    return url;
+  }
+
+  function getMediaOnerrorAttr() {
+    if (window.PfsMediaThumb && window.PfsMediaThumb.onerrorAttr) {
+      return window.PfsMediaThumb.onerrorAttr;
+    }
+    return "if(this.dataset.fullSrc&&this.getAttribute('src')!==this.dataset.fullSrc){this.src=this.dataset.fullSrc;}else{this.onerror=null;this.src='images/school-1.webp';}";
+  }
+
   function showToast(message, type = "success") {
     let toast = $("cms-toast");
 
@@ -350,21 +367,25 @@
       return;
     }
 
+    const onerrorAttr = getMediaOnerrorAttr();
     postsTableBody.innerHTML = posts.map(post => {
       const published = post.status === "published";
       const featured = Boolean(post.featured);
-      const cover = post.cover || "images/school-1.webp";
+      const fullCover = post.cover || "images/school-1.webp";
+      const thumbCover = toThumbUrl(fullCover);
+      const safeTitle = escapeHtml(post.title || "article");
       const url =
         `blog-post.html?slug=${encodeURIComponent(post.slug || post.id)}`;
 
       return `
         <tr>
           <td>
-            <img src="${escapeHtml(cover)}" alt=""
+            <img src="${escapeHtml(thumbCover)}" alt=""
+              data-full-src="${escapeHtml(fullCover)}"
               class="post-thumb-preview"
               width="58" height="42"
               loading="lazy" decoding="async"
-              onerror="this.src='images/school-1.webp'">
+              onerror="${onerrorAttr}">
           </td>
           <td class="post-title-cell">
             <span class="post-title-link">${escapeHtml(post.title)}</span>
@@ -385,6 +406,7 @@
           <td style="text-align:center">
             <button type="button" class="table-action-btn"
               data-action="feature" data-id="${escapeHtml(post.id)}"
+              aria-label="${featured ? `Unfeature ${safeTitle}` : `Feature ${safeTitle}`}"
               title="${featured ? "Unfeature article" : "Feature article"}">
               ${svgIcon(featured ? "starFilled" : "starOutline")}
             </button>
@@ -401,16 +423,21 @@
             <div class="table-actions">
               <button type="button" class="table-action-btn"
                 data-action="edit" data-id="${escapeHtml(post.id)}"
+                aria-label="Edit ${safeTitle}"
                 title="Edit Article">${svgIcon("edit")}</button>
               <a href="${url}" target="_blank" rel="noopener"
-                class="table-action-btn" title="View Public Article">${svgIcon("view")}</a>
+                class="table-action-btn"
+                aria-label="View public article ${safeTitle}"
+                title="View Public Article">${svgIcon("view")}</a>
               <button type="button" class="table-action-btn"
                 data-action="status" data-id="${escapeHtml(post.id)}"
+                aria-label="${published ? `Switch ${safeTitle} to draft` : `Publish ${safeTitle}`}"
                 title="${published ? "Switch to Draft" : "Publish Article"}">
                 ${svgIcon(published ? "pause" : "play")}
               </button>
               <button type="button" class="table-action-btn btn-delete"
                 data-action="delete" data-id="${escapeHtml(post.id)}"
+                aria-label="Delete ${safeTitle}"
                 title="Delete Article">${svgIcon("trash")}</button>
             </div>
           </td>

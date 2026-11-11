@@ -10,7 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://hztinvahixhvkfhpccrq.supabase.co" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"></noscript>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/blog.css">
   <script src="js/blog-data.js" defer></script>
@@ -24,7 +26,7 @@
 <body>
   <header class="site-header">
     <a class="brand" href="index.html">
-      <img src="images/pfs undone logo.webp" alt="PFS school logo" width="52" height="52" decoding="async">
+      <img src="images/pfs-logo-128.webp" alt="PFS school logo" width="52" height="52" decoding="async">
       <span>PRIME FOCUS <small>SCHOOLS</small></span>
     </a>
 
@@ -106,13 +108,13 @@
           <button type="button" class="share-btn btn-copy" id="share-btn-copy" title="Copy article link to clipboard">
             Copy Link
           </button>
-          <a class="share-btn btn-whatsapp" id="share-btn-whatsapp" target="_blank" rel="noopener noreferrer" title="Share via WhatsApp">
+          <a class="share-btn btn-whatsapp" id="share-btn-whatsapp" href="https://api.whatsapp.com/send" target="_blank" rel="noopener noreferrer" title="Share via WhatsApp">
             WhatsApp
           </a>
-          <a class="share-btn btn-x" id="share-btn-x" target="_blank" rel="noopener noreferrer" title="Share on X / Twitter">
+          <a class="share-btn btn-x" id="share-btn-x" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener noreferrer" title="Share on X / Twitter">
             X Post
           </a>
-          <a class="share-btn btn-facebook" id="share-btn-facebook" target="_blank" rel="noopener noreferrer" title="Share on Facebook">
+          <a class="share-btn btn-facebook" id="share-btn-facebook" href="https://www.facebook.com/sharer/sharer.php" target="_blank" rel="noopener noreferrer" title="Share on Facebook">
             Facebook
           </a>
         </div>
@@ -122,7 +124,8 @@
       <section class="author-bio-card">
         <div class="bio-avatar" id="bio-author-avatar">PFS</div>
         <div class="author-bio-copy">
-          <h4 id="bio-author-name">Prime Focus Schools</h4>
+          <h2 class="sr-only">About the Author</h2>
+          <h3 id="bio-author-name">Prime Focus Schools</h3>
           <p class="role-tag" id="bio-author-role">Editorial Board</p>
           <p>
             Prime Focus Schools is a premier educational institution in Ipaja, Lagos, dedicated to academic excellence, 
@@ -166,7 +169,7 @@
   <footer class="site-footer">
     <div class="footer-main">
       <a class="brand footer-brand" href="index.html">
-        <img src="images/pfs undone logo.webp" alt="Prime Focus Schools logo" width="52" height="52" loading="lazy" decoding="async">
+        <img src="images/pfs-logo-128.webp" alt="Prime Focus Schools logo" width="52" height="52" loading="lazy" decoding="async">
         <span>PRIME FOCUS <small>SCHOOLS</small></span>
       </a>
       <p>Glorify God Always.</p>

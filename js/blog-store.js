@@ -245,7 +245,7 @@
     if (!readyPromise) {
       readyPromise = refresh().catch(error => {
         readyPromise = null;
-        console.error("Could not load blog articles from Supabase:", error);
+        console.warn("Could not load blog articles from Supabase:", error);
         throw error;
       });
     }

@@ -1453,6 +1453,106 @@
     return defaults.quickPickPhotos || [];
   }
 
+  const NO_THUMB_IMAGES = new Set([
+    "ict-lab.webp",
+    "principal-pfs.webp",
+    "td-lab.webp",
+    "school-1-original.webp",
+    "school-2-original.webp",
+    "events/girlsday.webp",
+    "events/hausa1.webp",
+    "pfs undone logo.webp",
+    "pfs-logo-128.webp"
+  ]);
+
+  function toThumbSrc(url) {
+    const raw = String(url || "").trim();
+    if (!raw) return raw;
+
+    const match = raw.match(/^((?:\.\.?\/|\/)?)images\/(.+)$/i);
+    if (!match) return raw;
+
+    const prefix = match[1] || "";
+    const rest = match[2];
+    if (/^thumbs\//i.test(rest)) return raw;
+
+    const cleanPath = rest.split(/[?#]/)[0];
+    let decoded = cleanPath;
+    try {
+      decoded = decodeURIComponent(cleanPath);
+    } catch (e) {
+      decoded = cleanPath;
+    }
+
+    if (NO_THUMB_IMAGES.has(decoded.toLowerCase())) {
+      return raw;
+    }
+
+    return `${prefix}images/thumbs/${rest}`;
+  }
+
+  function toFullSrc(url) {
+    const raw = String(url || "").trim();
+    if (!raw) return raw;
+
+    if (/^https?:\/\//i.test(raw)) {
+      try {
+        const parsed = new URL(raw);
+        if (
+          typeof window !== "undefined" &&
+          window.location &&
+          parsed.origin === window.location.origin
+        ) {
+          return raw.replace(/(^|\/)images\/thumbs\//i, "$1images/");
+        }
+        return raw;
+      } catch (e) {
+        return raw;
+      }
+    }
+
+    return raw.replace(/(^|\/)images\/thumbs\//i, "$1images/");
+  }
+
+  function handleImgError(img) {
+    if (!img) return;
+    const currentSrc = img.getAttribute("src") || "";
+    const fullSrc = img.dataset ? img.dataset.fullSrc : "";
+    const defaultSrc = img.dataset ? img.dataset.defaultSrc : "";
+    const finalFallback = "images/school-1.webp";
+
+    if (fullSrc && currentSrc !== fullSrc) {
+      img.src = fullSrc;
+      return;
+    }
+    if (defaultSrc && currentSrc !== defaultSrc) {
+      img.src = defaultSrc;
+      return;
+    }
+    if (currentSrc !== finalFallback) {
+      img.onerror = null;
+      img.src = finalFallback;
+      return;
+    }
+    img.onerror = null;
+  }
+
+  const PfsMediaThumb = {
+    NO_THUMB_IMAGES,
+    toThumbSrc,
+    toFullSrc,
+    handleError: handleImgError,
+    onerrorAttr:
+      "if(window.PfsMediaThumb){window.PfsMediaThumb.handleError(this);}else{this.onerror=null;this.src='images/school-1.webp';}"
+  };
+
+  if (typeof window !== "undefined") {
+    window.PfsMediaThumb = PfsMediaThumb;
+  }
+  if (typeof globalThis !== "undefined") {
+    globalThis.PfsMediaThumb = PfsMediaThumb;
+  }
+
   return {
     STORAGE_BUCKET,
     ready,

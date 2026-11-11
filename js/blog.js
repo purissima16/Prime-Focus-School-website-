@@ -18,6 +18,31 @@
     return div.innerHTML;
   }
 
+  function sanitizeCoverUrl(url) {
+    const raw = url || "images/school-1.webp";
+    if (typeof sanitizeImageUrl === "function") {
+      return sanitizeImageUrl(raw, "images/school-1.webp");
+    }
+    return raw;
+  }
+
+  function toThumbUrl(url) {
+    if (
+      window.PfsMediaThumb &&
+      typeof window.PfsMediaThumb.toThumbSrc === "function"
+    ) {
+      return window.PfsMediaThumb.toThumbSrc(url);
+    }
+    return url;
+  }
+
+  function getMediaOnerrorAttr() {
+    if (window.PfsMediaThumb && window.PfsMediaThumb.onerrorAttr) {
+      return window.PfsMediaThumb.onerrorAttr;
+    }
+    return "if(this.dataset.fullSrc&&this.getAttribute('src')!==this.dataset.fullSrc){this.src=this.dataset.fullSrc;}else{this.onerror=null;this.src='images/school-1.webp';}";
+  }
+
   function getInitials(name) {
     if (!name) return "PFS";
     const parts = name
@@ -110,17 +135,21 @@
     function createPostCard(post) {
       const readUrl =
         `blog-post.html?slug=${encodeURIComponent(post.slug || post.id)}`;
-      const coverImg = post.cover || "images/school-1.webp";
+      const fullCover = sanitizeCoverUrl(post.cover);
+      const thumbCover = toThumbUrl(fullCover);
 
       return `
         <article class="blog-post-card">
           <div class="blog-card-media zoomable-img-trigger"
+            data-full-src="${escapeHtml(fullCover)}"
             role="button" tabindex="0"
             aria-label="View ${escapeHtml(post.title)} photo widely">
-            <img src="${escapeHtml(coverImg)}"
+            <img src="${escapeHtml(thumbCover)}"
+              data-full-src="${escapeHtml(fullCover)}"
               alt="${escapeHtml(post.title)}"
               width="1200" height="750"
-              loading="lazy" decoding="async">
+              loading="lazy" decoding="async"
+              onerror="${getMediaOnerrorAttr()}">
             <span class="zoom-cue-badge">View Widely</span>
           </div>
           <div class="blog-card-body">
@@ -147,22 +176,28 @@
 
       if (!post) {
         featuredContainer.innerHTML = "";
+        featuredContainer.classList.add("is-empty");
         return;
       }
 
+      featuredContainer.classList.remove("is-empty");
       const readUrl =
         `blog-post.html?slug=${encodeURIComponent(post.slug || post.id)}`;
-      const coverImg = post.cover || "images/school-1.webp";
+      const fullCover = sanitizeCoverUrl(post.cover);
+      const thumbCover = toThumbUrl(fullCover);
 
       featuredContainer.innerHTML = `
         <div class="featured-article-card">
           <div class="featured-card-media zoomable-img-trigger"
+            data-full-src="${escapeHtml(fullCover)}"
             role="button" tabindex="0"
             aria-label="View featured story: ${escapeHtml(post.title)} widely">
-            <img src="${escapeHtml(coverImg)}"
+            <img src="${escapeHtml(thumbCover)}"
+              data-full-src="${escapeHtml(fullCover)}"
               alt="${escapeHtml(post.title)}"
               width="1200" height="750"
-              loading="lazy" decoding="async">
+              loading="lazy" decoding="async"
+              onerror="${getMediaOnerrorAttr()}">
             <span class="featured-badge">FEATURED STORY</span>
             <span class="zoom-cue-badge">View Widely</span>
           </div>
@@ -349,10 +384,11 @@
       post.authorRole || "Editorial Board";
 
     if (coverImage) {
-      const nextCover = post.cover || "images/school-1.webp";
+      const nextCover = sanitizeCoverUrl(post.cover);
       coverImage.removeAttribute("loading");
       coverImage.fetchPriority = "high";
       coverImage.decoding = "sync";
+      coverImage.dataset.fullSrc = nextCover;
       if (coverImage.getAttribute("src") !== nextCover) {
         coverImage.src = nextCover;
       }
@@ -434,20 +470,21 @@
 
     if (copyButton && !copyButton._pfsBound) {
       copyButton._pfsBound = true;
-      copyButton.addEventListener("click", () => {
+      copyButton.addEventListener("click", async () => {
         const currentUrl = window.location.href;
-        navigator.clipboard.writeText(currentUrl).then(
-          () => showToast("Article link copied to clipboard!"),
-          () => {
-            const input = document.createElement("input");
-            input.value = currentUrl;
-            document.body.appendChild(input);
-            input.select();
-            document.execCommand("copy");
-            input.remove();
-            showToast("Article link copied!");
+        if (
+          navigator.clipboard &&
+          typeof navigator.clipboard.writeText === "function"
+        ) {
+          try {
+            await navigator.clipboard.writeText(currentUrl);
+            showToast("Article link copied to clipboard!");
+            return;
+          } catch (err) {
+            // Fall through to non-deprecated manual copy prompt
           }
-        );
+        }
+        showToast("Copy this link manually from your browser address bar.");
       });
     }
 
@@ -509,15 +546,19 @@
     grid.innerHTML = related.map(post => {
       const url =
         `blog-post.html?slug=${encodeURIComponent(post.slug || post.id)}`;
+      const fullCover = sanitizeCoverUrl(post.cover);
+      const thumbCover = toThumbUrl(fullCover);
 
       return `
         <article class="blog-post-card">
           <div class="blog-card-media">
             <a href="${url}">
-              <img src="${escapeHtml(post.cover || "images/school-1.webp")}"
+              <img src="${escapeHtml(thumbCover)}"
+                data-full-src="${escapeHtml(fullCover)}"
                 alt="${escapeHtml(post.title)}"
                 width="1200" height="750"
-                loading="lazy" decoding="async">
+                loading="lazy" decoding="async"
+                onerror="${getMediaOnerrorAttr()}">
             </a>
           </div>
           <div class="blog-card-body">
@@ -549,6 +590,7 @@
       sort: "newest"
     });
 
+    container.classList.toggle("is-empty", !posts.length);
     if (!posts.length) {
       container.innerHTML = "<p>New stories coming soon!</p>";
       return;
@@ -557,18 +599,23 @@
     container.innerHTML = posts.map(post => {
       const url =
         `blog-post.html?slug=${encodeURIComponent(post.slug || post.id)}`;
-      const cover = post.cover || "images/school-1.webp";
+      const fullCover = sanitizeCoverUrl(post.cover);
+      const thumbCover = toThumbUrl(fullCover);
 
       return `
         <article class="event-card blog-home-card">
           <div class="card-media-wrap zoomable-img-trigger"
             data-title="${escapeHtml(post.title)}"
             data-caption="${escapeHtml(post.excerpt || "")}"
-            role="button" tabindex="0">
-            <img src="${escapeHtml(cover)}"
+            data-full-src="${escapeHtml(fullCover)}"
+            role="button" tabindex="0"
+            aria-label="View ${escapeHtml(post.title)} photo widely">
+            <img src="${escapeHtml(thumbCover)}"
+              data-full-src="${escapeHtml(fullCover)}"
               alt="${escapeHtml(post.title)}"
               width="1200" height="750"
-              loading="lazy" decoding="async">
+              loading="lazy" decoding="async"
+              onerror="${getMediaOnerrorAttr()}">
             <span class="zoom-cue-badge">View Widely</span>
           </div>
           <div class="event-copy">
@@ -623,7 +670,7 @@
         .catch(error => {
           window.removeEventListener("pfs:blog-updated", markUpdated);
           blogStoreSettled = true;
-          console.error(
+          console.warn(
             "Using cached blog articles because Supabase could not load:",
             error
           );
