@@ -106,20 +106,20 @@ drop policy if exists "Admins can insert facilities" on public.site_facilities;
 create policy "Admins can insert facilities"
   on public.site_facilities for insert
   to authenticated
-  with check (exists (select 1 from public.admins where user_id = auth.uid()));
+  with check (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Admins can update facilities" on public.site_facilities;
 create policy "Admins can update facilities"
   on public.site_facilities for update
   to authenticated
-  using (exists (select 1 from public.admins where user_id = auth.uid()))
-  with check (exists (select 1 from public.admins where user_id = auth.uid()));
+  using (auth.uid() in (select user_id from public.admins))
+  with check (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Admins can delete facilities" on public.site_facilities;
 create policy "Admins can delete facilities"
   on public.site_facilities for delete
   to authenticated
-  using (exists (select 1 from public.admins where user_id = auth.uid()));
+  using (auth.uid() in (select user_id from public.admins));
 
 -- site_events
 drop policy if exists "Public can read events" on public.site_events;
@@ -132,20 +132,20 @@ drop policy if exists "Admins can insert events" on public.site_events;
 create policy "Admins can insert events"
   on public.site_events for insert
   to authenticated
-  with check (exists (select 1 from public.admins where user_id = auth.uid()));
+  with check (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Admins can update events" on public.site_events;
 create policy "Admins can update events"
   on public.site_events for update
   to authenticated
-  using (exists (select 1 from public.admins where user_id = auth.uid()))
-  with check (exists (select 1 from public.admins where user_id = auth.uid()));
+  using (auth.uid() in (select user_id from public.admins))
+  with check (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Admins can delete events" on public.site_events;
 create policy "Admins can delete events"
   on public.site_events for delete
   to authenticated
-  using (exists (select 1 from public.admins where user_id = auth.uid()));
+  using (auth.uid() in (select user_id from public.admins));
 
 -- site_event_photos
 drop policy if exists "Public can read event photos" on public.site_event_photos;
@@ -158,20 +158,20 @@ drop policy if exists "Admins can insert event photos" on public.site_event_phot
 create policy "Admins can insert event photos"
   on public.site_event_photos for insert
   to authenticated
-  with check (exists (select 1 from public.admins where user_id = auth.uid()));
+  with check (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Admins can update event photos" on public.site_event_photos;
 create policy "Admins can update event photos"
   on public.site_event_photos for update
   to authenticated
-  using (exists (select 1 from public.admins where user_id = auth.uid()))
-  with check (exists (select 1 from public.admins where user_id = auth.uid()));
+  using (auth.uid() in (select user_id from public.admins))
+  with check (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Admins can delete event photos" on public.site_event_photos;
 create policy "Admins can delete event photos"
   on public.site_event_photos for delete
   to authenticated
-  using (exists (select 1 from public.admins where user_id = auth.uid()));
+  using (auth.uid() in (select user_id from public.admins));
 
 -- site_gallery_photos
 drop policy if exists "Public can read gallery photos" on public.site_gallery_photos;
@@ -184,20 +184,20 @@ drop policy if exists "Admins can insert gallery photos" on public.site_gallery_
 create policy "Admins can insert gallery photos"
   on public.site_gallery_photos for insert
   to authenticated
-  with check (exists (select 1 from public.admins where user_id = auth.uid()));
+  with check (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Admins can update gallery photos" on public.site_gallery_photos;
 create policy "Admins can update gallery photos"
   on public.site_gallery_photos for update
   to authenticated
-  using (exists (select 1 from public.admins where user_id = auth.uid()))
-  with check (exists (select 1 from public.admins where user_id = auth.uid()));
+  using (auth.uid() in (select user_id from public.admins))
+  with check (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Admins can delete gallery photos" on public.site_gallery_photos;
 create policy "Admins can delete gallery photos"
   on public.site_gallery_photos for delete
   to authenticated
-  using (exists (select 1 from public.admins where user_id = auth.uid()));
+  using (auth.uid() in (select user_id from public.admins));
 
 -- site_media_settings
 drop policy if exists "Public can read site media settings" on public.site_media_settings;
@@ -210,20 +210,20 @@ drop policy if exists "Admins can insert site media settings" on public.site_med
 create policy "Admins can insert site media settings"
   on public.site_media_settings for insert
   to authenticated
-  with check (exists (select 1 from public.admins where user_id = auth.uid()));
+  with check (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Admins can update site media settings" on public.site_media_settings;
 create policy "Admins can update site media settings"
   on public.site_media_settings for update
   to authenticated
-  using (exists (select 1 from public.admins where user_id = auth.uid()))
-  with check (exists (select 1 from public.admins where user_id = auth.uid()));
+  using (auth.uid() in (select user_id from public.admins))
+  with check (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Admins can delete site media settings" on public.site_media_settings;
 create policy "Admins can delete site media settings"
   on public.site_media_settings for delete
   to authenticated
-  using (exists (select 1 from public.admins where user_id = auth.uid()));
+  using (auth.uid() in (select user_id from public.admins));
 
 -- 9. Public Storage Bucket for Uploaded Photos
 insert into storage.buckets (id, name, public)
@@ -242,7 +242,7 @@ create policy "Admins can upload pfs-media files"
   to authenticated
   with check (
     bucket_id = 'pfs-media'
-    and exists (select 1 from public.admins where user_id = auth.uid())
+    and auth.uid() in (select user_id from public.admins)
   );
 
 drop policy if exists "Admins can update pfs-media files" on storage.objects;
@@ -251,11 +251,11 @@ create policy "Admins can update pfs-media files"
   to authenticated
   using (
     bucket_id = 'pfs-media'
-    and exists (select 1 from public.admins where user_id = auth.uid())
+    and auth.uid() in (select user_id from public.admins)
   )
   with check (
     bucket_id = 'pfs-media'
-    and exists (select 1 from public.admins where user_id = auth.uid())
+    and auth.uid() in (select user_id from public.admins)
   );
 
 drop policy if exists "Admins can delete pfs-media files" on storage.objects;
@@ -264,5 +264,5 @@ create policy "Admins can delete pfs-media files"
   to authenticated
   using (
     bucket_id = 'pfs-media'
-    and exists (select 1 from public.admins where user_id = auth.uid())
+    and auth.uid() in (select user_id from public.admins)
   );

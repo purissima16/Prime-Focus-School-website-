@@ -79,7 +79,53 @@
   let blogSearchQuery = "";
   let blogSortOrder = "newest";
   let blogStoreSettled = false;
+  let blogLoadError = null;
   let singlePostFound = false;
+  let singlePostTemplate = null;
+
+  function loadBlogFromSupabase() {
+    if (typeof BlogStore.ready !== "function") {
+      blogStoreSettled = true;
+      return;
+    }
+
+    let updatedDuringReady = false;
+    const markUpdated = () => {
+      updatedDuringReady = true;
+    };
+    window.addEventListener("pfs:blog-updated", markUpdated, { once: true });
+
+    BlogStore.ready()
+      .then(() => {
+        window.removeEventListener("pfs:blog-updated", markUpdated);
+        blogStoreSettled = true;
+        blogLoadError = null;
+        const needsNotFoundCheck =
+          Boolean(document.getElementById("single-post-content")) &&
+          !singlePostFound;
+        if (!updatedDuringReady || needsNotFoundCheck) {
+          renderAllBlogViews();
+        }
+      })
+      .catch(error => {
+        window.removeEventListener("pfs:blog-updated", markUpdated);
+        blogStoreSettled = true;
+        blogLoadError = error;
+        console.error("Could not load blog articles from Supabase:", error);
+        renderAllBlogViews();
+      });
+  }
+
+  function retryBlogLoad() {
+    blogStoreSettled = false;
+    blogLoadError = null;
+    if (singlePostTemplate !== null) {
+      const wrapper = document.getElementById("single-post-content");
+      if (wrapper) wrapper.innerHTML = singlePostTemplate;
+    }
+    renderAllBlogViews();
+    loadBlogFromSupabase();
+  }
 
   function initBlogPage() {
     const blogGrid = document.getElementById("blog-posts-grid");
@@ -234,6 +280,32 @@
         sort: blogSortOrder
       });
 
+      if (!blogStoreSettled && !posts.length) {
+        renderFeaturedCard(null);
+        if (resultsCountEl) resultsCountEl.textContent = "Loading articles...";
+        if (emptyStateEl) emptyStateEl.style.display = "none";
+        blogGrid.innerHTML =
+          '<p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px 12px;">Loading articles...</p>';
+        return;
+      }
+
+      if (blogLoadError && !posts.length) {
+        renderFeaturedCard(null);
+        if (resultsCountEl) {
+          resultsCountEl.textContent = "Unable to load articles";
+        }
+        if (emptyStateEl) emptyStateEl.style.display = "none";
+        blogGrid.innerHTML = `
+          <div class="blog-empty-state" style="grid-column: 1 / -1; display: block;">
+            <h3>Unable to Load Articles</h3>
+            <p>We couldn't connect to load articles right now. Please check your connection and try again.</p>
+            <button type="button" id="blog-retry-btn" class="button button-blue">Try Again</button>
+          </div>`;
+        const retryBtn = document.getElementById("blog-retry-btn");
+        if (retryBtn) retryBtn.addEventListener("click", retryBlogLoad);
+        return;
+      }
+
       let gridPosts = posts;
 
       if (
@@ -324,6 +396,10 @@
     const postWrapper = document.getElementById("single-post-content");
     if (!postWrapper) return;
 
+    if (singlePostTemplate === null) {
+      singlePostTemplate = postWrapper.innerHTML;
+    }
+
     singlePostFound = false;
 
     const params = new URLSearchParams(window.location.search);
@@ -337,9 +413,33 @@
     const post = BlogStore.getPostByIdOrSlug(postParam);
     if (!post) {
       if (blogStoreSettled) {
-        renderNotFound();
+        if (blogLoadError) {
+          renderLoadError();
+        } else {
+          renderNotFound();
+        }
+      } else {
+        const categoryBadge = document.getElementById("post-category-badge");
+        const dateEl = document.getElementById("post-date-display");
+        const readTimeEl = document.getElementById("post-readtime-display");
+        const titleEl = document.getElementById("post-title-display");
+        const authorName = document.getElementById("post-author-name");
+        const authorRole = document.getElementById("post-author-role");
+        const bodyEl = document.getElementById("post-body-content");
+
+        if (categoryBadge) categoryBadge.textContent = "Loading";
+        if (dateEl) dateEl.textContent = "";
+        if (readTimeEl) readTimeEl.textContent = "";
+        if (titleEl) titleEl.textContent = "Loading article...";
+        if (authorName) authorName.textContent = "Prime Focus Schools";
+        if (authorRole) authorRole.textContent = "";
+        if (bodyEl) bodyEl.innerHTML = "<p>Loading article...</p>";
       }
       return;
+    }
+
+    if (!document.getElementById("post-title-display") && singlePostTemplate !== null) {
+      postWrapper.innerHTML = singlePostTemplate;
     }
 
     singlePostFound = true;
@@ -457,6 +557,33 @@
           ← Back to All Articles
         </a>
       </div>`;
+  }
+
+  function renderLoadError() {
+    const wrapper = document.getElementById("single-post-content");
+    if (!wrapper) return;
+
+    wrapper.innerHTML = `
+      <div class="blog-empty-state" style="padding:100px 20px">
+        <div class="blog-empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h3>Unable to Load Article</h3>
+        <p>We couldn't connect to load this article right now. Please try again.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button type="button" id="single-post-retry-btn" class="button button-blue">Try Again</button>
+          <a class="button button-outline" style="border-color: var(--blue); color: var(--blue); background: transparent;" href="blog.html">
+            ← Back to All Articles
+          </a>
+        </div>
+      </div>`;
+
+    const retryBtn = document.getElementById("single-post-retry-btn");
+    if (retryBtn) retryBtn.addEventListener("click", retryBlogLoad);
   }
 
   function setupSocialShare(post) {
@@ -590,6 +717,20 @@
       sort: "newest"
     });
 
+    if (!blogStoreSettled && !posts.length) {
+      container.classList.remove("is-empty");
+      container.innerHTML =
+        '<p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 20px 12px;">Loading latest articles...</p>';
+      return;
+    }
+
+    if (blogLoadError && !posts.length) {
+      container.classList.add("is-empty");
+      container.innerHTML =
+        '<p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 20px 12px;">Unable to load blog articles right now.</p>';
+      return;
+    }
+
     container.classList.toggle("is-empty", !posts.length);
     if (!posts.length) {
       container.innerHTML = "<p>New stories coming soon!</p>";
@@ -645,41 +786,22 @@
     initHomeBlogPreview();
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    // Render cached or default articles immediately before remote refresh.
+  function bootBlog() {
     renderAllBlogViews();
+    loadBlogFromSupabase();
+  }
 
-    if (typeof BlogStore.ready === "function") {
-      let updatedDuringReady = false;
-      const markUpdated = () => {
-        updatedDuringReady = true;
-      };
-      window.addEventListener("pfs:blog-updated", markUpdated, { once: true });
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootBlog);
+  } else {
+    bootBlog();
+  }
 
-      BlogStore.ready()
-        .then(() => {
-          window.removeEventListener("pfs:blog-updated", markUpdated);
-          blogStoreSettled = true;
-          const needsNotFoundCheck =
-            Boolean(document.getElementById("single-post-content")) &&
-            !singlePostFound;
-          if (!updatedDuringReady || needsNotFoundCheck) {
-            renderAllBlogViews();
-          }
-        })
-        .catch(error => {
-          window.removeEventListener("pfs:blog-updated", markUpdated);
-          blogStoreSettled = true;
-          console.warn(
-            "Using cached blog articles because Supabase could not load:",
-            error
-          );
-          renderAllBlogViews();
-        });
-    } else {
+  window.addEventListener("pfs:blog-updated", event => {
+    if (event && event.detail && Array.isArray(event.detail.posts)) {
       blogStoreSettled = true;
+      blogLoadError = null;
     }
+    renderAllBlogViews();
   });
-
-  window.addEventListener("pfs:blog-updated", renderAllBlogViews);
 })();

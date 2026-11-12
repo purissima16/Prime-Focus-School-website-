@@ -163,8 +163,6 @@
   const btnExportJson = $("btn-export-json");
   const btnImportJson = $("btn-import-json");
   const fileImportInput = $("file-import-input");
-  const btnDownloadJs = $("btn-download-js");
-  const btnResetDefaults = $("btn-reset-defaults");
   const btnChangePassword = $("btn-change-password");
 
   function displayAuthError(message) {
@@ -531,7 +529,10 @@
       if (editorTitle) editorTitle.textContent = "Edit Article";
       if (fieldId) fieldId.value = post.id;
       if (fieldTitle) fieldTitle.value = post.title || "";
-      if (fieldSlug) fieldSlug.value = post.slug || "";
+      if (fieldSlug) {
+        fieldSlug.value = post.slug || "";
+        fieldSlug.readOnly = Boolean(post.slug);
+      }
 
       if (fieldCategory) {
         const exists = Array.from(fieldCategory.options)
@@ -571,6 +572,7 @@
       }
     } else {
       if (editorTitle) editorTitle.textContent = "Create New Article";
+      if (fieldSlug) fieldSlug.readOnly = false;
       if (fieldAuthor) fieldAuthor.value = "Prime Focus Schools";
       if (fieldAuthorRole) fieldAuthorRole.value = "Editorial Board";
       if (fieldDate) fieldDate.value = BlogStore.formatDate(new Date());
@@ -637,34 +639,26 @@
       if (!file) return;
 
       if (
-        window.MediaStore &&
-        typeof window.MediaStore.uploadImageWithInfo === "function"
+        !window.MediaStore ||
+        typeof window.MediaStore.uploadImageWithInfo !== "function"
       ) {
-        try {
-          showToast("Uploading cover photo...");
-          const uploaded = await window.MediaStore.uploadImageWithInfo(file, "blog");
-          if (fieldCover) fieldCover.value = uploaded.url;
-          if (coverPreviewImg) coverPreviewImg.src = uploaded.url;
-          showToast(
-            uploaded.usedFallback
-              ? "Image optimized locally. Save the article to keep the change."
-              : "Cover photo uploaded to Supabase Storage! Save the article to keep it."
-          );
-          fieldCoverFile.value = "";
-          return;
-        } catch (err) {
-          console.warn("Falling back to Data URL for blog cover:", err);
-        }
+        showToast("Media upload service is unavailable.", "error");
+        fieldCoverFile.value = "";
+        return;
       }
 
-      const reader = new FileReader();
-      reader.onload = loadEvent => {
-        const dataUrl = loadEvent.target.result;
-        if (fieldCover) fieldCover.value = dataUrl;
-        if (coverPreviewImg) coverPreviewImg.src = dataUrl;
-        showToast("Image loaded. Save the article to keep the change.");
-      };
-      reader.readAsDataURL(file);
+      try {
+        showToast("Uploading cover photo...");
+        const uploaded = await window.MediaStore.uploadImageWithInfo(file, "blog");
+        if (fieldCover) fieldCover.value = uploaded.url;
+        if (coverPreviewImg) coverPreviewImg.src = uploaded.url;
+        showToast("Cover photo uploaded to Supabase Storage! Save the article to keep it.");
+      } catch (err) {
+        console.error("Blog cover upload failed:", err);
+        showToast(err.message || "Could not upload cover photo to Supabase Storage.", "error");
+      } finally {
+        fieldCoverFile.value = "";
+      }
     });
   }
 
@@ -877,34 +871,6 @@
         showToast(error.message || "Could not import articles.", "error");
       } finally {
         fileImportInput.value = "";
-      }
-    });
-  }
-
-  if (btnDownloadJs) {
-    btnDownloadJs.addEventListener("click", () => {
-      downloadFile(
-        BlogStore.generateBlogDataFileCode(),
-        "blog-data.js",
-        "application/javascript"
-      );
-      showToast("Blog data file downloaded.");
-    });
-  }
-
-  if (btnResetDefaults) {
-    btnResetDefaults.addEventListener("click", async () => {
-      if (!confirm(
-        "Replace all current articles with the original sample articles?"
-      )) return;
-
-      try {
-        await BlogStore.resetToDefaults();
-        showToast("Sample articles restored.");
-        loadDashboard();
-      } catch (error) {
-        console.error("Could not reset articles:", error);
-        showToast(error.message || "Could not restore sample articles.", "error");
       }
     });
   }

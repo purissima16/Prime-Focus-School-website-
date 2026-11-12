@@ -15,28 +15,47 @@
   const SUPABASE_URL = "https://hztinvahixhvkfhpccrq.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_Jx9KPHzuBIbJtG9rBr3MZA_iax1izan";
-  const STORAGE_KEY = "pfs_blog_posts_v1";
+  const LEGACY_STORAGE_KEY = "pfs_blog_posts_v1";
 
   let client = null;
-  let postsCache = readLocalPosts();
+  let postsCache = [];
   let readyPromise = null;
   let refreshInFlight = null;
 
-  if (
-    typeof window !== "undefined" &&
-    window.supabase &&
-    typeof window.supabase.createClient === "function"
-  ) {
-    client = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
+  const isCmsPage =
+    typeof document !== "undefined" &&
+    Boolean(document.getElementById("cms-auth-form"));
 
-    client.auth.onAuthStateChange(event => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
-        setTimeout(() => refresh().catch(console.error), 0);
-      }
-    });
+  // Remove any previously cached blog posts from browser storage.
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+    }
+  } catch (error) {
+    // Ignore storage access errors.
+  }
+
+  if (typeof window !== "undefined") {
+    if (window.__pfsSupabaseClient) {
+      client = window.__pfsSupabaseClient;
+    } else if (
+      window.supabase &&
+      typeof window.supabase.createClient === "function"
+    ) {
+      client = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+      window.__pfsSupabaseClient = client;
+    }
+
+    if (client && isCmsPage) {
+      client.auth.onAuthStateChange(event => {
+        if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+          setTimeout(() => refresh().catch(console.error), 0);
+        }
+      });
+    }
   }
 
   function dispatchPostsUpdated() {
@@ -51,38 +70,18 @@
     }
   }
 
-  function readLocalPosts() {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length) return parsed;
-      }
-    } catch (error) {
-      console.warn("Could not read cached blog posts.", error);
-    }
-
-    if (
-      typeof defaultBlogPosts !== "undefined" &&
-      Array.isArray(defaultBlogPosts)
-    ) {
-      return JSON.parse(JSON.stringify(defaultBlogPosts));
-    }
-
-    return [];
+  function setPosts(posts) {
+    postsCache = Array.isArray(posts) ? posts : [];
+    dispatchPostsUpdated();
   }
 
-  function saveLocalPosts(posts) {
-    postsCache = posts;
-
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-    } catch (error) {
-      console.warn("Could not cache blog posts in this browser.", error);
+  function requireClient() {
+    if (!client) {
+      throw new Error(
+        "Supabase is not loaded. Check the Supabase script order in the HTML."
+      );
     }
-
-    dispatchPostsUpdated();
+    return client;
   }
 
   function slugify(text) {
@@ -159,30 +158,9 @@
     };
   }
 
-  async function isAdmin() {
-    if (!client) return false;
-
-    const { data: sessionData, error: sessionError } =
-      await client.auth.getSession();
-
-    if (sessionError || !sessionData.session) return false;
-
-    const { data, error } = await client
-      .from("admins")
-      .select("user_id")
-      .eq("user_id", sessionData.session.user.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Could not check CMS admin access:", error);
-      return false;
-    }
-
-    return Boolean(data);
-  }
-
   async function clearOtherPublishedFeaturedPosts(postId, updatedAt) {
-    const { error } = await client
+    const activeClient = requireClient();
+    const { error } = await activeClient
       .from("posts")
       .update({
         featured: false,
@@ -199,38 +177,16 @@
     if (refreshInFlight) return refreshInFlight;
 
     refreshInFlight = (async () => {
-      if (!client) {
-        throw new Error(
-          "Supabase is not loaded. Check the Supabase script order in the HTML."
-        );
-      }
+      const activeClient = requireClient();
 
-      const { data, error } = await client
+      const { data, error } = await activeClient
         .from("posts")
         .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      let rows = data || [];
-
-      // If the table is empty, an authorized admin copies existing local
-      // articles or the sample articles into Supabase.
-      if (rows.length === 0 && await isAdmin()) {
-        const localPosts = readLocalPosts();
-
-        if (localPosts.length) {
-          const { data: inserted, error: insertError } = await client
-            .from("posts")
-            .insert(localPosts.map(toDatabase))
-            .select("*");
-
-          if (insertError) throw insertError;
-          rows = inserted || [];
-        }
-      }
-
-      saveLocalPosts(rows.map(fromDatabase));
+      setPosts((data || []).map(fromDatabase));
       return postsCache;
     })();
 
@@ -370,23 +326,22 @@
     )];
   }
 
-  async function savePost(postData) {
-    if (!postData || !postData.title) {
-      throw new Error("Article title is required.");
-    }
+  function normalizePostInput(postData, existing, now) {
+    const preservedSlug =
+      existing && existing.slug
+        ? existing.slug
+        : postData.slug
+          ? slugify(postData.slug)
+          : slugify(postData.title) || `post-${Date.now().toString(36)}`;
 
-    const now = new Date().toISOString();
-    const existing = postData.id
-      ? getPostByIdOrSlug(postData.id)
-      : null;
-
-    const post = {
+    return {
       ...(existing || {}),
       ...postData,
       id: existing
         ? existing.id
-        : `pfs-${slugify(postData.title) || "post"}-${Date.now().toString(36)}`,
-      slug: slugify(postData.slug || postData.title),
+        : postData.id ||
+          `pfs-${slugify(postData.title) || "post"}-${Date.now().toString(36)}`,
+      slug: preservedSlug,
       category: (postData.category || "General").trim(),
       author: (postData.author || "Prime Focus Schools").trim(),
       authorRole: (postData.authorRole || "Editorial Board").trim(),
@@ -407,15 +362,29 @@
             .filter(Boolean),
       status: postData.status === "draft" ? "draft" : "published",
       featured: Boolean(postData.featured),
-      createdAt: existing ? existing.createdAt : now,
+      createdAt: existing ? existing.createdAt : postData.createdAt || now,
       updatedAt: now
     };
+  }
+
+  async function savePost(postData) {
+    const activeClient = requireClient();
+    if (!postData || !postData.title) {
+      throw new Error("Article title is required.");
+    }
+
+    const now = new Date().toISOString();
+    const existing = postData.id
+      ? getPostByIdOrSlug(postData.id)
+      : null;
+
+    const post = normalizePostInput(postData, existing, now);
 
     if (post.featured && post.status === "published") {
       await clearOtherPublishedFeaturedPosts(post.id, now);
     }
 
-    const { data, error } = await client
+    const { data, error } = await activeClient
       .from("posts")
       .upsert(toDatabase(post), { onConflict: "id" })
       .select("*")
@@ -438,23 +407,25 @@
       ...postsCache.filter(item => item.id !== saved.id)
     ];
 
-    saveLocalPosts(postsCache);
+    setPosts(postsCache);
     return saved;
   }
 
   async function deletePost(id) {
-    const { error } = await client
+    const activeClient = requireClient();
+    const { error } = await activeClient
       .from("posts")
       .delete()
       .eq("id", id);
 
     if (error) throw error;
 
-    saveLocalPosts(postsCache.filter(post => post.id !== id));
+    setPosts(postsCache.filter(post => post.id !== id));
     return true;
   }
 
   async function toggleStatus(id) {
+    const activeClient = requireClient();
     const post = getPostByIdOrSlug(id);
     if (!post) return null;
 
@@ -466,7 +437,7 @@
       await clearOtherPublishedFeaturedPosts(id, now);
     }
 
-    const { data, error } = await client
+    const { data, error } = await activeClient
       .from("posts")
       .update({
         status: nextStatus,
@@ -480,7 +451,7 @@
 
     const updated = fromDatabase(data);
 
-    saveLocalPosts(
+    setPosts(
       postsCache.map(item => item.id === id ? updated : item)
     );
 
@@ -488,6 +459,7 @@
   }
 
   async function toggleFeatured(id) {
+    const activeClient = requireClient();
     const post = getPostByIdOrSlug(id);
     if (!post) return null;
 
@@ -498,7 +470,7 @@
       await clearOtherPublishedFeaturedPosts(id, now);
     }
 
-    const { data, error } = await client
+    const { data, error } = await activeClient
       .from("posts")
       .update({
         featured: willBeFeatured,
@@ -512,7 +484,7 @@
 
     const updated = fromDatabase(data);
 
-    saveLocalPosts(
+    setPosts(
       postsCache.map(item => ({
         ...item,
         featured: willBeFeatured
@@ -526,27 +498,9 @@
     return updated;
   }
 
-  async function replaceAllPosts(posts) {
-    const { error: deleteError } = await client
-      .from("posts")
-      .delete()
-      .neq("id", "");
-
-    if (deleteError) throw deleteError;
-
-    if (!posts.length) {
-      saveLocalPosts([]);
-      return;
-    }
-
-    const { data, error } = await client
-      .from("posts")
-      .insert(posts.map(toDatabase))
-      .select("*");
-
-    if (error) throw error;
-
-    saveLocalPosts((data || []).map(fromDatabase));
+  // Automatically load published articles from Supabase on public pages.
+  if (!isCmsPage && client) {
+    ready().catch(() => {});
   }
 
   const BlogStore = {
@@ -579,22 +533,12 @@
     toggleStatus,
     toggleFeatured,
 
-    async resetToDefaults() {
-      const defaults =
-        typeof defaultBlogPosts !== "undefined" &&
-        Array.isArray(defaultBlogPosts)
-          ? JSON.parse(JSON.stringify(defaultBlogPosts))
-          : [];
-
-      await replaceAllPosts(defaults);
-      return postsCache;
-    },
-
     exportJSON() {
       return JSON.stringify(postsCache, null, 2);
     },
 
     async importJSON(data) {
+      const activeClient = requireClient();
       const parsed =
         typeof data === "string" ? JSON.parse(data) : data;
 
@@ -608,14 +552,20 @@
         throw new Error("No valid blog posts found in the imported file.");
       }
 
-      await replaceAllPosts(validPosts);
+      const now = new Date().toISOString();
+      const rows = validPosts.map(item => {
+        const existing = item.id ? getPostByIdOrSlug(item.id) : null;
+        return toDatabase(normalizePostInput(item, existing, now));
+      });
+
+      const { error } = await activeClient
+        .from("posts")
+        .upsert(rows, { onConflict: "id" });
+
+      if (error) throw error;
+
+      await refresh();
       return postsCache;
-    },
-
-    generateBlogDataFileCode() {
-      const json = JSON.stringify(postsCache, null, 2);
-
-      return `/**\n * Prime Focus Schools - Blog Posts Dataset\n * Exported from PFS CMS\n */\n\nconst defaultBlogPosts = ${json};\n`;
     },
 
     slugify,

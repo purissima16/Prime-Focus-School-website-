@@ -18,7 +18,6 @@
   <link rel="stylesheet" href="css/blog.css">
   <link rel="stylesheet" href="css/cms.css">
 
-  <script src="js/blog-data.js" defer></script>
   <script src="js/media-data.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="js/blog-store.js" defer></script>
@@ -645,18 +644,12 @@
     </section>
 
     <section class="cms-toolbox-card">
-      <h3>CMS Backup &amp; Deployment Tools</h3>
+      <h3>CMS Backup &amp; Account Tools</h3>
       <p>
-        Export JSON backups, import articles, or download the updated
-        <code>blog-data.js</code> file for a static backup.
+        Export JSON backups, import articles directly into Supabase, or update the CMS passcode.
       </p>
 
       <div class="cms-toolbox-btns">
-        <button type="button" id="btn-download-js"
-          class="cms-btn cms-btn-secondary">
-          Download updated <code>blog-data.js</code>
-        </button>
-
         <button type="button" id="btn-export-json"
           class="cms-btn cms-btn-secondary">
           Export JSON Backup
@@ -673,11 +666,6 @@
         <button type="button" id="btn-change-password"
           class="cms-btn cms-btn-secondary">
           Change Passcode
-        </button>
-
-        <button type="button" id="btn-reset-defaults"
-          class="cms-btn cms-btn-danger" style="margin-left:auto">
-          Reset to Sample Articles
         </button>
       </div>
     </section>

@@ -23,7 +23,6 @@ PORT = 8000
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 POSTS_FILE = os.path.join(DATA_DIR, "posts.json")
-JS_DATA_FILE = os.path.join(BASE_DIR, "js", "blog-data.js")
 POSTS_LOCK = threading.RLock()
 
 MEDIA_CACHE_EXTENSIONS = frozenset({
@@ -54,21 +53,6 @@ def write_posts(posts):
         try:
             with open(POSTS_FILE, "w", encoding="utf-8") as f:
                 json.dump(posts, f, indent=2, ensure_ascii=False)
-
-            # Also sync js/blog-data.js for static fallback
-            js_code = (
-                "/**\n"
-                " * Prime Focus Schools - Blog Posts Dataset\n"
-                f" * Synchronized via local CMS server on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-                " * Glorify God Always | Ipaja, Lagos\n"
-                " */\n\n"
-                f"const defaultBlogPosts = {json.dumps(posts, indent=2, ensure_ascii=False)};\n\n"
-                "if (typeof module !== 'undefined' && module.exports) {\n"
-                "  module.exports = { defaultBlogPosts };\n"
-                "}\n"
-            )
-            with open(JS_DATA_FILE, "w", encoding="utf-8") as f:
-                f.write(js_code)
             return True
         except Exception as e:
             print(f"[ERROR] Failed writing posts: {e}")

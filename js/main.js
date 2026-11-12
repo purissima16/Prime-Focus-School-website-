@@ -85,55 +85,45 @@ function getFullZoomSrc(el, img) {
   return sanitizeImageUrl(full);
 }
 
+let mediaStoreSettled = false;
+let mediaLoadError = null;
+
 function getMediaFacilities(options = {}) {
   if (window.MediaStore && typeof window.MediaStore.getFacilities === "function") {
     return window.MediaStore.getFacilities(options);
   }
-  const fallback =
-    typeof defaultSiteMedia !== "undefined" && Array.isArray(defaultSiteMedia.facilities)
-      ? [...defaultSiteMedia.facilities]
-      : [];
-  if (options.homeOnly) {
-    const home = fallback.filter(f => f.showOnHome);
-    return options.limit ? (home.length ? home : fallback).slice(0, options.limit) : home.length ? home : fallback;
-  }
-  return typeof options.limit === "number" ? fallback.slice(0, options.limit) : fallback;
+  return [];
 }
 
 function getMediaEvents(options = {}) {
   if (window.MediaStore && typeof window.MediaStore.getEvents === "function") {
     return window.MediaStore.getEvents(options);
   }
-  const fallback =
-    typeof defaultSiteMedia !== "undefined" && Array.isArray(defaultSiteMedia.events)
-      ? [...defaultSiteMedia.events]
-      : [];
-  return typeof options.limit === "number" ? fallback.slice(0, options.limit) : fallback;
+  return [];
 }
 
 function getMediaGalleryPhotos(options = {}) {
   if (window.MediaStore && typeof window.MediaStore.getGalleryPhotos === "function") {
     return window.MediaStore.getGalleryPhotos(options);
   }
-  const fallback =
-    typeof defaultSiteMedia !== "undefined" && Array.isArray(defaultSiteMedia.galleryPhotos)
-      ? [...defaultSiteMedia.galleryPhotos]
-      : [];
-  return typeof options.limit === "number" ? fallback.slice(0, options.limit) : fallback;
+  return [];
 }
 
 function getMediaSetting(key) {
   if (window.MediaStore && typeof window.MediaStore.getSetting === "function") {
     return window.MediaStore.getSetting(key);
   }
-  if (
-    typeof defaultSiteMedia !== "undefined" &&
-    defaultSiteMedia.settings &&
-    defaultSiteMedia.settings[key]
-  ) {
-    return defaultSiteMedia.settings[key];
-  }
   return null;
+}
+
+function renderMediaPlaceholder(target, { loadingText, errorText, emptyText, padding = "30px 12px" }) {
+  const isLoading = !mediaStoreSettled;
+  const text = isLoading ? loadingText : mediaLoadError ? errorText : emptyText;
+  target.classList.toggle("is-empty", !isLoading);
+  target.innerHTML = `
+    <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: ${padding};">
+      ${escapeHtml(text)}
+    </p>`;
 }
 
 /* ==========================================================================
@@ -416,15 +406,16 @@ function renderFacilities(targetId, limit, homeOnly = false) {
   if (!target) return;
 
   const items = getMediaFacilities({ limit, homeOnly });
-  target.classList.toggle("is-empty", !items.length);
   if (!items.length) {
-    target.innerHTML = `
-      <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 30px 12px;">
-        No facilities have been published yet.
-      </p>`;
+    renderMediaPlaceholder(target, {
+      loadingText: "Loading facilities...",
+      errorText: "Unable to load facilities right now.",
+      emptyText: "No facilities have been published yet."
+    });
     return;
   }
 
+  target.classList.remove("is-empty");
   target.innerHTML = items.map((f, i) => createFacilityCard(f, i)).join("");
   bindAllZoomableImages();
 }
@@ -434,15 +425,16 @@ function renderEvents(targetId, limit) {
   if (!target) return;
 
   const items = getMediaEvents({ limit });
-  target.classList.toggle("is-empty", !items.length);
   if (!items.length) {
-    target.innerHTML = `
-      <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 30px 12px;">
-        No past events have been published yet.
-      </p>`;
+    renderMediaPlaceholder(target, {
+      loadingText: "Loading events...",
+      errorText: "Unable to load events right now.",
+      emptyText: "No past events have been published yet."
+    });
     return;
   }
 
+  target.classList.remove("is-empty");
   target.innerHTML = items.map((event, index) => createEventCard(event, index)).join("");
   bindAllZoomableImages();
 }
@@ -452,15 +444,16 @@ function renderEventAlbums() {
   if (!target) return;
 
   const events = getMediaEvents();
-  target.classList.toggle("is-empty", !events.length);
   if (!events.length) {
-    target.innerHTML = `
-      <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 30px 12px;">
-        No past events have been added yet.
-      </p>`;
+    renderMediaPlaceholder(target, {
+      loadingText: "Loading past events...",
+      errorText: "Unable to load past events right now.",
+      emptyText: "No past events have been added yet."
+    });
     return;
   }
 
+  target.classList.remove("is-empty");
   target.innerHTML = events.map((event, index) => createEventCard(event, index)).join("");
   bindAllZoomableImages();
 }
@@ -476,6 +469,15 @@ function renderCampusGallery() {
   const allPhotos = getMediaGalleryPhotos();
 
   if (!allPhotos.length) {
+    if (!mediaStoreSettled) {
+      if (section) section.style.display = "";
+      renderMediaPlaceholder(grid, {
+        loadingText: "Loading gallery photos...",
+        errorText: "Unable to load gallery photos right now.",
+        emptyText: ""
+      });
+      return;
+    }
     if (section) section.style.display = "none";
     grid.classList.add("is-empty");
     grid.innerHTML = "";
@@ -574,11 +576,12 @@ function renderSingleEventPage() {
 
   const events = getMediaEvents();
   if (!events.length) {
-    target.classList.add("is-empty");
-    target.innerHTML = `
-      <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px 12px;">
-        No event photographs found.
-      </p>`;
+    renderMediaPlaceholder(target, {
+      loadingText: "Loading event photographs...",
+      errorText: "Unable to load event photographs right now.",
+      emptyText: "No event photographs found.",
+      padding: "40px 12px"
+    });
     return;
   }
 
@@ -1002,6 +1005,8 @@ document.addEventListener("DOMContentLoaded", () => {
   bindAllZoomableImages();
 
   window.addEventListener("pfs:media-updated", () => {
+    mediaStoreSettled = true;
+    mediaLoadError = null;
     renderAllMediaSections();
     bindAllZoomableImages();
   });
@@ -1009,12 +1014,21 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.MediaStore && typeof window.MediaStore.ready === "function") {
     window.MediaStore.ready()
       .then(() => {
+        mediaStoreSettled = true;
+        mediaLoadError = null;
         renderAllMediaSections();
         bindAllZoomableImages();
       })
       .catch(error => {
-        console.warn("Could not refresh media from Supabase:", error);
+        mediaStoreSettled = true;
+        mediaLoadError = error;
+        console.warn("Could not load media from Supabase:", error);
+        renderAllMediaSections();
+        bindAllZoomableImages();
       });
+  } else {
+    mediaStoreSettled = true;
+    renderAllMediaSections();
   }
 
   // Mobile Navigation
@@ -1055,19 +1069,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (contactForm) {
     const contactSupabase =
-      window.MediaStore && typeof window.MediaStore.getClient === "function" && window.MediaStore.getClient()
-        ? window.MediaStore.getClient()
-        : window.supabase.createClient(
+      (window.MediaStore && typeof window.MediaStore.getClient === "function" && window.MediaStore.getClient()) ||
+      (window.BlogStore && typeof window.BlogStore.getClient === "function" && window.BlogStore.getClient()) ||
+      window.__pfsSupabaseClient ||
+      (window.supabase && typeof window.supabase.createClient === "function"
+        ? (window.__pfsSupabaseClient = window.supabase.createClient(
             "https://hztinvahixhvkfhpccrq.supabase.co",
-            "sb_publishable_Jx9KPHzuBIbJtG9rBr3MZA_iax1izan",
-            {
-              auth: {
-                persistSession: false,
-                autoRefreshToken: false,
-                detectSessionInUrl: false
-              }
-            }
-          );
+            "sb_publishable_Jx9KPHzuBIbJtG9rBr3MZA_iax1izan"
+          ))
+        : null);
 
     contactForm.addEventListener("submit", async event => {
       event.preventDefault();

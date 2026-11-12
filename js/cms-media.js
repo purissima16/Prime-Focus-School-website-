@@ -107,47 +107,47 @@ alter table public.site_media_settings enable row level security;
 drop policy if exists "Public can read facilities" on public.site_facilities;
 create policy "Public can read facilities" on public.site_facilities for select to anon, authenticated using (true);
 drop policy if exists "Admins can insert facilities" on public.site_facilities;
-create policy "Admins can insert facilities" on public.site_facilities for insert to authenticated with check (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can insert facilities" on public.site_facilities for insert to authenticated with check (auth.uid() in (select user_id from public.admins));
 drop policy if exists "Admins can update facilities" on public.site_facilities;
-create policy "Admins can update facilities" on public.site_facilities for update to authenticated using (exists (select 1 from public.admins where user_id = auth.uid())) with check (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can update facilities" on public.site_facilities for update to authenticated using (auth.uid() in (select user_id from public.admins)) with check (auth.uid() in (select user_id from public.admins));
 drop policy if exists "Admins can delete facilities" on public.site_facilities;
-create policy "Admins can delete facilities" on public.site_facilities for delete to authenticated using (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can delete facilities" on public.site_facilities for delete to authenticated using (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Public can read events" on public.site_events;
 create policy "Public can read events" on public.site_events for select to anon, authenticated using (true);
 drop policy if exists "Admins can insert events" on public.site_events;
-create policy "Admins can insert events" on public.site_events for insert to authenticated with check (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can insert events" on public.site_events for insert to authenticated with check (auth.uid() in (select user_id from public.admins));
 drop policy if exists "Admins can update events" on public.site_events;
-create policy "Admins can update events" on public.site_events for update to authenticated using (exists (select 1 from public.admins where user_id = auth.uid())) with check (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can update events" on public.site_events for update to authenticated using (auth.uid() in (select user_id from public.admins)) with check (auth.uid() in (select user_id from public.admins));
 drop policy if exists "Admins can delete events" on public.site_events;
-create policy "Admins can delete events" on public.site_events for delete to authenticated using (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can delete events" on public.site_events for delete to authenticated using (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Public can read event photos" on public.site_event_photos;
 create policy "Public can read event photos" on public.site_event_photos for select to anon, authenticated using (true);
 drop policy if exists "Admins can insert event photos" on public.site_event_photos;
-create policy "Admins can insert event photos" on public.site_event_photos for insert to authenticated with check (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can insert event photos" on public.site_event_photos for insert to authenticated with check (auth.uid() in (select user_id from public.admins));
 drop policy if exists "Admins can update event photos" on public.site_event_photos;
-create policy "Admins can update event photos" on public.site_event_photos for update to authenticated using (exists (select 1 from public.admins where user_id = auth.uid())) with check (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can update event photos" on public.site_event_photos for update to authenticated using (auth.uid() in (select user_id from public.admins)) with check (auth.uid() in (select user_id from public.admins));
 drop policy if exists "Admins can delete event photos" on public.site_event_photos;
-create policy "Admins can delete event photos" on public.site_event_photos for delete to authenticated using (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can delete event photos" on public.site_event_photos for delete to authenticated using (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Public can read gallery photos" on public.site_gallery_photos;
 create policy "Public can read gallery photos" on public.site_gallery_photos for select to anon, authenticated using (true);
 drop policy if exists "Admins can insert gallery photos" on public.site_gallery_photos;
-create policy "Admins can insert gallery photos" on public.site_gallery_photos for insert to authenticated with check (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can insert gallery photos" on public.site_gallery_photos for insert to authenticated with check (auth.uid() in (select user_id from public.admins));
 drop policy if exists "Admins can update gallery photos" on public.site_gallery_photos;
-create policy "Admins can update gallery photos" on public.site_gallery_photos for update to authenticated using (exists (select 1 from public.admins where user_id = auth.uid())) with check (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can update gallery photos" on public.site_gallery_photos for update to authenticated using (auth.uid() in (select user_id from public.admins)) with check (auth.uid() in (select user_id from public.admins));
 drop policy if exists "Admins can delete gallery photos" on public.site_gallery_photos;
-create policy "Admins can delete gallery photos" on public.site_gallery_photos for delete to authenticated using (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can delete gallery photos" on public.site_gallery_photos for delete to authenticated using (auth.uid() in (select user_id from public.admins));
 
 drop policy if exists "Public can read site media settings" on public.site_media_settings;
 create policy "Public can read site media settings" on public.site_media_settings for select to anon, authenticated using (true);
 drop policy if exists "Admins can insert site media settings" on public.site_media_settings;
-create policy "Admins can insert site media settings" on public.site_media_settings for insert to authenticated with check (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can insert site media settings" on public.site_media_settings for insert to authenticated with check (auth.uid() in (select user_id from public.admins));
 drop policy if exists "Admins can update site media settings" on public.site_media_settings;
-create policy "Admins can update site media settings" on public.site_media_settings for update to authenticated using (exists (select 1 from public.admins where user_id = auth.uid())) with check (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can update site media settings" on public.site_media_settings for update to authenticated using (auth.uid() in (select user_id from public.admins)) with check (auth.uid() in (select user_id from public.admins));
 drop policy if exists "Admins can delete site media settings" on public.site_media_settings;
-create policy "Admins can delete site media settings" on public.site_media_settings for delete to authenticated using (exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can delete site media settings" on public.site_media_settings for delete to authenticated using (auth.uid() in (select user_id from public.admins));
 
 insert into storage.buckets (id, name, public)
 values ('pfs-media', 'pfs-media', true)
@@ -156,11 +156,11 @@ on conflict (id) do update set public = true;
 drop policy if exists "Public can view pfs-media files" on storage.objects;
 create policy "Public can view pfs-media files" on storage.objects for select to public using (bucket_id = 'pfs-media');
 drop policy if exists "Admins can upload pfs-media files" on storage.objects;
-create policy "Admins can upload pfs-media files" on storage.objects for insert to authenticated with check (bucket_id = 'pfs-media' and exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can upload pfs-media files" on storage.objects for insert to authenticated with check (bucket_id = 'pfs-media' and auth.uid() in (select user_id from public.admins));
 drop policy if exists "Admins can update pfs-media files" on storage.objects;
-create policy "Admins can update pfs-media files" on storage.objects for update to authenticated using (bucket_id = 'pfs-media' and exists (select 1 from public.admins where user_id = auth.uid())) with check (bucket_id = 'pfs-media' and exists (select 1 from public.admins where user_id = auth.uid()));
+create policy "Admins can update pfs-media files" on storage.objects for update to authenticated using (bucket_id = 'pfs-media' and auth.uid() in (select user_id from public.admins)) with check (bucket_id = 'pfs-media' and auth.uid() in (select user_id from public.admins));
 drop policy if exists "Admins can delete pfs-media files" on storage.objects;
-create policy "Admins can delete pfs-media files" on storage.objects for delete to authenticated using (bucket_id = 'pfs-media' and exists (select 1 from public.admins where user_id = auth.uid()));`;
+create policy "Admins can delete pfs-media files" on storage.objects for delete to authenticated using (bucket_id = 'pfs-media' and auth.uid() in (select user_id from public.admins));`;
 
   function svgIcon(name, size = 15) {
     if (window.PfsCmsIcons && typeof window.PfsCmsIcons.svgIcon === "function") {
@@ -520,7 +520,6 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
 
     try {
       const uploadedItems = [];
-      let usedFallbackCount = 0;
 
       for (let i = 0; i < files.length; i++) {
         if (progress) {
@@ -531,7 +530,6 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
           files[i],
           `events/${selectedEventId}`
         );
-        if (res.usedFallback) usedFallbackCount++;
         uploadedItems.push({ image: res.url, caption: sharedCaption });
       }
 
@@ -542,11 +540,7 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
       await MediaStore.addEventPhotos(selectedEventId, uploadedItems);
       if (captionInput) captionInput.value = "";
       renderAllMediaPanels();
-      showToast(
-        usedFallbackCount
-          ? `Added ${uploadedItems.length} photo(s) (saved inline; verify pfs-media bucket for CDN).`
-          : `Uploaded and saved ${uploadedItems.length} photo(s) to event album!`
-      );
+      showToast(`Uploaded and saved ${uploadedItems.length} photo(s) to event album!`);
     } catch (error) {
       console.error("Event photo upload failed:", error);
       showToast(error.message || "Could not upload event photos.", "error");
@@ -925,7 +919,6 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
 
     try {
       const items = [];
-      let usedFallbackCount = 0;
 
       for (let i = 0; i < files.length; i++) {
         if (progress) {
@@ -933,7 +926,6 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
           progress.textContent = `Optimizing & uploading gallery photo ${i + 1} of ${files.length}...`;
         }
         const res = await MediaStore.uploadImageWithInfo(files[i], "gallery");
-        if (res.usedFallback) usedFallbackCount++;
 
         const fileLabel = files[i].name
           .replace(/\.[^.]+$/, "")
@@ -958,11 +950,7 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
       if (titleInput) titleInput.value = "";
       if (captionInput) captionInput.value = "";
       renderAllMediaPanels();
-      showToast(
-        usedFallbackCount
-          ? `Added ${items.length} gallery photo(s) (saved inline).`
-          : `Uploaded ${items.length} photo(s) to Campus Gallery!`
-      );
+      showToast(`Uploaded ${items.length} photo(s) to Campus Gallery!`);
     } catch (error) {
       console.error("Gallery upload failed:", error);
       showToast(error.message || "Could not upload gallery photos.", "error");
@@ -1690,14 +1678,14 @@ create policy "Admins can delete pfs-media files" on storage.objects for delete 
       restoreMediaBtn.addEventListener("click", async () => {
         if (
           !confirm(
-            "Restore all default Facilities, Past Events, Event Photos, and Campus Gallery photos in Supabase?"
+            "Restore default Facilities, Past Events, Event Photos, and Campus Gallery photos in Supabase? (Existing custom items will be kept.)"
           )
         ) {
           return;
         }
         try {
           restoreMediaBtn.disabled = true;
-          await MediaStore.seedDefaultsToSupabase(true);
+          await MediaStore.seedDefaultsToSupabase();
           renderAllMediaPanels();
           showToast("Default school photos restored in Supabase.");
         } catch (error) {

@@ -17,11 +17,24 @@
   const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_Jx9KPHzuBIbJtG9rBr3MZA_iax1izan";
   const STORAGE_BUCKET = "pfs-media";
-  const LOCAL_CACHE_KEY = "pfs_site_media_v1";
+  const LEGACY_CACHE_KEY = "pfs_site_media_v1";
 
   let sharedClient = null;
   let readyPromise = null;
   let refreshInFlight = null;
+
+  const isCmsPage =
+    typeof document !== "undefined" &&
+    Boolean(document.getElementById("cms-auth-form"));
+
+  // Remove any previously cached site media from browser storage.
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.removeItem(LEGACY_CACHE_KEY);
+    }
+  } catch (error) {
+    // Ignore storage access errors.
+  }
 
   const schemaStatus = {
     checked: false,
@@ -31,7 +44,17 @@
     lastError: null
   };
 
-  let mediaCache = readLocalCache();
+  function createEmptyState() {
+    return {
+      facilities: [],
+      events: [],
+      galleryPhotos: [],
+      settings: {},
+      initialized: false
+    };
+  }
+
+  let mediaCache = createEmptyState();
 
   function cloneDefaults() {
     if (
@@ -172,31 +195,8 @@
     };
   }
 
-  function readLocalCache() {
-    try {
-      const raw = localStorage.getItem(LOCAL_CACHE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === "object") {
-          return normalizeState(parsed);
-        }
-      }
-    } catch (error) {
-      console.warn("Could not read cached site media:", error);
-    }
-
-    return normalizeState(cloneDefaults());
-  }
-
-  function saveLocalCache(nextState) {
+  function setMediaState(nextState) {
     mediaCache = normalizeState(nextState);
-
-    try {
-      localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(mediaCache));
-    } catch (error) {
-      console.warn("Could not cache site media in localStorage:", error);
-    }
-
     dispatchMediaUpdated();
   }
 
@@ -215,35 +215,35 @@
   function getClient() {
     if (sharedClient) return sharedClient;
 
-    if (
-      typeof window !== "undefined" &&
-      window.BlogStore &&
-      typeof window.BlogStore.getClient === "function"
-    ) {
-      const blogClient = window.BlogStore.getClient();
-      if (blogClient) {
-        sharedClient = blogClient;
+    if (typeof window !== "undefined") {
+      if (window.__pfsSupabaseClient) {
+        sharedClient = window.__pfsSupabaseClient;
         return sharedClient;
       }
-    }
 
-    if (
-      typeof window !== "undefined" &&
-      window.supabase &&
-      typeof window.supabase.createClient === "function"
-    ) {
-      sharedClient = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY,
-        {
-          auth: {
-            persistSession: false,
-            autoRefreshToken: false,
-            detectSessionInUrl: false
-          }
+      if (
+        window.BlogStore &&
+        typeof window.BlogStore.getClient === "function"
+      ) {
+        const blogClient = window.BlogStore.getClient();
+        if (blogClient) {
+          sharedClient = blogClient;
+          window.__pfsSupabaseClient = blogClient;
+          return sharedClient;
         }
-      );
-      return sharedClient;
+      }
+
+      if (
+        window.supabase &&
+        typeof window.supabase.createClient === "function"
+      ) {
+        sharedClient = window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_PUBLISHABLE_KEY
+        );
+        window.__pfsSupabaseClient = sharedClient;
+        return sharedClient;
+      }
     }
 
     return null;
@@ -271,9 +271,11 @@
     const message = String(error.message || "").toLowerCase();
     return (
       code === "PGRST205" ||
+      code === "PGRST200" ||
       code === "42P01" ||
       error.status === 404 ||
       message.includes("could not find the table") ||
+      message.includes("could not find a relationship") ||
       message.includes("does not exist")
     );
   }
@@ -314,12 +316,16 @@
   }
 
   function mapEventFromDb(row, photoRows) {
-    const items = (photoRows || [])
-      .filter(p => p.event_id === row.id)
+    const rawPhotos = Array.isArray(row.site_event_photos)
+      ? row.site_event_photos
+      : (photoRows || []).filter(p => p.event_id === row.id);
+
+    const items = rawPhotos
+      .slice()
       .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
       .map(p => ({
         id: p.id,
-        eventId: p.event_id,
+        eventId: p.event_id || row.id,
         image: p.image_url,
         caption: p.caption || "",
         sortOrder: typeof p.sort_order === "number" ? p.sort_order : 0,
@@ -354,19 +360,12 @@
     };
   }
 
-  async function seedDefaultsToSupabase(forceOverwrite = false) {
+  async function seedDefaultsToSupabase() {
     const client = getClient();
     if (!client) throw new Error("Supabase client is not available.");
 
     const defaults = normalizeState(cloneDefaults());
     const now = new Date().toISOString();
-
-    if (forceOverwrite) {
-      await client.from("site_event_photos").delete().neq("id", "");
-      await client.from("site_events").delete().neq("id", "");
-      await client.from("site_facilities").delete().neq("id", "");
-      await client.from("site_gallery_photos").delete().neq("id", "");
-    }
 
     if (defaults.facilities.length) {
       const { error } = await client.from("site_facilities").upsert(
@@ -470,7 +469,7 @@
         schemaStatus.checked = true;
         schemaStatus.ready = false;
         schemaStatus.lastError = "Supabase client is not loaded.";
-        return mediaCache;
+        throw new Error("Supabase client is not loaded.");
       }
 
       const requiredTables = [
@@ -481,18 +480,14 @@
         "site_media_settings"
       ];
 
-      const [facRes, evtRes, evtPhotoRes, galRes, setRes] = await Promise.all([
+      const [facRes, evtRes, galRes, setRes] = await Promise.all([
         client
           .from("site_facilities")
           .select("*")
           .order("sort_order", { ascending: true }),
         client
           .from("site_events")
-          .select("*")
-          .order("sort_order", { ascending: true }),
-        client
-          .from("site_event_photos")
-          .select("*")
+          .select("*, site_event_photos(*)")
           .order("sort_order", { ascending: true }),
         client
           .from("site_gallery_photos")
@@ -504,7 +499,6 @@
       const responses = [
         { table: "site_facilities", res: facRes },
         { table: "site_events", res: evtRes },
-        { table: "site_event_photos", res: evtPhotoRes },
         { table: "site_gallery_photos", res: galRes },
         { table: "site_media_settings", res: setRes }
       ];
@@ -520,7 +514,7 @@
         schemaStatus.missingTables = missingTables;
         schemaStatus.lastError =
           `Missing Supabase table(s): ${missingTables.join(", ")}`;
-        dispatchMediaUpdated();
+        setMediaState(cloneDefaults());
         return mediaCache;
       }
 
@@ -539,7 +533,6 @@
 
       const facRows = facRes.data || [];
       const evtRows = evtRes.data || [];
-      const evtPhotoRows = evtPhotoRes.data || [];
       const galRows = galRes.data || [];
       const setRows = setRes.data || [];
 
@@ -567,24 +560,22 @@
       if (!initializedFlag && allEmpty) {
         if (await isAdmin()) {
           refreshInFlight = null;
-          return seedDefaultsToSupabase(false);
+          return seedDefaultsToSupabase();
         }
 
         // Before an admin initializes Supabase, keep displaying default photos
-        // on the public site rather than showing empty sections.
+        // in memory rather than storing data locally or showing empty sections.
         const defaults = cloneDefaults();
-        saveLocalCache({
+        setMediaState({
           ...defaults,
           initialized: false
         });
         return mediaCache;
       }
 
-      const mappedEvents = evtRows.map(row =>
-        mapEventFromDb(row, evtPhotoRows)
-      );
+      const mappedEvents = evtRows.map(row => mapEventFromDb(row));
 
-      saveLocalCache({
+      setMediaState({
         facilities: facRows.map(mapFacilityFromDb),
         events: mappedEvents,
         galleryPhotos: galRows.map(mapGalleryFromDb),
@@ -609,8 +600,8 @@
     if (!readyPromise) {
       readyPromise = refresh().catch(error => {
         readyPromise = null;
-        console.warn("Using fallback site media:", error);
-        return mediaCache;
+        console.warn("Could not load site media from Supabase:", error);
+        throw error;
       });
     }
     return readyPromise;
@@ -630,16 +621,6 @@
         reject(err || new Error("Could not decode selected image."));
       };
       img.src = url;
-    });
-  }
-
-  function blobToDataUrl(blob) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () =>
-        reject(new Error("Could not read compressed image."));
-      reader.readAsDataURL(blob);
     });
   }
 
@@ -714,37 +695,21 @@
         upsert: false
       });
 
-    if (!uploadError) {
-      const { data } = client.storage
-        .from(STORAGE_BUCKET)
-        .getPublicUrl(objectPath);
-      schemaStatus.storageReady = true;
-      return {
-        url: data.publicUrl,
-        usedFallback: false,
-        warning: null
-      };
-    }
-
-    // Fallback to compact data URL if Storage bucket/policy isn't configured yet
-    schemaStatus.storageReady = false;
-    const compact = await optimizeImageFile(file, {
-      maxWidth: 1100,
-      maxHeight: 1100,
-      quality: 0.76
-    });
-
-    if (compact.blob.size > 450 * 1024) {
+    if (uploadError) {
+      schemaStatus.storageReady = false;
       throw new Error(
         `Storage bucket "${STORAGE_BUCKET}" upload failed (${uploadError.message}). Please run supabase-media-setup.sql in Supabase SQL Editor.`
       );
     }
 
-    const dataUrl = await blobToDataUrl(compact.blob);
+    const { data } = client.storage
+      .from(STORAGE_BUCKET)
+      .getPublicUrl(objectPath);
+    schemaStatus.storageReady = true;
     return {
-      url: dataUrl,
-      usedFallback: true,
-      warning: `Storage bucket not ready (${uploadError.message}); saved compact inline image.`
+      url: data.publicUrl,
+      usedFallback: false,
+      warning: null
     };
   }
 
@@ -877,7 +842,7 @@
       mapped
     ].sort((a, b) => a.sortOrder - b.sortOrder);
 
-    saveLocalCache({ ...mediaCache, facilities: updatedList, initialized: true });
+    setMediaState({ ...mediaCache, facilities: updatedList, initialized: true });
     return mapped;
   }
 
@@ -897,7 +862,7 @@
       await cleanupStorageUrlIfUnused(existing.image, id);
     }
 
-    saveLocalCache({
+    setMediaState({
       ...mediaCache,
       facilities: mediaCache.facilities.filter(f => f.id !== id)
     });
@@ -1039,7 +1004,7 @@
         existing.cover,
         ...(existing.photoItems || []).map(p => p.image)
       ];
-      saveLocalCache({
+      setMediaState({
         ...mediaCache,
         events: mediaCache.events.filter(e => e.id !== id)
       });
@@ -1551,6 +1516,10 @@
   }
   if (typeof globalThis !== "undefined") {
     globalThis.PfsMediaThumb = PfsMediaThumb;
+  }
+
+  if (!isCmsPage && getClient()) {
+    ready().catch(() => {});
   }
 
   return {
