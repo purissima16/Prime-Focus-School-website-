@@ -30,9 +30,16 @@ grant select on public.posts to anon, authenticated;
 grant insert, update, delete on public.posts to authenticated;
 
 drop policy if exists "Public can read published posts" on public.posts;
-create policy "Public can read published posts"
+drop policy if exists "Anon can read published posts" on public.posts;
+create policy "Anon can read published posts"
   on public.posts for select
-  to anon, authenticated
+  to anon
+  using (status = 'published');
+
+drop policy if exists "Authenticated can read published or admin posts" on public.posts;
+create policy "Authenticated can read published or admin posts"
+  on public.posts for select
+  to authenticated
   using (
     status = 'published'
     or auth.uid() in (select user_id from public.admins)
